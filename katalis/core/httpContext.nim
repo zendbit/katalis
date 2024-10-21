@@ -198,25 +198,14 @@ proc reply*(
   ## send response
 
   self.response.headers &= httpHeaders
+  if self.response.headers.getValues("content-type").len == 0: ## \
+    ## set default value content-type to text/html
+    ## if not set yet
+    self.response.headers["content-type"] = "text/html"
   self.response.httpCode = httpCode
   self.response.body = body
 
   await self.reply()
-
-
-proc replyHtml*(
-    self: HttpContext,
-    httpCode: HttpCode,
-    body: string,
-    httpHeaders: HttpHeaders = nil
-  ) {.gcsafe async.} =
-  ## send http resp as html
-
-
-  let headers = newHttpHeaders()
-  headers["content-type"] = "text/html"
-
-  await self.reply(httpCode, body, headers & httpHeaders)
 
 
 proc replyJson*(
