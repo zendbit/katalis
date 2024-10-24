@@ -16,40 +16,24 @@
 import
   options,
   tables,
-  json
+  json,
+  times
 
 export
   options,
   tables,
-  json
+  json,
+  times
 
 
 import
   ../core/form
 
 
-type
-  ValidationProperties* = ref object of RootObj ## \
-    ## validation properties
-    
-    isRequired*: Option[bool]
-    minValue*: Option[float]
-    maxValue*: Option[float]
-    minLength*: Option[int]
-    maxLength*: Option[int]
-    isNumber*: Option[bool]
-    regexExpr*: Option[string]
-    isEmail*: Option[bool]
-    isPassword*: Option[bool]
-    errorMsg*: Option[string]
-    successMsg*: Option[string]
-    isDateTime*: Option[bool]
-    minDateTime*: Option[string]
-    maxDateTime*: Option[string]
-    dateTimeFormat*: Option[string]
-    inList*: Option[seq[string]]
-    
+import regex
 
+
+type
   Field* = ref object of RootObj ## \
     ## Field item to validate
 
@@ -70,12 +54,12 @@ type
     ] = ref object of RootObj ## \
     ## validation object type
 
-    validFields*: seq[Field] ## \
-    ## valid field list
-    notValidFields*: seq[Field] ## \
+    fields*: OrderedTable[string, Field] ## \
     ## not valid field list
     toCheck*: T ## \
     ## value to check
+    field: Field ## \
+    ## hold current field to check
 
 
 proc newValidation*[
@@ -85,229 +69,373 @@ proc newValidation*[
   ](toCheck: T): Validation[T] {.gcsafe.} = ## \
   ## new validation
 
-  Validation[T](toCheck: toCheck)
+  Validation[T](
+    toCheck: toCheck,
+    fields: initOrderedTable[string, Field]()
+  )
 
 
-proc isRequired(
+proc setMsg(
     self: Validation,
-    field: Field,
-    properties: ValidationProperties
+    failedMsg: string,
+    okMsg: string
   ) {.gcsafe.} = ## \
+  ## set message
+
+  if self.field.isValid: self.field.msg = okMsg
+  else: self.field.msg = failedMsg
+
+
+proc getValue(self: Validation): string {.gcsafe.} = ## \
+  ## get value from field
+
+  when self.toCheck is Form:
+    result = self.toCheck.data.getOrDefault(self.field.name)
+  
+  when self.toCheck is JsonNode:
+    if not self.toCheck{self.field.name}.isNil:
+      result = $self.toCheck{self.field.name}
+    
+  when self.toCheck is TableRef[string, string]:
+    result = self.toCheck.getOrDefault(self.field.name)
+
+
+proc isRequired*(
+    self: Validation,
+    failedMsg: string = "Field is required",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
   ## check field value empty or not
 
-  if properties.errorMsg.isNone:
-    properties.errorMsg = "Field is required.".some
-
-  if properties.successMsg.isNone:
-    properties.successMsg = "Valid.".some
-
-  if self.toCheck is Form:
-    if self.toCheck.data.getOrDefault(field.name) != "":
-      field.value = self.toCheck.data[field.name]
-      field.isValid = true
-
-    else:
-      field.isValid = false
-
-  if field.isValid:
-    field.msg = properties.successMsg.get
-
-  else:
-    field.msg = properties.errorMsg.get
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
 
 
-proc isEmail(
+  self.field.value = self.getValue
+
+  if self.field.value == "":
+      self.field.isValid = false
+
+  self.setMsg(failedMsg, okMsg)
+  self
+
+
+proc isEmail*(
     self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
+    failedMsg: string = "Email is not valid",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
   ## check field value is email type
 
-  if properties.errorMsg.isNone:
-    properties.errorMsg = "Email is not valid.".some
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
+  
+  self.field.value = self.getValue
+  
+  if not self.field.value.contains("@") or
+    self.field.value.split("@").len != 2:
+    self.field.isValid = false
 
-  if properties.successMsg.isNone:
-    properties.successMsg = "Valid.".some
+  self.setMsg(failedMsg, okMsg)
+  self
+
+
+proc isPassword*(
+    self: Validation,
+    failedMsg: string = "At least 8 characters",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
+  ## check field value is password type
   
-  if self.toCheck is Form:
-    if self.toCheck.data.getOrDefault(field.name).contains("@"):
-      field.value = self.toCheck.data[field.name]
-      field.isValid = true
-    
-    else:
-      field.isValid = false
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
+
+  self.field.value = self.getValue
+
+  if self.field.value.len < 8:
+    self.field.isValid = false
+
+  self.setMsg(failedMsg, okMsg)
+  self
+
+
+proc minLength*(
+    self: Validation,
+    length: int,
+    failedMsg: string = "Min length {length}",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
+  ## check field value minimum length
   
-  if field.isValid:
-    field.msg = properties.successMsg.get
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
+
+  self.field.value = self.getValue
+
+  if self.field.value.len < length:
+    self.field.isValid = false
+
+  self.setMsg(failedMsg.replace("{length}", $length), okMsg)
+  self
+
+
+proc maxLength*(
+    self: Validation,
+    length: int,
+    failedMsg: string = "Max length {length}",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
+  ## check field value maximum length
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
+  
+  self.field.value = self.getValue
+
+  if self.field.value.len > length:
+    self.field.isValid = false
+
+  self.setMsg(failedMsg.replace("{length}", $length), okMsg)
+  self
+
+
+proc isNumber*(
+    self: Validation,
+    failedMsg: string = "Not number",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
+  ## check field value is number type
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
+  
+  self.field.value = self.getValue
+
+  try:
+    discard self.field.value.parseFloat
+
+  except:
+    self.field.isValid = false
+
+  self.setMsg(failedMsg, okMsg)
+  self
+
+
+proc minValue*[T: int | float](
+    self: Validation,
+    value: T,
+    failedMsg: string = "Min value {value}",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
+  ## check field minimum value
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
+
+  self.field.value = self.getValue
+  when value is float:
+    var parsedValue: float = 0
 
   else:
-    field.msg = properties.errorMsg.get
+    var parsedValue: int = 0
+
+  try:
+    when value is float:
+      parsedValue = self.field.value.parseFloat
+
+    else:
+      parsedValue = self.field.value.parseInt
+
+    if parsedValue < value:
+      self.field.isValid = false
+
+  except:
+    self.field.isValid = false
+
+  self.setMsg(failedMsg.replace("{value}", $value), okMsg)
+  self
 
 
-proc isPassword(
+proc maxValue*[T: int | float](
     self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
-  ## check field value is password type
-
-  discard
-
-
-proc minLength(
-    self: Validation,
-    field: Field,
-    properties: ValidationProperties
-
-  ) {.gcsafe.} = ## \
-  ## check field value minimum length
-
-  discard
-
-
-proc maxLength(
-    self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
-  ## check field value maximum length
-
-  discard
-
-
-proc isNumber(
-    self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
-  ## check field value is number type
-
-  discard
-
-
-proc minValue(
-    self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
-  ## check field minimum value
-
-  discard
-
-
-proc maxValue(
-    self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
+    value: T,
+    failedMsg: string = "Max value {value}",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
   ## check field maximum value
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
 
-  discard
+  self.field.value = self.getValue
+  when value is float:
+    var parsedValue: float = 0
+
+  else:
+    var parsedValue: int = 0
+
+  try:
+    when value is float:
+      parsedValue = self.field.value.parseFloat
+
+    else:
+      parsedValue = self.field.value.parseInt
+
+    if parsedValue > value:
+      self.field.isValid = false
+
+  except:
+    self.field.isValid = false
+
+  self.setMsg(failedMsg.replace("{value}", $value), okMsg)
+  self
 
 
-proc isDateTime(
+proc isDateTime*(
     self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
+    dateTimeFormat: string = "yyyy-MM-dd HH:mm:ss",
+    tz: Timezone = local(),
+    failedMsg: string = "Not date, datetime or time",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
   ## check field value is datetime type
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
 
-  discard
+  self.field.value = self.getValue
+  try:
+    discard times.parse(self.field.value, dateTimeFormat, tz)
+
+  except:
+    self.field.isValid = false
+
+  self.setMsg(failedMsg, okMsg)
+  self
 
 
-proc minDateTime(
+proc minDateTime*(
     self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
+    dateTime: DateTime,
+    dateTimeFormat: string = "yyyy-MM-dd HH:mm:ss",
+    tz: Timezone = local(),
+    failedMsg: string = "Min value {datetime}",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
   ## check field value minimum datetime
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
 
-  discard
+  self.field.value = self.getValue
+  var parsedValue: DateTime
+  try:
+    parsedValue = times.parse(self.field.value, dateTimeFormat, tz)
+    if parsedValue < dateTime:
+      self.field.isValid = false
+
+  except:
+    self.field.isValid = false
+
+  self.setMsg(
+    failedMsg.replace(
+      "{datetime}", dateTime.format(dateTimeFormat, tz)
+    ),
+    okMsg
+  )
+  self
 
 
-proc maxDateTime(
+proc maxDateTime*(
     self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
+    dateTime: DateTime,
+    dateTimeFormat: string = "yyyy-MM-dd HH:mm:ss",
+    tz: Timezone = local(),
+    failedMsg: string = "Max value {datetime}",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
   ## check field value maximum datetime
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
 
-  discard
+  self.field.value = self.getValue
+  var parsedValue: DateTime
+  try:
+    parsedValue = times.parse(self.field.value, dateTimeFormat, tz)
+    if parsedValue > dateTime:
+      self.field.isValid = false
+
+  except:
+    self.field.isValid = false
+
+  self.setMsg(
+    failedMsg.replace(
+      "{datetime}", dateTime.format(dateTimeFormat, tz)
+    ),
+    okMsg
+  )
+  self
 
 
-proc inList(
+proc inList*(
     self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
+    values: seq[string],
+    failedMsg: string = "Not in list",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
   ## check field value is in list of values
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
 
-  discard
+  self.field.value = self.getValue
+  self.field.isValid = self.field.value in values
+
+  self.setMsg(failedMsg, okMsg)
+  self
 
 
-proc regexExpr(
+proc matchWith*(
     self: Validation,
-    field: Field,
-    properties: ValidationProperties
-  ) {.gcsafe.} = ## \
+    regexExpr: string,
+    failedMsg: string = "Not match with {regexExpr}",
+    okMsg: string = "Ok"
+  ): Validation {.gcsafe discardable.} = ## \
   ## check field value is in list of values
+  
+  ## if not valid from previous validation
+  ## don't validate just return
+  if not self.field.isValid: return
 
-  discard
+  self.field.value = self.getValue
+  self.field.isValid = self.field.value.match(re2 regexExpr)
+
+  self.setMsg(failedMsg.replace("{regexExpr}", regexExpr), okMsg)
+  self
 
 
 proc withField*(
     self: Validation,
-    name: string,
-    isRequired: Option[bool] = bool.none,
-    minValue: Option[float] = float.none,
-    maxValue: Option[float] = float.none,
-    minLength: Option[int] = int.none,
-    maxLength: Option[int] = int.none,
-    isNumber: Option[bool] = bool.none,
-    regexExpr: Option[string] = string.none,
-    isEmail: Option[bool] = bool.none,
-    isPassword: Option[bool] = bool.none,
-    errorMsg: Option[string] = string.none,
-    successMsg: Option[string] = string.none,
-    isDateTime: Option[bool] = bool.none,
-    minDateTime: Option[string] = string.none,
-    maxDateTime: Option[string] = string.none,
-    dateTimeFormat: Option[string] = "yyyy-MM-dd HH:mm:ss".some,
-    inList: Option[seq[string]] = seq[string].none
-  ) {.gcsafe.} = ## \
-  ## define field to check
-  ## name of the field to check is required
+    name: string
+  ): Validation {.gcsafe.} = ## \
+  ## add field to validate
 
-  let field = Field(name: name)
-  let properties = ValidationProperties(
-      isRequired: isRequired,
-      minValue: minValue,
-      maxValue: maxValue,
-      minLength: minLength,
-      maxLength: maxLength,
-      isNumber: isNumber,
-      regexExpr: regexExpr,
-      isEmail: isEmail,
-      isPassword: isPassword,
-      errorMsg: errorMsg,
-      successMsg: successMsg,
-      isDateTime: isDateTime,
-      minDateTime: minDateTime,
-      maxDateTime: maxDateTime,
-      dateTimeFormat: dateTimeFormat,
-      inList: inList
-    )
-
-  if isRequired.isSome: self.isRequired(field, properties)
-  if isEmail.isSome: self.isEmail(field, properties)
-  if isPassword.isSome: self.isPassword(field, properties)
-  if minLength.isSome: self.minLength(field, properties)
-  if maxLength.isSome: self.maxLength(field, properties)
-  if isNumber.isSome: self.isNumber(field, properties)
-  if minValue.isSome: self.minValue(field, properties)
-  if maxValue.isSome: self.maxValue(field, properties)
-  if isDateTime.isSome: self.isDateTime(field, properties)
-  if minDateTime.isSome: self.minDateTime(field, properties)
-  if maxDateTime.isSome: self.maxDateTime(field, properties)
-  if inList.isSome: self.inList(field, properties)
+  self.fields[name] = Field(name: name, isValid: true) ## \
+  ## create new field then add field to fields table
+  self.field = self.fields[name] ## \
+  ## set current field pointer to field with last added
+  self
 
