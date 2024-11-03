@@ -31,7 +31,7 @@ type
 
     context*: Context ## \
     ## moustache context
-    templatesDir: Path ## \
+    templatesDir*: Path ## \
     ## path to templatesDir
 
 
