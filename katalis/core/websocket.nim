@@ -325,3 +325,14 @@ proc reply*(
 
   self.outFrame = frame
   await self.client.send(self.outFrame.toString)
+
+
+proc reply*(
+    self: WebSocket,
+    msg: string,
+    fin: uint8 = 0x1,
+    opCode: uint8 = WsOpCode.TextFrame.uint8
+  ) {.gcsafe async.} = ## \
+  ## send websocket payload default is text frame
+
+  await self.reply(newWsFrame(msg, fin, opCode))
