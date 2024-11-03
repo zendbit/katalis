@@ -7,7 +7,7 @@ nimble install katalis
 ```
 
 ## Running simple app
-After installing katalis, you can simple create your first app by import *katalisApp*
+After installing katalis, you can simply create your first app by import *katalisApp*
 ```nim
 import katalis/katalisApp
 ```
