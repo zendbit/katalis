@@ -42,7 +42,7 @@ Katalis will run on port 8000 as default port
 Listening non secure (plain) on http://0.0.0.0:8000
 ```
 
-Lets open browser and open [http://localhost:8000](http://localhost:8000)
+Lets open with the browser [http://localhost:8000](http://localhost:8000)
 
 ![Alt http://localhost:8000](https://github.com/zendbit/katalis-readme-assets/blob/981946bf0fee5acaa341edc04ed3e26f82263e5c/Screenshot%20From%202024-11-03%2021-38-44.png)
 ## Katalis structure
