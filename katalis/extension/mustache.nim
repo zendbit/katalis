@@ -8,7 +8,7 @@
 ##
 
 ##
-## View template system, using mustache template engine
+## Mustache template system, using mustache template engine
 ## logicless template engine
 ## https://github.com/zendbit/moustachu
 ##
@@ -26,7 +26,7 @@ export moustachu
 
 
 type
-  View* = ref object of RootObj ## \
+  Mustache* = ref object of RootObj ## \
     ## view object
 
     context*: Context ## \
@@ -35,15 +35,15 @@ type
     ## path to templatesDir
 
 
-proc newView*(templatesDir: string = $(getCurrentDir() / Path("templates"))): View = ## \
+proc newMustache*(templatesDir: string = $(getCurrentDir() / Path("templates"))): Mustache = ## \
   ## create new view with partials dir for optional param
   ## default partialsDir is in templates dir
 
-  View(context: newContext(), templatesDir: Path(templatesDir))
+  Mustache(context: newContext(), templatesDir: Path(templatesDir))
 
 
 proc render*(
-    self: View,
+    self: Mustache,
     templates: string
   ): string = ## \
   ## render moustache templates
