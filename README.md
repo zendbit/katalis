@@ -58,7 +58,7 @@ in progress
 ## 6. Create routes and handling request
 in progress
 
-## 7. Katalis DSL (Macro)
+## 7. Katalis DSL (Domain Specific Language)
 
 ## 8. Query string, form (urlencoded/multipart), json
 in progress
