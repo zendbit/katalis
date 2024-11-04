@@ -1,5 +1,5 @@
 # katalis
-Katalis is nim lang micro framework
+Katalis is [nim lang](https://nim-lang.org) micro framework
 
 ## Install
 ```
