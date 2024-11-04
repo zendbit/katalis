@@ -1,12 +1,12 @@
 # katalis
 Katalis is [nim lang](https://nim-lang.org) micro framework
 
-## Install
+## 1. Install
 ```
 nimble install katalis
 ```
 
-## Running simple app
+## 2. Running simple app
 After installing katalis, you can simply create your first app by import *katalisApp*
 ```nim
 import katalis/katalisApp
@@ -46,34 +46,36 @@ Lets open with the browser [http://localhost:8000](http://localhost:8000)
 
 ![Alt http://localhost:8000](https://github.com/zendbit/katalis-readme-assets/blob/981946bf0fee5acaa341edc04ed3e26f82263e5c/Screenshot%20From%202024-11-03%2021-38-44.png)
 
-## Katalis structure
+## 3. Katalis structure
 in progress
 
-## Configuration
+## 4. Configuration
 in progress
 
-## Serve static file
+## 5. Serve static file
 in progress
 
-## Create routes and handling request
+## 6. Create routes and handling request
 in progress
 
-## Query string, form (urlencoded/multipart), json
+## 7. Katalis DSL (Macro)
+
+## 8. Query string, form (urlencoded/multipart), json
 in progress
 
-## Validation
+## 9. Validation
 in progress
-## Template engine (Mustache)
-in progress
-
-## Websocket
+## 10. Template engine (Mustache)
 in progress
 
-## SSL
+## 11. Websocket
 in progress
 
-## Create extensions
+## 12. SSL
 in progress
 
-## Fullstack
+## 13. Create extensions
+in progress
+
+## 14. Fullstack
 in progress
