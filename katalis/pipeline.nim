@@ -28,7 +28,7 @@ include pipelines/initialize/
 include pipelines/before/
 [
   http,
-  websocket,
+  webSocket,
   httpRanges,
   session
 ]

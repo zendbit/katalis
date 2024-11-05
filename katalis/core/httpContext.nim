@@ -45,7 +45,7 @@ export uri3
 
 import
   constants,
-  websocket,
+  webSocket,
   ../utils/httpcore as utilsHttpCore,
   replyMsg,
   environment,
@@ -55,7 +55,7 @@ import
 
 export
   constants,
-  websocket,
+  webSocket,
   replymsg,
   staticfile,
   utilsHttpCore,
@@ -76,7 +76,7 @@ type
     response*: Response ## \
     ## Response type instance
     webSocket*: WebSocket ## \
-    ## websocket parameter context
+    ## webSocket parameter context
     onreply*: proc (
         self: HttpContext,
         env: Environment = environment.instance()

@@ -487,7 +487,7 @@ macro `@!`*(name: untyped): untyped =
     result = nnkStmtList.newTree(
         nnkDotExpr.newTree(
           ident("ctx"),
-          ident("websocket")
+          ident("webSocket")
         )
       )
 
