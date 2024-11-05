@@ -14,14 +14,21 @@ import katalis/katalisApp
 
 Katalis has some macros for it's own DSL. Katalis use *@!* as macros prefix (We will explore about katalis DSL on the next section).
 
+Create directory for the app
+```bash
+mkdir simpleapp
+cd simpleapp
+```
+
 Create nim source file, in this case we will use *app.nim*
 ```nim
 import katalis/katalisApp
 
 ## lets do some basics configuration
-@!Settings.enableReusePort = true
 @!Settings.enableServeStatic = true
 @!Settings.enableKeepAlive = true
+## we also can use custom port
+#@!Settings.port = Port(8080)
 
 ## lets start simple app
 @!App:
@@ -32,9 +39,9 @@ import katalis/katalisApp
 @!Emit
 ```
 
-Compile the source and run it!
+Compile the source with --threads:on switch to enable thread support and run it!
 ```bash
-nim c -r app.nim
+nim c -r --threads:on app.nim
 ```
 
 Katalis will run on port 8000 as default port
