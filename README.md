@@ -52,9 +52,26 @@ Listening non secure (plain) on http://0.0.0.0:8000
 Lets open with the browser [http://localhost:8000](http://localhost:8000)
 
 ![Alt http://localhost:8000](https://github.com/zendbit/katalis-readme-assets/blob/981946bf0fee5acaa341edc04ed3e26f82263e5c/Screenshot%20From%202024-11-03%2021-38-44.png)
-
+--threads:on
 ## 3. Katalis structure
-in progress
+Internal katalis structure is devided into some folders structure
+### 3.1 core (folder)
+Core folder contains base katalis framework it's focused on http protocol implementataion and some protocols enhancements
+|Filename|Description|
+|--------|-----------|
+|constants.nim|contains constans declaration used by katalis|
+|environment.nim|contains shared environment (settings, shared threads variable)|
+|form.nim|contains functionalities for construct form (urlencoded, data)|
+|httpContext.nim|contains http context per client request (cookie, request, response)|
+|katalis.nim|katalis object type and instance|
+|multipart.nim|contains functionality for construct multipart data|
+|replyMsg.nim|universal response message to client|
+|request.nim|request object type used by http context|
+|response.nim|response object type used by http context|
+|routes.nim|route object type and instance, contains funtionalities for handling route request|
+|session.nim|contains funtionalities for handling cookies|
+|staticFile.nim|contains funtionalities for handling static file|
+|websocket.nim|websocket object type for handling websocket request|
 
 ## 4. Configuration
 in progress
