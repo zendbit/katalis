@@ -78,9 +78,22 @@ Pipelines in katalis is like middleware, it will process request from client and
 |---------|------------|
 |after|this will be evaluate after route process|
 |before|this will be evaluate before route process|
-|initialize|will be eveluate on katalis initialization, when katalis start|
+|initialize|will be eveluate on katalis initialization when katalis start|
 |onReply|will be evaluate before response message to client, this usually used for modified response message|
-
+### 3.2.1 Initialize pipeline
+Initialize pipeline will be eveluate on katalis initialization when katalis start.
+|Filename|Description|
+|--------|-----------|
+|taskMonitor|this will start task monitor for katalis|
+We can also add custom task, to start with schedules like cron job
+### 3.2.1 Before pipeline
+Before pipeline will be evaluate before route processing happen, this pipeline has advantages like early checking like authentication. Katalis has some predefines before pipelines
+|Filename|Description|
+|--------|-----------|
+|http.nim|handle http request from client (get, post, head, etc)|
+|httpRanges.nim|handle http ranges request from client|
+|session.nim|session initialization|
+|webSocket.nim|handle web socket request from client, if http protocol upgrade request present|
 ## 4. Katalis DSL (Domain Specific Language)
 
 ## 5. Configuration
