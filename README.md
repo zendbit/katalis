@@ -73,6 +73,13 @@ Core folder contains base katalis framework it's focused on http protocol implem
 |staticFile.nim|contains funtionalities for handling static file|
 |webSocket.nim|websocket object type for handling websocket request|
 ### 3.2 Pipelines (folder)
+Pipelines in katalis is like middleware, it will process request from client and response with appropriate response. Katalis has some pipelines
+|Pipelines|Descriptions|
+|---------|------------|
+|after|this will be evaluate after route process|
+|before|this will be evaluate before route process|
+|initialize|will be eveluate on katalis initialization, when katalis start|
+|onReply|will be evaluate before response message to client, this usually used for modified response message|
 
 ## 4. Katalis DSL (Domain Specific Language)
 
