@@ -71,18 +71,18 @@ Core folder contains base katalis framework it's focused on http protocol implem
 |routes.nim|route object type and instance, contains funtionalities for handling route request|
 |session.nim|contains funtionalities for handling cookies|
 |staticFile.nim|contains funtionalities for handling static file|
-|websocket.nim|websocket object type for handling websocket request|
+|webSocket.nim|websocket object type for handling websocket request|
+### 3.2 Pipelines (folder)
 
-## 4. Configuration
+## 4. Katalis DSL (Domain Specific Language)
+
+## 5. Configuration
+
+## 6. Serve static file
 in progress
 
-## 5. Serve static file
+## 7. Create routes and handling request
 in progress
-
-## 6. Create routes and handling request
-in progress
-
-## 7. Katalis DSL (Domain Specific Language)
 
 ## 8. Query string, form (urlencoded/multipart), json
 in progress
