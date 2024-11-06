@@ -85,7 +85,7 @@ Pipelines in katalis is like middleware, it will process request from client and
 Initialize pipeline will be eveluate on katalis initialization when katalis start.
 |Filename|Description|
 |--------|-----------|
-|taskMonitor|this will start task monitor for katalis|
+|taskMonitor.nim|this will start task monitor for katalis|
 
 We can also add custom task with schedules like cron job
 
