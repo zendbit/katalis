@@ -24,7 +24,7 @@ import std/
 import
   ../../core/routes,
   ../../macros/sugar,
-  ../../core/websocket,
+  ../../core/webSocket,
   ../../core/form,
   ../../core/environment
 
