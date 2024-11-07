@@ -12,7 +12,7 @@
 ##
 
 
-include pipeline
+include pipelines
 
 import
   core/katalis,
