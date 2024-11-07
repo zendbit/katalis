@@ -81,7 +81,7 @@ Pipelines in katalis is like middleware, it will process request from client and
 |initialize|will be eveluate on katalis initialization when katalis start|
 |onReply|will be evaluate before response message to client, this usually used for modified response message|
 
-### 3.2.1 Initialize pipelines
+#### 3.2.1 Initialize pipelines
 Initialize pipeline will be eveluate on katalis initialization when katalis start.
 |Filename|Description|
 |--------|-----------|
@@ -89,7 +89,7 @@ Initialize pipeline will be eveluate on katalis initialization when katalis star
 
 We can also add custom task with schedules like cron job
 
-### 3.2.2 Before pipelines
+#### 3.2.2 Before pipelines
 Before pipeline will be evaluate before route processing, this pipeline has advantages like early checking like authentication. Katalis has some predefines before pipelines
 |Filename|Description|
 |--------|-----------|
@@ -98,7 +98,7 @@ Before pipeline will be evaluate before route processing, this pipeline has adva
 |session.nim|session initialization|
 |webSocket.nim|handle web socket request from client, if http protocol upgrade request present|
 
-### 3.2.3 After pipelines
+#### 3.2.3 After pipelines
 After pipeline will be evaluate after route processing, this pipelines has advantages like early checking if request has access to route resource or not
 |Filename|Description|
 |--------|-----------|
@@ -106,7 +106,7 @@ After pipeline will be evaluate after route processing, this pipelines has advan
 
 Static file must be placed is in *static* folder, but we can also changes default static folder from configuration (For more information about configuration see configuration section).
 
-### 3.2.4 OnReply pipelines
+#### 3.2.4 OnReply pipelines
 OnReply pipeline will be evaluate before sending response to client, this pipeline used for modifying payload.
 |Filename|Description|
 |--------|-----------|
@@ -114,13 +114,27 @@ OnReply pipeline will be evaluate before sending response to client, this pipeli
 |httpComposePayload.nim|handle composing payload header + body for response|
 |httpCompress.nim|handle compression support (gzip) if client support zip compression|
 
-### 3.2.5 Cleanup pipelines
-Clenaup pipeline will evaluate after sending response to client, this pipeline will evaluate after all process response to client finished.
+#### 3.2.5 Cleanup pipelines
+Clenup pipeline will evaluate after sending response to client, this pipeline will evaluate after all process response to client finished.
 |Filename|Description|
 |--------|-----------|
 |httpContext.nim|will cleanup unused cache data related with http context|
 
+### 3.3 Macros (folder)
+Macros folder contains macros definition for katalis framework
+|Filename|Description|
+|--------|-----------|
+|sugar.nim|macros definition for katalis DSL (Domain Specific Language)|
+
+More information about DSL, see DSL (Domain Specific Languate) section
+
+### 3.4 Utils (folder)
+
 ## 4. Katalis DSL (Domain Specific Language)
+Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code.
+|Filename|Description|
+|--------|-----------|
+|
 
 ## 5. Configuration
 
