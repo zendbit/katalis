@@ -103,7 +103,10 @@ After pipeline will be evaluate after route processing, this pipelines has advan
 |Filename|Description|
 |httpStaticFile|handle static file request from client|
 
-Static file must be placed is in *static* folder, but we can also changes default static folder from configuration
+Static file must be placed is in *static* folder, but we can also changes default static folder from configuration (For more information about configuration see configuration section).
+
+### 3.2.4 OnReply pipelines
+
 ## 4. Katalis DSL (Domain Specific Language)
 
 ## 5. Configuration
