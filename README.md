@@ -271,6 +271,38 @@ DSL Code structure in Katalis
 ```
 
 ## 5. Configuration
+Configuration can be set using *@!Settings* macro. See katalis/core/environment.nim (Settings object type)
+```nim
+@!Settings.address = "0.0.0.0" ## default
+@!Settings.port = Port(8000) ## default
+
+## available settings (default value, all size metric in bytes):
+## address: string = "0.0.0.0"
+## port: Port = Port(8000)
+## enableReuseAddress: bool = true
+## enableReusePort:bool = true
+## sslSettings: SslSettings = nil
+## maxRecvSize: int64 = 209715200
+## enableKeepAlive: bool = true
+## enableOOBInline: bool = false
+## enableBroadcast: bool = false
+## enableDontRoute: bool = false
+## storagesDir: string = getCurrentDir().joinPath("storages")
+## storagesUploadDir: string = getCurrentDir().joinPath("storages", "upload")
+## storagesBodyDir: string = getCurrentDir().joinPath("storages", "body")
+## storagesSessionDir: string = getCurrentDir().joinPath("storages", "session")
+## staticDir: string = getCurrentDir().joinPath("static")
+## enableServeStatic: bool = false
+## readRecvBuffer: int = 524288
+## enableTrace: bool = false
+## chunkSize: int = 16384
+## maxSendSize: int = 52428800
+## enableChunkedTransfer: bool = true
+## enableRanges: bool = true
+## rangesSize: int = 2097152
+## enableCompression: bool = true
+## maxBodySize: int = 52428800
+```
 
 ## 6. Serve static file
 in progress
