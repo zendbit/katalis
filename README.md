@@ -177,6 +177,27 @@ Available on outside *@!App* block
 |@!SharedEnv|katalis shared Table[string, string] type object for sharing between the app instance, related to Environment type object in katalis/core/environment.nim|
 |@!Trace|trace block for displaying debug message, available when @!Settings.enableTrace = true|
 
+Available only inside *@!App* block
+|Name|Description|
+|----|-----------|
+|@!Before|before route block pipeline|
+|@!After|after route block pipeline|
+|@!OnReply|on reply pipeline|
+|@!Cleanup|cleanup pipeline|
+|@![Get, Post, Patch, Delete, Put, Options, Trace, Head, Connect]|http method for routing|
+|@!Context|http context route parameter, related to HttpContext type object in katalis/core/httpContext.nim|
+|@!Env|environment route parameter, related to Environment type object in katalis/core/environment.nim|
+|@!Req|request context from client, related to Request type object in katalis/core/request.nim|
+|@!Res|response context to client, related to Response type object in katalis/core/response.nim|
+|@!WebSocket|websocket context service, related to WebSocket type object in katalis/core/webSocket.nim|
+|@!Client|socket client context, related to AsyncSocket type object in katalis/core/httpContext.nim|
+|@!Body|request body from client, related to Request type object field in katalis/core/request.nim|
+|@!Segment|path segment url from client request, related to RequestParam type object in katalis/core/request.nim also related to Table[string, string] nim stdlib|
+|@!Query|query string from client request, related to RequestParam type object in katalis/core/request.nim also related to Table[string, string] nim stdlib|
+|@!Json|json data from client request, related to RequestParam type object in katalis/core/request.nim also related to JsonNode nim stdlib|
+|@!Xml|xml data from client request, related to RequestParam type object in katalis/core/request.nim also related to XmlNode nim stdlib|
+|@!Form|form data from client will handle form urlencode/multipart, related to Form type object in katalis/core/form.nim|
+
 ## 5. Configuration
 
 ## 6. Serve static file
