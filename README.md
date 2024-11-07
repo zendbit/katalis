@@ -107,6 +107,18 @@ After pipeline will be evaluate after route processing, this pipelines has advan
 Static file must be placed is in *static* folder, but we can also changes default static folder from configuration (For more information about configuration see configuration section).
 
 ### 3.2.4 OnReply pipelines
+OnReply pipeline will be evaluate before sending response to client, this pipeline used for modifying payload.
+|Filename|Description|
+|--------|-----------|
+|httpChunked.nim|handle chunked payload response, default is chunked as http standard|
+|httpComposePayload.nim|handle composing payload header + body for response|
+|httpCompress.nim|handle compression support (gzip) if client support zip compression|
+
+### 3.2.5 Cleanup pipelines
+Clenaup pipeline will evaluate after sending response to client, this pipeline will evaluate after all process response to client finished.
+|Filename|Description|
+|--------|-----------|
+|httpContext.nim|will cleanup unused cache data related with http context|
 
 ## 4. Katalis DSL (Domain Specific Language)
 
