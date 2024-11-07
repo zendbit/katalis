@@ -184,6 +184,7 @@ Available only inside *@!App* block
 |@!After|after route block pipeline|
 |@!OnReply|on reply pipeline|
 |@!Cleanup|cleanup pipeline|
+|@!EndPoint|set endpoint for each route prefix (Optional)|
 |@![Get, Post, Patch, Delete, Put, Options, Trace, Head, Connect]|http method for routing|
 |@!Context|http context route parameter, related to HttpContext type object in katalis/core/httpContext.nim|
 |@!Env|environment route parameter, related to Environment type object in katalis/core/environment.nim|
@@ -197,6 +198,77 @@ Available only inside *@!App* block
 |@!Json|json data from client request, related to RequestParam type object in katalis/core/request.nim also related to JsonNode nim stdlib|
 |@!Xml|xml data from client request, related to RequestParam type object in katalis/core/request.nim also related to XmlNode nim stdlib|
 |@!Form|form data from client will handle form urlencode/multipart, related to Form type object in katalis/core/form.nim|
+
+DSL Code structure in Katalis
+```nim
+## available on global
+## @!Settings
+## @!Emit -> Should called after @!App block
+## @!Route
+## @!Katalis
+## @!Environment
+## @!SharedEnv
+## @!Trace
+
+## katalis app block
+@!App:
+  ## code here
+
+  ## endpoint optional, this endpoint prefix path will append to each route path request
+  ## this is optional, and should be define before all other pipeline
+  @!EndPoint "/test/api"
+
+  ## before route block
+  @!Before:
+    ## available here
+    ## @!Context
+    ## @!Req
+    ## @!Res
+    ## @!Env
+    ## @!Res
+    ## @!WebSocket
+    ## @!Client
+    ## @!Body
+    ## @!Segment
+    ## @!Query
+    ## @!Json
+    ## @!Xml
+    ## @!Form
+    ## also global katalis macros
+
+    ## code here
+
+  ## after route block
+  @!After:
+
+    ## code here
+
+  ## on reply block
+  @!OnReply:
+
+    ## code here
+
+  ## cleanup block
+  @!Cleanup:
+
+    ## code here
+
+
+  ## routing
+  ## available method @!Get, @!Post, @!Put, @!Delete, @!Patch, @!Head, @!Connect, @!Options, @!Trace
+  @!Post "/register":
+
+    ## code here
+
+  @!Get "/home":
+
+    ## code here
+
+  ## also support for multiple method on routing
+  @![Get, Post] "/login":
+
+    ## code here
+```
 
 ## 5. Configuration
 
