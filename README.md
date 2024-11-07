@@ -137,13 +137,31 @@ Utilities and helper for katalis framework
 |httpcore.nim|http core stdlib extension|
 |json.nim|some json stdlib extension|
 
-### 3.5 Extension (Folder)
+### 3.5 Extension (folder)
 Internal extension for katalis framework
 |Filename|Description|
 |--------|-----------|
 |mustache.nim|mustache template engine using [mustachu](https://github.com/fenekku/moustachu) nimble pkg|
 |taskMonitor.nim|simple cron job for katalis|
 |validation.nim|simplify validation for form, json, and Table[string, string]|
+
+### 3.6 KatalisApp (file)
+Katalis application, this is starting poin of katalis framework. Includes all file needed for developing katalis application.
+|Filename|Description|
+|--------|-----------|
+|katalisApp.nim|include this file for starting the app server|
+
+### 3.7 Pipeline (file)
+Katalis pipeline contains include declaration for katalis pipelines order, include declaration is important depend on this order:
+- initialize
+- before
+- after
+- onReply
+- cleanup
+
+|Filename|Description|
+|--------|-----------|
+|pipeline.nim|pipeline order includes declaration|
 
 ## 4. Katalis DSL (Domain Specific Language)
 Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code.
