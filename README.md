@@ -164,10 +164,18 @@ Katalis pipeline contains include declaration for katalis pipelines order, inclu
 |pipeline.nim|pipeline order includes declaration|
 
 ## 4. Katalis DSL (Domain Specific Language)
-Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code.
-|Filename|Description|
-|--------|-----------|
-|
+Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code. Katalis using *@!* prefix for the DSL to prevent confict and make it easy for coding convention. Katalis DSL available in *katalis/macros/sugar.nim*. There are some macros that only can be called inside *@!App* block and block pipeline in katalis let see the table.
+
+Available on outside *@!App* block
+|Name|Description|
+|----|-----------|
+|@!Settings|katalis settings instance, related to Settings type object in katalis/core/environment.nim|
+|@!Emit|start katalis app, related to Katalis type object in katalis/core/katalis.nim|
+|@!Routes|katalis routes object instance, related to Route type object in katalis/core/routes.nim|
+|@!Katalis|katalis object instance, related to Katalis type object in katalis/core/katalis.nim|
+|@!Environment|katalis environment instance, related to Environment type object in katalis/core/environment.nim|
+|@!SharedEnv|katalis shared Table[string, string] type object for sharing between the app instance, related to Environment type object in katalis/core/environment.nim|
+|@!Trace|trace block for displaying debug message, available when @!Settings.enableTrace = true|
 
 ## 5. Configuration
 
