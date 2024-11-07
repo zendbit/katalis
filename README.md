@@ -71,18 +71,111 @@ Core folder contains base katalis framework it's focused on http protocol implem
 |routes.nim|route object type and instance, contains funtionalities for handling route request|
 |session.nim|contains funtionalities for handling cookies|
 |staticFile.nim|contains funtionalities for handling static file|
-|websocket.nim|websocket object type for handling websocket request|
+|webSocket.nim|websocket object type for handling websocket request|
+### 3.2 Pipelines (folder)
+Pipelines in katalis is like middleware, it will process request from client and response with appropriate response. Katalis has some pipelines
+|Pipelines|Descriptions|
+|---------|------------|
+|after|this will be evaluate after route process|
+|before|this will be evaluate before route process|
+|initialize|will be eveluate on katalis initialization when katalis start|
+|onReply|will be evaluate before response message to client, this usually used for modified response message|
 
-## 4. Configuration
+#### 3.2.1 Initialize pipelines
+Initialize pipeline will be eveluate on katalis initialization when katalis start.
+|Filename|Description|
+|--------|-----------|
+|taskMonitor.nim|this will start task monitor for katalis|
+
+We can also add custom task with schedules like cron job
+
+#### 3.2.2 Before pipelines
+Before pipeline will be evaluate before route processing, this pipeline has advantages like early checking like authentication. Katalis has some predefines before pipelines
+|Filename|Description|
+|--------|-----------|
+|http.nim|handle http request from client (get, post, head, etc)|
+|httpRanges.nim|handle http ranges request from client|
+|session.nim|session initialization|
+|webSocket.nim|handle web socket request from client, if http protocol upgrade request present|
+
+#### 3.2.3 After pipelines
+After pipeline will be evaluate after route processing, this pipelines has advantages like early checking if request has access to route resource or not
+|Filename|Description|
+|--------|-----------|
+|httpStaticFile|handle static file request from client|
+
+Static file must be placed is in *static* folder, but we can also changes default static folder from configuration (For more information about configuration see configuration section).
+
+#### 3.2.4 OnReply pipelines
+OnReply pipeline will be evaluate before sending response to client, this pipeline used for modifying payload.
+|Filename|Description|
+|--------|-----------|
+|httpChunked.nim|handle chunked payload response, default is chunked as http standard|
+|httpComposePayload.nim|handle composing payload header + body for response|
+|httpCompress.nim|handle compression support (gzip) if client support zip compression|
+
+#### 3.2.5 Cleanup pipelines
+Clenup pipeline will evaluate after sending response to client, this pipeline will evaluate after all process response to client finished.
+|Filename|Description|
+|--------|-----------|
+|httpContext.nim|will cleanup unused cache data related with http context|
+
+### 3.3 Macros (folder)
+Macros folder contains macros definition for katalis framework
+|Filename|Description|
+|--------|-----------|
+|sugar.nim|macros definition for katalis DSL (Domain Specific Language)|
+
+More information about DSL, see DSL (Domain Specific Languate) section
+
+### 3.4 Utils (folder)
+Utilities and helper for katalis framework
+|Filename|Description|
+|--------|-----------|
+|crypt.nim|some cryptohraphy algorithm|
+|debug.nim|debug msg|
+|httpcore.nim|http core stdlib extension|
+|json.nim|some json stdlib extension|
+
+### 3.5 Extension (folder)
+Internal extension for katalis framework
+|Filename|Description|
+|--------|-----------|
+|mustache.nim|mustache template engine using [mustachu](https://github.com/fenekku/moustachu) nimble pkg|
+|taskMonitor.nim|simple cron job for katalis|
+|validation.nim|simplify validation for form, json, and Table[string, string]|
+
+### 3.6 KatalisApp (file)
+Katalis application, this is starting poin of katalis framework. Includes all file needed for developing katalis application.
+|Filename|Description|
+|--------|-----------|
+|katalisApp.nim|include this file for starting the app server|
+
+### 3.7 Pipeline (file)
+Katalis pipeline contains include declaration for katalis pipelines order, include declaration is important depend on this order:
+- initialize
+- before
+- after
+- onReply
+- cleanup
+
+|Filename|Description|
+|--------|-----------|
+|pipeline.nim|pipeline order includes declaration|
+
+## 4. Katalis DSL (Domain Specific Language)
+Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code.
+|Filename|Description|
+|--------|-----------|
+|
+
+## 5. Configuration
+
+## 6. Serve static file
 in progress
 
-## 5. Serve static file
+## 7. Create routes and handling request
 in progress
-
-## 6. Create routes and handling request
-in progress
-
-## 7. Katalis DSL (Domain Specific Language)
 
 ## 8. Query string, form (urlencoded/multipart), json
 in progress
