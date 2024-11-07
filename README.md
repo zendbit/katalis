@@ -129,6 +129,21 @@ Macros folder contains macros definition for katalis framework
 More information about DSL, see DSL (Domain Specific Languate) section
 
 ### 3.4 Utils (folder)
+Utilities and helper for katalis framework
+|Filename|Description|
+|--------|-----------|
+|crypt.nim|some cryptohraphy algorithm|
+|debug.nim|debug msg|
+|httpcore.nim|http core stdlib extension|
+|json.nim|some json stdlib extension|
+
+### 3.5 Extension (Folder)
+Internal extension for katalis framework
+|Filename|Description|
+|--------|-----------|
+|mustache.nim|mustache template engine using [mustachu](https://github.com/fenekku/moustachu) nimble pkg|
+|taskMonitor.nim|simple cron job for katalis|
+|validation.nim|simplify validation for form, json, and Table[string, string]|
 
 ## 4. Katalis DSL (Domain Specific Language)
 Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code.
