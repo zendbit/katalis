@@ -4,7 +4,7 @@
 # Katalis
 Katalis is [nim lang](https://nim-lang.org) micro framework
 
-Katalis always focusing on protocol implementation and performance improvement. For fullstack framework using katalis it will depend on your needs, we not provides frontend engine or database layer because it will vary for each developer taste!.
+Katalis always focusing on protocol implementation and performance improvement. For fullstack framework using katalis it will be depends on developer needs, we not provides frontend engine or database layer because it will vary for each developer taste!.
 
 If you want to use katalis as fullstack nim you can read on fullstack section in this documentation.
 
