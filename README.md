@@ -367,6 +367,45 @@ import katalis/extension/mustache
   @!Get "/hello":
     await @!Context.reply(Http200, "<h1>world!</h1>")
 
+  ## mapping route, retrieve segment to variable
+  @!Get "/birthdate/:month/:day/:year":
+    ## this will retrieve segments
+    ## as variable month, day, and year
+    ## http://localhost/admin/birthdate/may/22/2000
+    
+    let birthdate = [@!Segment["month"],  @!Segment["day"], @!Segment["year"]].join("/")
+
+    await @!Context.reply(
+      Http200,
+      &"<h3>Birthdate</h3> <p>{birthdate}</p>"
+    )
+
+  ## mapping route, retrieve query string to variable
+  @!Get "/birthdate":
+    ## this will retrieve query string
+    ## as variable month, day, and year
+    ## http://localhost/admin/birthdate?month=may&day=22&year=2000
+    
+    let birthdate = [@!Query.getOrDefault("month"),  @!Query.getOrDefault("day"), @!Query.getOrDefault("year")].join("/")
+
+    await @!Context.reply(
+      Http200,
+      &"<h3>Birthdate</h3> <p>{birthdate}</p>"
+    )
+
+  ## mapping route, retrieve segment as regex pattern
+  @!Get "/birthdate/re<:month([a-zA-Z]+)_:day([0-9]+)_:year([0-9]+)>":
+    ## this will retrieve query string
+    ## as variable month, day, and year
+    ## http://localhost/admin/birthdate/may_22_2000
+    
+    let birthdate = [@!Segment.getOrDefault("month"),  @!Segment.getOrDefault("day"), @!Segment.getOrDefault("year")].join("/")
+
+    await @!Context.reply(
+      Http200,
+      &"<h3>Birthdate</h3> <p>{birthdate}</p>"
+    )
+
   ## we also can have multiple method
   ## in one route definition
   @![Get, Post] "/login":
