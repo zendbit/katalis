@@ -305,7 +305,40 @@ Configuration can be set using *@!Settings* macro. See katalis/core/environment.
 ```
 
 ## 6. Serve static file
-in progress
+For serving static file like static html, css, image, video, etc. We only need to enable *enableServeStatic* in katalis settings.
+
+Lets create *serverstatic-example* folder.
+```bash
+mkdir servestatic-example
+cd servestatic-example
+```
+
+Then create *static* folder inside *servestatic-example* folder
+```bash
+mkdir static
+```
+
+Inside *servestatic-example* folder we create minimal katalis app for serving static file. In this case we create *app.nim*
+```nim
+import katalis/katalisApp
+
+## enable static file service
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!Emit
+```
+
+Compile and start the server
+```bash
+nim c -r app.nim
+```
+
+Don't forget to put your static files into *static* folder
+
+![Alt static folders](https://github.com/zendbit/katalis-readme-assets/blob/94adfbcf3d80eb3eaec2d60974203b7c1737382a/Screenshot%20From%202024-11-09%2016-09-16.png)
+
+Open with browser [http://localhost:8000/index.html](http://localhost:8000/index.html)
 
 ## 7. Create routes and handling request
 in progress
