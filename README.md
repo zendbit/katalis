@@ -346,6 +346,7 @@ Open with browser [http://localhost:8000/index.html](http://localhost:8000/index
 ## 7. Create routes and handling request
 ```nim
 import katalis/katalisApp
+import katalis/extension/mustache
 
 @!Settings.enableServeStatic = true
 @!Settings.enableKeepAlive = true
@@ -359,21 +360,78 @@ import katalis/katalisApp
   ## in this case, because we already set @!EndPoint to "/admin"
   ## so the route url will be http://localhost:8000/admin
   @!Get "/":
-    await @!Context.reply(Http200, "<h1>This is the root page!")
+    await @!Context.reply(Http200, "<h1>This is admin the root page!")
 
   ## another get example
   ## http://localhost:8000/hello
   @!Get "/hello":
     await @!Context.reply(Http200, "<h1>world!</h1>")
 
+  ## we also can have multiple method
+  ## in one route definition
+  @![Get, Post] "/login":
+    ## we can use validation to check fields
+    ## but for validation details we will discuss in other section
+    ## about validation
+
+    ## let get form data username, password
+    ## if method http post validate the form data
+    let username = @!Form.data.getOrDefault("username")
+    let password = @!Form.data.getOrDefault("password")
+    var errorMsg = ""
+    if @!Req.httpMethod == HttpPost:
+      if username == "" or password == "":
+        errorMsg = "username or password is required!"
+
+    ##
+    ## katalis come with mustache template engine
+    ## for template engine we will explain later
+    ##
+    let tpl = 
+      """
+        <html>
+          <head>
+            <title>example</title>
+          </head>
+          <body>
+            <h3>Login</h3>
+            <form method="POST">
+              <input type="text" name="username" placeholder="username" value="{{username}}">
+              <br>
+              <input type="password" name="password" placeholder="password" value="{{password}}">
+              <br>
+              <input type="submit" value="Login">
+            </form>
+            <h4>{{errorMsg}}</h4>
+          </body>
+        </html>
+      """
+
+    let m = newMustache()
+    m.context["errorMsg"] = errorMsg
+    m.context["username"] = username
+    m.context["password"] = password
+    @!Context.reply(Http200, m.render(tpl))
+
+## we can have multiple @!App for routes separation
+@!App:
+  ## let definde endpoint for users
+  @!EndPoint "/user"
+
+  ## the user root page
+  ## http://localhost:8000/user
+  @!Get "/":
+    await @!Context.reply(Http200, "<h1>This is user root page</h1>")
+
 @!Emit
 ```
 
-## 8. Query string, form (urlencoded/multipart), json, xml
+## 8. Query string, form (urlencoded/multipart), json, xml, upload
 in progress
 
 ## 9. Validation
 in progress
+
 ## 10. Template engine (Mustache)
 in progress
 
