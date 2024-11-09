@@ -344,7 +344,30 @@ Don't forget to put your static files into *static* folder
 Open with browser [http://localhost:8000/index.html](http://localhost:8000/index.html)
 
 ## 7. Create routes and handling request
-in progress
+```nim
+import katalis/katalisApp
+
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!App:
+  ## we can also create prefix for all routes
+  @!EndPoint "/admin" ## \
+  ## all routes will prefixed with /admin/
+
+  ## get request for default /
+  ## in this case, because we already set @!EndPoint to "/admin"
+  ## so the route url will be http://localhost:8000/admin
+  @!Get "/":
+    await @!Context.reply(Http200, "<h1>This is the root page!")
+
+  ## another get example
+  ## http://localhost:8000/hello
+  @!Get "/hello":
+    await @!Context.reply(Http200, "<h1>world!</h1>")
+
+@!Emit
+```
 
 ## 8. Query string, form (urlencoded/multipart), json, xml
 in progress
