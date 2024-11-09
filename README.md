@@ -343,7 +343,7 @@ Open with browser [http://localhost:8000/index.html](http://localhost:8000/index
 ## 7. Create routes and handling request
 in progress
 
-## 8. Query string, form (urlencoded/multipart), json
+## 8. Query string, form (urlencoded/multipart), json, xml
 in progress
 
 ## 9. Validation
