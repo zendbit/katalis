@@ -1,4 +1,7 @@
-# katalis
+# Gold Sponsor
+<img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Awan%20Media%20Semesta_600_BG.png" width="150px"> <img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Super%20Server_600%20(1)_BG.png" width="150px">
+
+# Katalis
 Katalis is [nim lang](https://nim-lang.org) micro framework
 
 ## 1. Install
@@ -164,20 +167,209 @@ Katalis pipeline contains include declaration for katalis pipelines order, inclu
 |pipeline.nim|pipeline order includes declaration|
 
 ## 4. Katalis DSL (Domain Specific Language)
-Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code.
-|Filename|Description|
-|--------|-----------|
-|
+Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code. Katalis using *@!* prefix for the DSL to prevent confict and make it easy for coding convention. Katalis DSL available in *katalis/macros/sugar.nim*. There are some macros that only can be called inside *@!App* block and block pipeline in katalis let see the table.
+
+Available on outside *@!App* block
+|Name|Description|
+|----|-----------|
+|@!Settings|katalis settings instance, related to Settings type object in katalis/core/environment.nim|
+|@!Emit|start katalis app, related to Katalis type object in katalis/core/katalis.nim|
+|@!Routes|katalis routes object instance, related to Route type object in katalis/core/routes.nim|
+|@!Katalis|katalis object instance, related to Katalis type object in katalis/core/katalis.nim|
+|@!Environment|katalis environment instance, related to Environment type object in katalis/core/environment.nim|
+|@!SharedEnv|katalis shared Table[string, string] type object for sharing between the app instance, related to Environment type object in katalis/core/environment.nim|
+|@!Trace|trace block for displaying debug message, available when @!Settings.enableTrace = true|
+
+Available only inside *@!App* block
+|Name|Description|
+|----|-----------|
+|@!Before|before route block pipeline|
+|@!After|after route block pipeline|
+|@!OnReply|on reply pipeline|
+|@!Cleanup|cleanup pipeline|
+|@!EndPoint|set endpoint for each route prefix (Optional)|
+|@![Get, Post, Patch, Delete, Put, Options, Trace, Head, Connect]|http method for routing|
+|@!Context|http context route parameter, related to HttpContext type object in katalis/core/httpContext.nim|
+|@!Env|environment route parameter, related to Environment type object in katalis/core/environment.nim|
+|@!Req|request context from client, related to Request type object in katalis/core/request.nim|
+|@!Res|response context to client, related to Response type object in katalis/core/response.nim|
+|@!WebSocket|websocket context service, related to WebSocket type object in katalis/core/webSocket.nim|
+|@!Client|socket client context, related to AsyncSocket type object in katalis/core/httpContext.nim|
+|@!Body|request body from client, related to Request type object field in katalis/core/request.nim|
+|@!Segment|path segment url from client request, related to RequestParam type object in katalis/core/request.nim also related to Table[string, string] nim stdlib|
+|@!Query|query string from client request, related to RequestParam type object in katalis/core/request.nim also related to Table[string, string] nim stdlib|
+|@!Json|json data from client request, related to RequestParam type object in katalis/core/request.nim also related to JsonNode nim stdlib|
+|@!Xml|xml data from client request, related to RequestParam type object in katalis/core/request.nim also related to XmlNode nim stdlib|
+|@!Form|form data from client will handle form urlencode/multipart, related to Form type object in katalis/core/form.nim|
+
+DSL Code structure in Katalis
+```nim
+## available on global
+## @!Settings
+## @!Emit -> Should called after @!App block
+## @!Route
+## @!Katalis
+## @!Environment
+## @!SharedEnv
+## @!Trace
+
+## katalis app block
+@!App:
+  ## code here
+
+  ## endpoint optional, this endpoint prefix path will append to each route path request
+  ## this is optional, and should be define before all other pipeline
+  @!EndPoint "/test/api"
+
+  ## before route block
+  @!Before:
+    ## available here
+    ## @!Context
+    ## @!Req
+    ## @!Res
+    ## @!Env
+    ## @!Res
+    ## @!WebSocket
+    ## @!Client
+    ## @!Body
+    ## @!Segment
+    ## @!Query
+    ## @!Json
+    ## @!Xml
+    ## @!Form
+    ## also global katalis macros
+
+    ## code here
+
+  ## after route block
+  @!After:
+
+    ## code here
+
+  ## on reply block
+  @!OnReply:
+
+    ## code here
+
+  ## cleanup block
+  @!Cleanup:
+
+    ## code here
+
+
+  ## routing
+  ## available method @!Get, @!Post, @!Put, @!Delete, @!Patch, @!Head, @!Connect, @!Options, @!Trace
+  @!Post "/register":
+
+    ## code here
+
+  @!Get "/home":
+
+    ## code here
+
+  ## also support for multiple method on routing
+  @![Get, Post] "/login":
+
+    ## code here
+```
 
 ## 5. Configuration
+Configuration can be set using *@!Settings* macro. See katalis/core/environment.nim (Settings object type)
+```nim
+@!Settings.address = "0.0.0.0" ## default
+@!Settings.port = Port(8000) ## default
+
+## available settings (default value, all size metric in bytes):
+## address: string = "0.0.0.0"
+## port: Port = Port(8000)
+## enableReuseAddress: bool = true
+## enableReusePort:bool = true
+## sslSettings: SslSettings = nil
+## maxRecvSize: int64 = 209715200
+## enableKeepAlive: bool = true
+## enableOOBInline: bool = false
+## enableBroadcast: bool = false
+## enableDontRoute: bool = false
+## storagesDir: string = getCurrentDir().joinPath("storages")
+## storagesUploadDir: string = getCurrentDir().joinPath("storages", "upload")
+## storagesBodyDir: string = getCurrentDir().joinPath("storages", "body")
+## storagesSessionDir: string = getCurrentDir().joinPath("storages", "session")
+## staticDir: string = getCurrentDir().joinPath("static")
+## enableServeStatic: bool = false
+## readRecvBuffer: int = 524288
+## enableTrace: bool = false
+## chunkSize: int = 16384
+## maxSendSize: int = 52428800
+## enableChunkedTransfer: bool = true
+## enableRanges: bool = true
+## rangesSize: int = 2097152
+## enableCompression: bool = true
+## maxBodySize: int = 52428800
+```
 
 ## 6. Serve static file
-in progress
+For serving static file like static html, css, image, video, etc. We only need to enable *enableServeStatic* in katalis settings.
+
+Lets create *serverstatic-example* folder.
+```bash
+mkdir servestatic-example
+cd servestatic-example
+```
+
+Then create *static* folder inside *servestatic-example* folder
+```bash
+mkdir static
+```
+
+Inside *servestatic-example* folder we create minimal katalis app for serving static file. In this case we create *app.nim*
+```nim
+import katalis/katalisApp
+
+## enable static file service
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!Emit
+```
+
+Compile and start the server
+```bash
+nim c -r app.nim
+```
+
+Don't forget to put your static files into *static* folder
+
+![Alt static folders](https://github.com/zendbit/katalis-readme-assets/blob/94adfbcf3d80eb3eaec2d60974203b7c1737382a/Screenshot%20From%202024-11-09%2016-09-16.png)
+
+Open with browser [http://localhost:8000/index.html](http://localhost:8000/index.html)
 
 ## 7. Create routes and handling request
-in progress
+```nim
+import katalis/katalisApp
 
-## 8. Query string, form (urlencoded/multipart), json
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!App:
+  ## we can also create prefix for all routes
+  @!EndPoint "/admin" ## \
+  ## all routes will prefixed with /admin/
+
+  ## get request for default /
+  ## in this case, because we already set @!EndPoint to "/admin"
+  ## so the route url will be http://localhost:8000/admin
+  @!Get "/":
+    await @!Context.reply(Http200, "<h1>This is the root page!")
+
+  ## another get example
+  ## http://localhost:8000/hello
+  @!Get "/hello":
+    await @!Context.reply(Http200, "<h1>world!</h1>")
+
+@!Emit
+```
+
+## 8. Query string, form (urlencoded/multipart), json, xml
 in progress
 
 ## 9. Validation
