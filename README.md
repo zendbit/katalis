@@ -1,5 +1,16 @@
 # Gold Sponsor
-<img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Awan%20Media%20Semesta_600_BG.png" width="150px"> <img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Super%20Server_600%20(1)_BG.png" width="150px">
+<table>
+  <tr>
+    <td>
+      <a href="https://amscloud.co.id" target="_blank"><img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Awan%20Media%20Semesta_600_BG.png" width="150px"></a>
+      <br>
+      <a href="https://superserver.co.id" target="_blank"><img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Super%20Server_600%20(1)_BG.png" width="150px"></a>
+    </td>
+    <td>
+    <a href="https://www.facebook.com/kandangretawu" target="_blank"><img src="https://github.com/zendbit/katalis-readme-assets/blob/02ca1a457bba7d678d554cf5e931742ed8a955e1/326268483_1219408249008756_5424435258872438740_n.png" width="150px"></a>
+    </td>
+  </tr>
+</table>
 
 # Katalis
 Katalis is [nim lang](https://nim-lang.org) micro framework
