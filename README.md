@@ -170,7 +170,7 @@ Katalis application, this is starting poin of katalis framework. Includes all fi
 |--------|-----------|
 |katalisApp.nim|include this file for starting the app server|
 
-### 3.7 Pipeline (file)
+### 3.7 Pipelines (file)
 Katalis pipeline contains include declaration for katalis pipelines order, include declaration is important depend on this order:
 - initialize
 - before
@@ -180,7 +180,7 @@ Katalis pipeline contains include declaration for katalis pipelines order, inclu
 
 |Filename|Description|
 |--------|-----------|
-|pipeline.nim|pipeline order includes declaration|
+|pipelines.nim|pipeline order includes declaration|
 
 ## 4. Katalis DSL (Domain Specific Language)
 Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code. Katalis using *@!* prefix for the DSL to prevent confict and make it easy for coding convention. Katalis DSL available in *katalis/macros/sugar.nim*. There are some macros that only can be called inside *@!App* block and block pipeline in katalis let see the table.
