@@ -1,8 +1,8 @@
 # Gold Sponsor
 <a href="https://amscloud.co.id"><img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Awan%20Media%20Semesta_600_BG.png" height="100px"></a>
 <a href="https://superserver.co.id"><img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Super%20Server_600%20(1)_BG.png" height="100px"></a>
-<a href="https://www.facebook.com/kandangretawu"><img src="https://github.com/zendbit/katalis-readme-assets/blob/02ca1a457bba7d678d554cf5e931742ed8a955e1/326268483_1219408249008756_5424435258872438740_n.png" height="100px"></a>
 <a href="https://wisatech.co.id"><img src="https://github.com/zendbit/katalis-readme-assets/blob/68132bf0ae335fd61c071d9bfb7f42483be3873a/WhatsApp%20Image%202024-11-10%20at%2000.58.36.jpeg" height="100px"></a>
+<a href="https://www.facebook.com/kandangretawu"><img src="https://github.com/zendbit/katalis-readme-assets/blob/02ca1a457bba7d678d554cf5e931742ed8a955e1/326268483_1219408249008756_5424435258872438740_n.png" height="100px"></a>
 
 # Katalis
 Katalis is [nim lang](https://nim-lang.org) micro framework
