@@ -137,6 +137,17 @@ proc `==`*(first: Route, second: Route): bool {.gcsafe.} =
     first.httpMethod == second.httpMethod
 
 
+proc normalizePath(path: string): string {.gcsafe.} = ## \
+  ## normalize path
+  ## if path end with /
+  ## then remove it
+  var path = path
+  if path.len > 1 and path[^1] == '/':
+    path = path[0..(path.len - 2)]
+
+  path
+
+
 proc add*(
     self: Routes,
     httpMethod: seq[HttpMethod],
@@ -155,6 +166,7 @@ proc add*(
   ##       await ctx.resp
   ##   )
 
+  let path = path.normalizePath
   self.routeTable[path] = Route(
       httpMethod: httpMethod,
       path: path,
@@ -280,6 +292,7 @@ proc matchRoute(
   ## match between requestPath with routePath
   ## then retrieve the segment params
 
+  let requestPath = requestPath.normalizePath
   var param = newTable[string, string]()
   var regexMatch: RegexMatch2
   # fo non regex segment /:id/helo/:year/...
