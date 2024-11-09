@@ -1,4 +1,7 @@
-# katalis
+# Gold Sponsor
+<img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Awan%20Media%20Semesta_600_BG.png" width="150px"> <img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Super%20Server_600%20(1)_BG.png" width="150px">
+
+# Katalis
 Katalis is [nim lang](https://nim-lang.org) micro framework
 
 ## 1. Install
