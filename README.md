@@ -543,24 +543,24 @@ import katalis/katalisApp
 
 ### 8.4 Handling XML data
 ### 8.5 Handling uploaded files
-
-## 9. Validation
+## 9. Before, After Pipelines
+## 10. Validation
 in progress
 
-## 10. Template engine (Mustache)
+## 11. Template engine (Mustache)
 in progress
 
-## 11. Websocket
+## 12. Web Socket
 in progress
 
-## 12. Task Scheduler
+## 13. Task Scheduler
 in progress
 
-## 13. SSL
-in progress
-
-## 14. Create extensions
+## 14. Serve SSL
 in progress
 
 ## 15. Fullstack
+in progress
+
+## 16. Katalis Coding Style Guide
 in progress
