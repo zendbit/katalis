@@ -482,7 +482,22 @@ import katalis/extension/mustache
 ```
 
 ## 8. Query string, form (urlencoded/multipart), json, xml, upload
-in progress
+### 8.1 Handling query string request
+```nim
+import katalis/katalisApp
+
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!App:
+  @!Get "/test-qs":
+    ## lets get query string test
+    ## http://localhost:8000/test-qs?city=ngawi&province=surabaya
+    let city = @!Query.getOrDefault("city")
+    let province = @!Query.getOrDefault("surabaya")
+
+    @!Context.reply(Http200, &"<h3>Welcome to {province}, {city}.</h3>")
+```
 
 ## 9. Validation
 in progress
