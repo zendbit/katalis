@@ -541,6 +541,9 @@ import katalis/katalisApp
     await @!Context.replyJson(Http200, data)
 ```
 
+### 8.4 Handling XML data
+### 8.5 Handling uploaded files
+
 ## 9. Validation
 in progress
 
