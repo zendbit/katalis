@@ -533,9 +533,8 @@ import katalis/katalisApp
     ## all data will convert to nim stdlib JsonNode
     ## see https://nim-lang.org/docs/json.html
 
-    if not data.isNil: ## \
-      ## lets modify the data add country to json
-      data["country"] = %"indonesia"
+    ## lets modify the data add country to json
+    data["country"] = %"indonesia"
 
     ## katalis will automatic response as json if we pass JsonNode
     ## lets pass JsonNode from client and we modify it
