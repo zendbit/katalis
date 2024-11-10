@@ -516,6 +516,24 @@ import katalis/katalisApp
     @!Context.reply(Http200, &"<h3>Welcome to {province}, {city}.</h3>")
 ```
 
+### 8.3 Handling JSON data
+All json request data will convert to nim stdlib json see [https://nim-lang.org/docs/json.html](https://nim-lang.org/docs/json.html)
+```nim
+import katalis/katalisApp
+
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!App:
+  @!Post "/test-form":
+    ## lets get query string test
+    ## http://localhost:8000/test-form with post method
+    let city = @!Form.data.getOrDefault("city")
+    let province = @!Form.data.getOrDefault("province")
+
+    @!Context.reply(Http200, &"<h3>Welcome to {province}, {city}.</h3>")
+```
+
 ## 9. Validation
 in progress
 
