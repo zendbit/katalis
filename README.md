@@ -492,9 +492,26 @@ import katalis/katalisApp
 @!App:
   @!Get "/test-qs":
     ## lets get query string test
-    ## http://localhost:8000/test-qs?city=ngawi&province=surabaya
+    ## http://localhost:8000/test-qs?city=ngawi&province=surabaya with get method
     let city = @!Query.getOrDefault("city")
-    let province = @!Query.getOrDefault("surabaya")
+    let province = @!Query.getOrDefault("province")
+
+    @!Context.reply(Http200, &"<h3>Welcome to {province}, {city}.</h3>")
+```
+
+### 8.2 Handling form data
+```nim
+import katalis/katalisApp
+
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!App:
+  @!Post "/test-form":
+    ## lets get query string test
+    ## http://localhost:8000/test-form with post method
+    let city = @!Form.data.getOrDefault("city")
+    let province = @!Form.data.getOrDefault("province")
 
     @!Context.reply(Http200, &"<h3>Welcome to {province}, {city}.</h3>")
 ```
