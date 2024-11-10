@@ -491,7 +491,7 @@ import katalis/katalisApp
 
 @!App:
   @!Get "/test-qs":
-    ## lets get query string test
+    ## lets do query string test
     ## http://localhost:8000/test-qs?city=ngawi&province=surabaya with get method
     let city = @!Query.getOrDefault("city")
     let province = @!Query.getOrDefault("province")
@@ -508,7 +508,7 @@ import katalis/katalisApp
 
 @!App:
   @!Post "/test-form":
-    ## lets get query string test
+    ## lets do form test
     ## http://localhost:8000/test-form with post method
     let city = @!Form.data.getOrDefault("city")
     let province = @!Form.data.getOrDefault("province")
@@ -525,13 +525,21 @@ import katalis/katalisApp
 @!Settings.enableKeepAlive = true
 
 @!App:
-  @!Post "/test-form":
-    ## lets get query string test
-    ## http://localhost:8000/test-form with post method
-    let city = @!Form.data.getOrDefault("city")
-    let province = @!Form.data.getOrDefault("province")
+  @!Post "/test-json":
+    ## lets do json test
+    ## http://localhost:8000/test-json with post method
+    let data = @!Json ## \
+    ## json data from client request
+    ## all data will convert to nim stdlib JsonNode
+    ## see https://nim-lang.org/docs/json.html
 
-    @!Context.reply(Http200, &"<h3>Welcome to {province}, {city}.</h3>")
+    if not data.isNil: ## \
+      ## lets modify the data add country to json
+      data["country"] = %"indonesia"
+
+    ## katalis will automatic response as json if we pass JsonNode
+    ## lets pass JsonNode from client and we modify it
+    await @!Context.replyJson(Http200, data)
 ```
 
 ## 9. Validation
