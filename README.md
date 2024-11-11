@@ -542,6 +542,32 @@ import katalis/katalisApp
 ```
 
 ### 8.4 Handling XML data
+All xml request data will convert to nim stdlib xmltree see [https://nim-lang.org/docs/xmltree.html](https://nim-lang.org/docs/xmltree.html)
+```nim
+  @!Post "/test-xml":
+    ## lets do xml test
+    ## http://localhost:8000/test-xml with post method
+    let data = @!Xml ## \
+    ## xml data from client request
+    ## all data will convert to nim stdlib XmlNode
+    ## see https://nim-lang.org/docs/xmltree.html
+    ##
+    ## Try to send data using this xml format
+    ##  <Address>
+    ##    <City>Ngawi</City>
+    ##    <Province>Surabaya</Province>
+    ##  </Address>
+    ##
+
+    ## lets modify the data add country
+    let country = newElement("Country")
+    country.add(newText("Indonesia"))
+    data.add(country)
+
+    ## katalis will automatic response as xml if we pass XmlNode
+    ## lets pass XmlNode from client and we modify it
+    await @!Context.replyXml(Http200, data)
+```
 ### 8.5 Handling uploaded files
 ## 9. Before, After Pipelines
 ## 10. Validation
