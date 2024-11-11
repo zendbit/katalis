@@ -569,7 +569,7 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
     await @!Context.replyXml(Http200, data)
 ```
 ### 8.5 Handling uploaded files
-## 9. Before, After Pipelines
+## 9. Before, After, OnReply, Cleanup Pipelines
 ## 10. Validation
 in progress
 
