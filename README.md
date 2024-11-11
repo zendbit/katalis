@@ -121,7 +121,7 @@ Before pipeline will be evaluate before route processing, this pipeline has adva
 After pipeline will be evaluate after route processing, this pipelines has advantages like early checking if request has access to route resource or not
 |Filename|Description|
 |--------|-----------|
-|httpStaticFile|handle static file request from client|
+|httpStaticFile.nim|handle static file request from client|
 
 Static file must be placed is in *static* folder, but we can also changes default static folder from configuration (For more information about configuration see configuration section).
 
