@@ -897,6 +897,33 @@ Nim come with *Mustache* template engine. see katalis/extension/mustache.nim, th
 
 For mustache specs, you can refer to [https://mustache.github.io/](https://mustache.github.io/)
 
+Mustache can be inline or using *.mustache* file, in this case we will setup mustache using *.mustache*.
+
+We need create *templates* directory
+```bash
+mkdir templates
+```
+
+Then add file *index.mustache, header.mustache, footer.mustache*. Mustache specs support partials template.
+
+*index.mustache*
+```mustache
+<html>
+  <head><title>mustache example</title></head>
+  <body>
+    <div>
+      <h3>This is content section<h3>
+    </div>
+  </body>
+</html>
+```
+
+*header.mustache*
+```mustache
+<div>
+  <h3>This is content section<h3>
+</div>
+```
 ## 13. Web Socket
 in progress
 
