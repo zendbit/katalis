@@ -953,6 +953,7 @@ Let do with the code
   @!Get "/test-mustache":
     let m = newMustache()
     m.context["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
+    ## call the index.mustache in the templates folder with m.render("index")
     await @!Context.reply(Http200, m.render("index"))
 ```
 
