@@ -21,8 +21,8 @@ import
 import
   ../core/environment
 
-import moustachu
-export moustachu
+import nim_moustachu
+export nim_moustachu
 
 
 type
