@@ -673,16 +673,13 @@ After pipeline will execute after routing process, also after serving staticfile
 ## 10. Response Message
 in progress
 
-## 10. Validation
+## 11. Validation
 in progress
 
-## 11. Template engine (Mustache)
+## 12. Template engine (Mustache)
 in progress
 
-## 12. Web Socket
-in progress
-
-## 13. Task Scheduler
+## 13. Web Socket
 in progress
 
 ## 14. Serve SSL
