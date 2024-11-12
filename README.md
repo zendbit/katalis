@@ -988,6 +988,18 @@ Katalis also support serve SSL, we just need ssl certificate or we can use self 
 
 Hot to create self signed SSL?, you can follow this instruction [https://devcenter.heroku.com/articles/ssl-certificate-self](https://devcenter.heroku.com/articles/ssl-certificate-self). Or you can find other resource from the internet world.
 
+Then you can pass the certificate to the katalis settings
+```nim
+@!Settings.sslSettings = newSslSettings(
+    certFile = "path to certificate",
+    keyFile = "path to key file",
+    port = Port(8443), ## default value
+    enableVerify = false ## set to true if using production and valid ssl certificate
+  )
+```
+
+it will server on [https://localhost:8443](https://localhost:8443)
+
 ## 15. Fullstack
 Katalis is not fullstack framework, but if you want to use katalis as part of your stack you can use with others framework.
 
