@@ -1,8 +1,24 @@
 # Gold Sponsor
-<img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Awan%20Media%20Semesta_600_BG.png" width="150px"> <img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Super%20Server_600%20(1)_BG.png" width="150px">
+<table>
+  <tr>
+    <td>
+    <a href="https://amscloud.co.id"><img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Awan%20Media%20Semesta_600_BG.png" height="100px"></a>
+    <a href="https://superserver.co.id"><img src="https://github.com/zendbit/katalis-readme-assets/blob/f146951204bb7f941412d9becc8fa64c6cf7f5e0/Banner_Super%20Server_600%20(1)_BG.png" height="100px"></a>
+    <br>
+    <a href="https://wisatech.co.id"><img src="https://github.com/zendbit/katalis-readme-assets/blob/68132bf0ae335fd61c071d9bfb7f42483be3873a/WhatsApp%20Image%202024-11-10%20at%2000.58.36.jpeg" height="100px"></a>   
+    </td>
+    <td>
+    <a href="https://www.facebook.com/kandangretawu"><img src="https://github.com/zendbit/katalis-readme-assets/blob/02ca1a457bba7d678d554cf5e931742ed8a955e1/326268483_1219408249008756_5424435258872438740_n.png" height="200px"></a>
+    </td>
+  </tr>
+</table>
 
 # Katalis
 Katalis is [nim lang](https://nim-lang.org) micro framework
+
+Katalis always focusing on protocol implementation and performance improvement. For fullstack framework using katalis it will be depends on developer needs, we will not provides frontend engine or database layer engine (ORM) because it will vary for each developer taste!.
+
+If you want to use katalis as fullstack nim, you can read on fullstack section in this documentation.
 
 ## 1. Install
 ```
@@ -105,7 +121,7 @@ Before pipeline will be evaluate before route processing, this pipeline has adva
 After pipeline will be evaluate after route processing, this pipelines has advantages like early checking if request has access to route resource or not
 |Filename|Description|
 |--------|-----------|
-|httpStaticFile|handle static file request from client|
+|httpStaticFile.nim|handle static file request from client|
 
 Static file must be placed is in *static* folder, but we can also changes default static folder from configuration (For more information about configuration see configuration section).
 
@@ -154,7 +170,7 @@ Katalis application, this is starting poin of katalis framework. Includes all fi
 |--------|-----------|
 |katalisApp.nim|include this file for starting the app server|
 
-### 3.7 Pipeline (file)
+### 3.7 Pipelines (file)
 Katalis pipeline contains include declaration for katalis pipelines order, include declaration is important depend on this order:
 - initialize
 - before
@@ -164,7 +180,7 @@ Katalis pipeline contains include declaration for katalis pipelines order, inclu
 
 |Filename|Description|
 |--------|-----------|
-|pipeline.nim|pipeline order includes declaration|
+|pipelines.nim|pipeline order includes declaration|
 
 ## 4. Katalis DSL (Domain Specific Language)
 Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code. Katalis using *@!* prefix for the DSL to prevent confict and make it easy for coding convention. Katalis DSL available in *katalis/macros/sugar.nim*. There are some macros that only can be called inside *@!App* block and block pipeline in katalis let see the table.
@@ -346,6 +362,7 @@ Open with browser [http://localhost:8000/index.html](http://localhost:8000/index
 ## 7. Create routes and handling request
 ```nim
 import katalis/katalisApp
+import katalis/extension/mustache
 
 @!Settings.enableServeStatic = true
 @!Settings.enableKeepAlive = true
@@ -359,32 +376,217 @@ import katalis/katalisApp
   ## in this case, because we already set @!EndPoint to "/admin"
   ## so the route url will be http://localhost:8000/admin
   @!Get "/":
-    await @!Context.reply(Http200, "<h1>This is the root page!")
+    await @!Context.reply(Http200, "<h1>This is admin the root page!")
 
   ## another get example
   ## http://localhost:8000/hello
   @!Get "/hello":
     await @!Context.reply(Http200, "<h1>world!</h1>")
 
+  ## mapping route, retrieve segment to variable
+  @!Get "/birthdate/:month/:day/:year":
+    ## this will retrieve segments
+    ## as variable month, day, and year
+    ## http://localhost/admin/birthdate/may/22/2000
+    
+    let birthdate = [@!Segment["month"],  @!Segment["day"], @!Segment["year"]].join("/")
+
+    await @!Context.reply(
+      Http200,
+      &"<h3>Birthdate</h3> <p>{birthdate}</p>"
+    )
+
+  ## mapping route, retrieve query string to variable
+  @!Get "/birthdate":
+    ## this will retrieve query string
+    ## as variable month, day, and year
+    ## http://localhost/admin/birthdate?month=may&day=22&year=2000
+    
+    let birthdate = [@!Query.getOrDefault("month"),  @!Query.getOrDefault("day"), @!Query.getOrDefault("year")].join("/")
+
+    await @!Context.reply(
+      Http200,
+      &"<h3>Birthdate</h3> <p>{birthdate}</p>"
+    )
+
+  ## mapping route, retrieve segment as regex pattern
+  @!Get "/birthdate/re<:month([a-zA-Z]+)_:day([0-9]+)_:year([0-9]+)>":
+    ## this will retrieve query string
+    ## as variable month, day, and year
+    ## http://localhost/admin/birthdate/may_22_2000
+    
+    let birthdate = [@!Segment.getOrDefault("month"),  @!Segment.getOrDefault("day"), @!Segment.getOrDefault("year")].join("/")
+
+    await @!Context.reply(
+      Http200,
+      &"<h3>Birthdate</h3> <p>{birthdate}</p>"
+    )
+
+  ## we also can have multiple method
+  ## in one route definition
+  @![Get, Post] "/login":
+    ## we can use validation to check fields
+    ## but for validation details we will discuss in other section
+    ## about validation
+
+    ## let get form data username, password
+    ## if method http post validate the form data
+    let username = @!Form.data.getOrDefault("username")
+    let password = @!Form.data.getOrDefault("password")
+    var errorMsg = ""
+    if @!Req.httpMethod == HttpPost:
+      if username == "" or password == "":
+        errorMsg = "username or password is required!"
+
+    ##
+    ## katalis come with mustache template engine
+    ## for template engine we will explain later
+    ##
+    let tpl = 
+      """
+        <html>
+          <head>
+            <title>example</title>
+          </head>
+          <body>
+            <h3>Login</h3>
+            <form method="POST">
+              <input type="text" name="username" placeholder="username" value="{{username}}">
+              <br>
+              <input type="password" name="password" placeholder="password" value="{{password}}">
+              <br>
+              <input type="submit" value="Login">
+            </form>
+            <h4>{{errorMsg}}</h4>
+          </body>
+        </html>
+      """
+
+    let m = newMustache()
+    m.context["errorMsg"] = errorMsg
+    m.context["username"] = username
+    m.context["password"] = password
+    @!Context.reply(Http200, m.render(tpl))
+
+## we can have multiple @!App for routes separation
+@!App:
+  ## let definde endpoint for users
+  @!EndPoint "/user"
+
+  ## the user root page
+  ## http://localhost:8000/user
+  @!Get "/":
+    await @!Context.reply(Http200, "<h1>This is user root page</h1>")
+
 @!Emit
 ```
 
-## 8. Query string, form (urlencoded/multipart), json, xml
+## 8. Query string, form (urlencoded/multipart), json, xml, upload
+### 8.1 Handling query string request
+```nim
+import katalis/katalisApp
+
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!App:
+  @!Get "/test-qs":
+    ## lets do query string test
+    ## http://localhost:8000/test-qs?city=ngawi&province=surabaya with get method
+    let city = @!Query.getOrDefault("city")
+    let province = @!Query.getOrDefault("province")
+
+    @!Context.reply(Http200, &"<h3>Welcome to {province}, {city}.</h3>")
+```
+
+### 8.2 Handling form data
+```nim
+import katalis/katalisApp
+
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!App:
+  @!Post "/test-form":
+    ## lets do form test
+    ## http://localhost:8000/test-form with post method
+    let city = @!Form.data.getOrDefault("city")
+    let province = @!Form.data.getOrDefault("province")
+
+    @!Context.reply(Http200, &"<h3>Welcome to {province}, {city}.</h3>")
+```
+
+### 8.3 Handling JSON data
+All json request data will convert to nim stdlib json see [https://nim-lang.org/docs/json.html](https://nim-lang.org/docs/json.html)
+```nim
+import katalis/katalisApp
+
+@!Settings.enableServeStatic = true
+@!Settings.enableKeepAlive = true
+
+@!App:
+  @!Post "/test-json":
+    ## lets do json test
+    ## http://localhost:8000/test-json with post method
+    let data = @!Json ## \
+    ## json data from client request
+    ## all data will convert to nim stdlib JsonNode
+    ## see https://nim-lang.org/docs/json.html
+
+    ## lets modify the data add country to json
+    data["country"] = %"indonesia"
+
+    ## katalis will automatic response as json if we pass JsonNode
+    ## lets pass JsonNode from client and we modify it
+    await @!Context.replyJson(Http200, data)
+```
+
+### 8.4 Handling XML data
+All xml request data will convert to nim stdlib xmltree see [https://nim-lang.org/docs/xmltree.html](https://nim-lang.org/docs/xmltree.html)
+```nim
+  @!Post "/test-xml":
+    ## lets do xml test
+    ## http://localhost:8000/test-xml with post method
+    let data = @!Xml ## \
+    ## xml data from client request
+    ## all data will convert to nim stdlib XmlNode
+    ## see https://nim-lang.org/docs/xmltree.html
+    ##
+    ## Try to send data using this xml format
+    ##  <Address>
+    ##    <City>Ngawi</City>
+    ##    <Province>Surabaya</Province>
+    ##  </Address>
+    ##
+
+    ## lets modify the data add country
+    let country = newElement("Country")
+    country.add(newText("Indonesia"))
+    data.add(country)
+
+    ## katalis will automatic response as xml if we pass XmlNode
+    ## lets pass XmlNode from client and we modify it
+    await @!Context.replyXml(Http200, data)
+```
+### 8.5 Handling uploaded files
+## 9. Before, After, OnReply, Cleanup Pipelines
+## 10. Validation
 in progress
 
-## 9. Validation
-in progress
-## 10. Template engine (Mustache)
+## 11. Template engine (Mustache)
 in progress
 
-## 11. Websocket
+## 12. Web Socket
 in progress
 
-## 12. SSL
+## 13. Task Scheduler
 in progress
 
-## 13. Create extensions
+## 14. Serve SSL
 in progress
 
-## 14. Fullstack
+## 15. Fullstack
+in progress
+
+## 16. Katalis Coding Style Guide
 in progress
