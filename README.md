@@ -14,7 +14,7 @@
 </table>
 
 # Katalis
-Katalis is [nim lang](https://nim-lang.org) micro framework
+Katalis is [nim lang](https://nim-lang.org) micro web framework
 
 Katalis always focusing on protocol implementation and performance improvement. For fullstack framework using katalis it will be depends on developer needs, we will not provides frontend engine or database layer engine (ORM) because it will vary for each developer taste!.
 
@@ -481,7 +481,7 @@ import katalis/extension/mustache
 @!Emit
 ```
 
-## 8. Query string, form (urlencoded/multipart), json, xml, upload
+## 8. Query string, form (urlencoded/multipart), json, xml, upload, Redirect
 ### 8.1 Handling query string request
 ```nim
 import katalis/katalisApp
@@ -569,17 +569,264 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
     await @!Context.replyXml(Http200, data)
 ```
 ### 8.5 Handling uploaded files
+```nim
+  @![Get, Post] "/test-upload":
+    ## lets do upload multipart data
+    ## katalis come with mustache template engine
+    ## for template engine we will explain later
+    ##
+    let tpl = 
+      """
+        <html>
+          <head>
+            <title>upload test</title>
+          </head>
+          <body>
+            <h3>Upload files</h3>
+            <form method="POST" enctype="multipart/form-data">
+              Upload Single
+              <br>
+              <input name="onefile" type="file" />
+              <br>
+              <br>
+              Upload Multiple
+              <br>
+              <input name="multiplefiles[]" type="file" multiple />
+              <br>
+              <br>
+              <button type="submit">Upload</button>
+            </form>
+          </body>
+        </html>
+      """
+
+    if @!Req.httpMethod == HttpPost:
+      ## test show uploaded file info to console
+      if @!Form.files.len != 0:
+        for name, files in @!Form.files:
+          echo name
+          for file in files:
+            echo file.extension
+            echo file.path
+            echo file.mimetype
+            echo file.isAccessible
+
+      ## create directory uploaded if not exist
+      if not "uploaded".dirExists:
+        "uploaded".createDir
+
+      ## check if files exists
+      if "onefile" in @!Form.files:
+        let onefile = @!Form.files["onefile"][0]
+        ## move files to uploaded dir
+        onefile.path.moveFile("uploaded".joinPath(onefile.name))
+
+      if "multiplefiles" in @!Form.files:
+        let multiplefiles = @!Form.files["multiplefiles"]
+        for file in multiplefiles:
+          ## move files to uploaded dir
+          file.path.moveFile("uploaded".joinPath(file.name))
+
+    let m = newMustache()
+    @!Context.reply(Http200, m.render(tpl))
+```
+### 8.6 Redirect
+We can modify response header for redirection purpose
+```nim
+@!App:
+  @!Get "/home":
+    @!Context.reply(Http200, "<h3>Welcome home!</h3>")
+
+  @!Get "/test-redirect":
+    ## modify response header add redirect location to /home
+    @!Res.headers["Location"] = "/home"
+    @!Context.reply(Http307, "")
+```
 ## 9. Before, After, OnReply, Cleanup Pipelines
-## 10. Validation
+### 9.1 Before pipeline
+Before pipeline will execute before routing process, also before serving staticfile. We can use it to check for all route before route process. We can skip all route by returning *true* statement
+```nim
+@!App:
+  @!Before:
+    ## your code here
+
+    if something_wrong:
+      @!Context.reply(Http403, "Anauthorized access!")
+      ## by returning true, will skip all process and return the error message, this is simplify for checking
+      return true
+```
+### 9.2 After pipeline
+After pipeline will execute after routing process, also after serving staticfile
+```nim
+@!App:
+  @!After:
+    ## your code here
+
+    if something_wrong:
+      @!Res.headers["Location"] = "/home"
+      @!Context.reply(Http307, "")
+      ## return true for skip all routing definition
+      return true
+```
+### 9.3 OnReply
+OnReply pipeline will process before sending request to client, we can modify for all response from route. This example is from katalis/pipelines/onReply/httpChunked.nim, this code is for converting all response to chunked data before sending to client
+```nim
+##
+## katalis framework
+## This framework if free to use and to modify
+## License: MIT
+## Author: Amru Rosyada
+## Email: amru.rosyada@gmail.com, amru.rosyada@amscloud.co.id
+## Git: https://github.com/zendbit/katalis
+##
+
+##
+## add pipeline onreply
+## as http protocol handler
+## check if chunked Transfer-Encoding enabled or not
+##
+
+
+import std/
+[
+  streams,
+  strutils
+]
+
+
+import
+  ../../core/routes,
+  ../../macros/sugar,
+  ../../core/environment
+
+
+proc composeChunkPayload(
+    ctx: HttpContext,
+    env: Environment = environment.instance()
+  ): string {.gcsafe.} =
+  ## compose chunk payload
+  ## chunked transfer encoding must follow this role
+  ## for more details see about Transfer-Encoding: chunked
+
+  result = ctx.response.body
+
+  let bodyLength = ctx.response.body.len
+  var chunkSize = env.settings.chunkSize
+
+  if env.settings.enableChunkedTransfer and
+    bodyLength >= chunkSize:
+
+    proc constructChunk(
+        chunkSize: string,
+        chunk: string
+      ): string =
+
+      result = chunkSize &
+        $CRLF &
+        chunk &
+        $CRLF
+
+
+    let numberOfChunks = (bodyLength / chunkSize).int
+    var chunkSizeInHex = chunkSize.toHex
+    let bodyStream = newStringStream(result)
+    var bodyBuffer: string = ""
+
+    for _ in 1..numberOfChunks:
+      bodyBuffer &= constructChunk(
+        chunkSizeInHex,
+        bodyStream.readStr(chunkSize)
+      )
+
+    if bodyLength > chunkSize:
+      chunkSize = bodyLength mod chunkSize
+      bodyBuffer &= constructChunk(
+        chunkSize.toHex,
+        bodyStream.readStr(chunkSize)
+      )
+
+    bodyBuffer &= constructChunk("0", "")
+    bodyStream.close()
+
+    result = bodyBuffer
+
+
+@!App:
+  @!OnReply:
+    if @!Req.httpMethod == HttpHead: return
+
+    if not @!Settings.enableChunkedTransfer or
+      @!Res.body.len > @!Env.settings.chunkSize:
+
+      @!Res.body = @!Context.composeChunkPayload(@!Env)
+      @!Res.headers["transfer-encoding"] = "chunked"
+```
+### 9.4 Cleanup
+Cleanup pipeline will process after all pipeline finished, this usually for cleanup resource. This example is from katalis/pipelines/cleanup/httpContext.nim
+```nim
+##
+## katalis framework
+## This framework if free to use and to modify
+## License: MIT
+## Author: Amru Rosyada
+## Email: amru.rosyada@gmail.com, amru.rosyada@amscloud.co.id
+## Git: https://github.com/zendbit/katalis
+##
+
+##
+## Cleanup body request cache
+##
+
+
+import
+  ../../core/routes,
+  ../../macros/sugar,
+  ../../core/environment
+
+
+@!App:
+  @!Cleanup:
+    if @!Req.body.fileExists:
+      @!Req.body.removeFile
+
+    if @!Req.param.form.files.len != 0:
+      ## remove file after file uploaded
+      ## uploaded file should be move after finished
+      ## file uploaded before cleanup present
+      for _, files in @!Req.param.form.files:
+        for file in files:
+          if not file.isAccessible or not file.path.fileExists:
+            continue
+
+          file.path.removeFile
+
+    ## clear http context
+    @!Context.clear
+
+```
+## 10. Response Message
+Response message is universal response message, using this response message will always response application/json. See *katalis/core/replyMsg*
+```nim
+@!App:
+  @!Get "/test-replymsg":
+    ## see core katalis/core/replyMsg.nim
+    @!Context.reply(newReplyMsg(
+      httpCode = Http200,
+      success = true,
+      data = %*{
+        "username": "tian",
+        "address": "Guangdong"
+      },
+      error = %*{}
+    ))
+```
+## 11. Validation
 in progress
 
-## 11. Template engine (Mustache)
+## 12. Template engine (Mustache)
 in progress
 
-## 12. Web Socket
-in progress
-
-## 13. Task Scheduler
+## 13. Web Socket
 in progress
 
 ## 14. Serve SSL
