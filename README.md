@@ -821,7 +821,75 @@ Response message is universal response message, using this response message will
     ))
 ```
 ## 11. Validation
-in progress
+Katalis come with validation feature. See katalis/extension/validation.nim
+Available validation
+- isRequired
+- isEmail
+- minValue
+- maxValue
+- minLength
+- maxLength
+- isDateTime
+- minDateTime
+- maxDateTime
+- inList
+- matchWith -> regex validation
+```nim
+@!App:
+  @![Get, Post] "/test-validation":
+    ## validation is extension on katalis
+    ## see katalis/extension/validation.nim
+    let tpl =
+      """
+        <html>
+          <head><title>validation test</title></head>
+          <body>
+            <form method="POST">
+              <label>Username<label> <span>{{username.msg}}</span>
+              <br>
+              <input type="text" name="username" value="{{username.value}}">
+              <br>
+              <br>
+              <label>Password</label> <span>{{password.msg}}</span>
+              <br>
+              <input type="password" name="password" value="{{password.value}}">
+              <br>
+              <br>
+              <input type="submit" value="Register">
+            </form>
+          </body>
+        </html>
+      """
+    
+    ## mustache template
+    let m = newMustache()
+
+    if @!Req.httpMethod == HttpPost:
+      ## parameter can be Form, JsonNode or Table[string, string] type
+      let v = newValidation(@!Form)
+      v.withField("username").
+        isRequired(failedMsg = "Username is empty."). ## we can add custom failedMsg
+        minLength(8). ## minimum length of field value is 8 char length
+        maxLength(50). ## maximum length of field value is 50 char length
+        matchWith("([a-zA-Z0-9_]+)$", failedMsg = "Only a-z A-Z 0-9 _ are allowed") ## check with regex, only allow a-z A-Z 0-9 _
+
+      v.withField("password").
+        isRequired(failedMsg = "Password is empty."). ## we can add custom failedMsg
+        minLength(8). ## minimum length 8 char length
+        maxLength(254) ## maximum length 254 char length
+
+      ## we can check validation result for each field
+      ## lets print to console
+      echo "username " & v.fields["username"].msg & " -> " & $v.fields["username"].isValid
+      echo "password " & v.fields["password"].msg & " -> " & $v.fields["password"].isValid
+
+      ## set mustache context send data to template
+      for fieldName, fieldData in v.fields:
+        m.context[fieldName] = %fieldData
+
+    @!Context.reply(Http200, m.render(tpl))
+
+```
 
 ## 12. Template engine (Mustache)
 in progress
