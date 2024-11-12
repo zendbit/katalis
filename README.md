@@ -657,7 +657,7 @@ Before pipeline will execute before routing process, also before serving staticf
 ```
 ### 9.2 After pipeline
 After pipeline will execute after routing process, also after serving staticfile
-```
+```nim
 @!App:
   @!After:
     ## your code here
