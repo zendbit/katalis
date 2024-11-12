@@ -906,6 +906,20 @@ mkdir templates
 
 Then add file *index.mustache, header.mustache, footer.mustache*. Mustache specs support partials template.
 
+*header.mustache*
+```mustache
+<div>
+  <h3>This is header section<h3>
+</div>
+```
+
+*footer.mustache*
+```mustache
+<div>
+  <h3>This is footer section<h3>
+</div>
+```
+
 *index.mustache*
 ```mustache
 <html>
@@ -916,13 +930,6 @@ Then add file *index.mustache, header.mustache, footer.mustache*. Mustache specs
     </div>
   </body>
 </html>
-```
-
-*header.mustache*
-```mustache
-<div>
-  <h3>This is content section<h3>
-</div>
 ```
 ## 13. Web Socket
 in progress
