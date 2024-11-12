@@ -481,7 +481,7 @@ import katalis/extension/mustache
 @!Emit
 ```
 
-## 8. Query string, form (urlencoded/multipart), json, xml, upload, Redirect
+## 8. Query string, form (urlencoded/multipart), json, xml, upload, Redirect, Session
 ### 8.1 Handling query string request
 ```nim
 import katalis/katalisApp
@@ -641,6 +641,21 @@ We can modify response header for redirection purpose
     ## modify response header add redirect location to /home
     @!Res.headers["Location"] = "/home"
     @!Context.reply(Http307, "")
+```
+### 8.7 Session
+See *katalis/core/session.nim*
+```nim
+@!App:
+  ## init cookie session
+  @!Before:
+    await @!Context.initCookieSession()
+
+  @!Get "/hello":
+    await @!Context.addCookieSession("name", %"Tian Long")
+    let name = await @!Context.getCookieSession("name")
+    ## remove individual session with @!Context.deleteCookieSession("name")
+    ## destroy all session value with @!Context.destroyCookieSession()
+    await @!Context.reply(Http200, &"Hello {name}!")
 ```
 ## 9. Before, After, OnReply, Cleanup Pipelines
 ### 9.1 Before pipeline
