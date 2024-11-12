@@ -958,7 +958,30 @@ Let do with the code
 ```
 
 ## 13. Web Socket
-in progress
+Out of the box with webscoket. See *katalis/core/webSocket.nim*
+```nim
+@!App:
+  ## it will accessed with ws://localhost:8000/ws
+  @!WebSocket "/ws":
+    case @!WebSocket.state
+    of WsState.Open:
+      case @!WebSocket.inFrame.opCode
+      of WsOpCode.TextFrame.uint8:
+        await @!WebSocket.reply("This is from end point.")
+      of WsOpCode.ContinuationFrame.uint8:
+        ## code here
+      of WsOpCode.BinaryFrame.uint8:
+        ## code here
+      else:
+        discard
+
+    of WsState.Close:
+      echo "Closed"
+      
+    else:
+      discard
+
+```
 
 ## 14. Serve SSL
 in progress
