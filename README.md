@@ -895,6 +895,11 @@ Available validations are:
 ## 12. Template engine (Mustache)
 Nim come with *Mustache* template engine. see katalis/extension/mustache.nim, this template based on [https://github.com/fenekku/moustachu](https://github.com/fenekku/moustachu).
 
+For using mustache, we need to import mustache from the extension
+```nim
+import katalis/extension/mustache.nim
+```
+
 For mustache specs, you can refer to [https://mustache.github.io/](https://mustache.github.io/)
 
 Mustache can be inline or using *.mustache* file, in this case we will setup mustache using *.mustache*.
@@ -943,9 +948,12 @@ Then we will include partials *header.mustache and footer.mustache*
 Mustache using *{{tag_mustache}}* for data binding, in current nim it support JsonNode, Tables and mustache Context it serf.
 
 Let do with the code
-
 ```nim
-
+@!App:
+  @!Get "/test-mustache":
+    let m = newMustache()
+    m.context["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
+    await @!Context.reply(Http200, m.render("index"))
 ```
 
 ## 13. Web Socket
