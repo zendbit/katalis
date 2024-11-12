@@ -14,7 +14,7 @@
 </table>
 
 # Katalis
-Katalis is [nim lang](https://nim-lang.org) micro framework
+Katalis is [nim lang](https://nim-lang.org) micro web framework
 
 Katalis always focusing on protocol implementation and performance improvement. For fullstack framework using katalis it will be depends on developer needs, we will not provides frontend engine or database layer engine (ORM) because it will vary for each developer taste!.
 
