@@ -222,6 +222,19 @@ proc replyJson*(
   await self.reply(httpCode, $body, headers & httpHeaders)
 
 
+proc reply*(
+    self: HttpContext,
+    msg: ReplyMsg,
+    httpHeaders: HttpHeaders = nil
+  ) {.gcsafe async.} =
+  ## send http resp as json
+
+  let headers = newHttpHeaders()
+  headers["content-type"] = "application/json"
+
+  await self.replyJson(msg.httpCode, %msg, headers & httpHeaders)
+
+
 proc replyXml*(
     self: HttpContext,
     httpCode: HttpCode,
