@@ -895,7 +895,7 @@ Available validations are:
 ## 12. Template engine (Mustache)
 Nim come with *Mustache* template engine. see katalis/extension/mustache.nim, this template based on [https://github.com/fenekku/moustachu](https://github.com/fenekku/moustachu).
 
-For mustache spec, you can refer to [https://mustache.github.io/](https://mustache.github.io/)
+For mustache specs, you can refer to [https://mustache.github.io/](https://mustache.github.io/)
 
 ## 13. Web Socket
 in progress
