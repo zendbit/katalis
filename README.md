@@ -989,7 +989,18 @@ Katalis also support serve SSL, we just need ssl certificate or we can use self 
 Hot to create self signed SSL?, you can follow this instruction [https://devcenter.heroku.com/articles/ssl-certificate-self](https://devcenter.heroku.com/articles/ssl-certificate-self). Or you can find other resource from the internet world.
 
 ## 15. Fullstack
-in progress
+Katalis is not fullstack framework, but if you want to use katalis as part of your stack you can use with others framework.
 
-## 16. Katalis Coding Style Guide
-in progress
+Frontend:
+- [htmx](https://htmx.org)
+- [karax](https://github.com/karaxnim/karax)
+- [nimja](https://github.com/enthus1ast/nimja)
+
+Databse (ORM):
+- [norm](https://norm.nim.town/)
+- [norman](https://norman.nim.town/)
+
+## 16. Katalis Coding Style Guideline
+Katalis coding style guideline is simple
+- Follow nim lang Coding Style
+- Only use Katalis DSL on the App and Pipeline don't use it on the *core, utils* to make katalis easy for debugging
