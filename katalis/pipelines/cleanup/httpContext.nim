@@ -27,11 +27,12 @@ import
       ## remove file after file uploaded
       ## uploaded file should be move after finished
       ## file uploaded before cleanup present
-      for _, v in @!Req.param.form.files:
-        if not v.isAccessible or not v.path.fileExists:
-          continue
+      for _, files in @!Req.param.form.files:
+        for file in files:
+          if not file.isAccessible or not file.path.fileExists:
+            continue
 
-        v.path.removeFile
+          file.path.removeFile
 
     ## clear http context
     @!Context.clear

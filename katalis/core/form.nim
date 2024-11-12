@@ -37,7 +37,7 @@ type
 
     data*: TableRef[string, string] ## \
     ## hold form data non files
-    files*: TableRef[string, StaticFile] ## \
+    files*: TableRef[string, seq[StaticFile]] ## \
     ## hold content disposition of files
 
 
@@ -46,7 +46,7 @@ proc newForm*(): Form {.gcsafe.} =
 
   result = Form(
       data: newTable[string, string](),
-      files: newTable[string, StaticFile]()
+      files: newTable[string, seq[StaticFile]]()
     )
 
 
@@ -63,10 +63,12 @@ proc addData*(
 proc addFile*(
     self: Form,
     name: string,
-    path: string
+    file: StaticFile
   ) {.gcsafe.} =
   ## add file to form data
-  ## path is path to file
 
-  self.files[name] = newStaticFile(path)
+  if not self.files.contains(name):
+    self.files[name] = @[file]
+  else:
+    self.files[name].add(file)
 

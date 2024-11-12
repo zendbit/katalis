@@ -55,10 +55,12 @@ type
     ## hold path of the file
     extension*: string ## \
     ## hold file extension
-    mimetype*: string ## \
+    mimeType*: string ## \
     ## hold mime type of file
     file*: AsyncFile ## \
     ## async file
+    name*: string ## \
+    ## file name
 
 
 proc newStaticFile*(
@@ -76,11 +78,12 @@ proc newStaticFile*(
       staticFile.info = staticFile.path.getFileInfo()
       staticFile.isAccessible = true
       staticFile.msg = "Success"
+      staticFile.name = staticFile.path.extractFilename
 
       let fileParts = staticFile.path.splitFile()
       let mimetype = newMimetypes()
       staticFile.extension = fileParts.ext
-      staticFile.mimetype = mimetype.
+      staticFile.mimeType = mimetype.
         getMimetype(fileParts.ext, default = "application/octet-stream")
     except Exception as e:
       staticFile.msg = e.msg
@@ -155,7 +158,7 @@ proc readContentsAsBytesRanges*(
   let contentRanges = (await self.readContents(@[ranges]))[0]
 
   let headers = newHttpHeaders()
-  headers.add("content-type", self.mimetype)
+  headers.add("content-type", self.mimeType)
   headers.add(
     "content-range",
     &"bytes {ranges.start}-{ranges.stop}/{self.info.size}"
@@ -176,7 +179,7 @@ proc readContentsAsBytesRangesMultipart*(
   for i in 0..contentsRanges.high:
     # header info for each part
     let headers = newHttpHeaders()
-    headers.add("content-type", self.mimetype)
+    headers.add("content-type", self.mimeType)
     headers.add(
       "content-cange",
       &"bytes {ranges[i].start}-{ranges[i].stop}/{self.info.size}"

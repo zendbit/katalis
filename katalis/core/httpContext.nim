@@ -256,7 +256,7 @@ proc parseFormMultipart*(
   ) {.gcsafe async.} =
   ## parse form multipart
   # try get form multipart boundary
-  
+
   let req = self.request
   let settings = env.settings
   let client = self.client
@@ -273,32 +273,128 @@ proc parseFormMultipart*(
   # calculate remain req.body and num req.body
   # if bodyLen larger than readRecvBuffer
   if bodyLen > settings.readRecvBuffer:
-    numOfBuff = floor(bodyLen / settings.readRecvBuffer).int + 1
+    numOfBuff = floor(bodyLen / settings.readRecvBuffer).int
     remainToBuff = bodyLen mod settings.readRecvBuffer
-  else:
-    numOfBuff = 1
 
-  var isCollectMeta = false
-  var isCollectData = false
-  var isFile = false
   let formData = newForm()
   let crlf = &"{CRLF}"
   let doubleCrlf = &"{CRLF}{CRLF}"
+  var isParseMultipart = false
+  var filename = ""
   var metaName = ""
+  var contentType = ""
 
   for i in 0..numOfBuff:
-    if i < numOfBuff:
-      if i == numOfBuff - 1 and remainToBuff != 0:
-        req.body &= await client.recv(remainToBuff)
-      elif bodyLen < settings.readRecvBuffer:
-        req.body &= await client.recv(bodyLen)
-      else:
-        req.body &= await client.recv(settings.readRecvBuffer)
+    if i == numOfBuff and remainToBuff != 0:
+      req.body &= await client.recv(remainToBuff)
+    elif bodyLen < settings.readRecvBuffer:
+      req.body &= await client.recv(bodyLen)
+    else:
+      req.body &= await client.recv(settings.readRecvBuffer)
 
+    let crlfIndex = proc (): int = req.body.find(crlf)
+    let boundaryStartIndex = proc (): int = req.body.find(boundary.start)
+    let boundaryEndIndex = proc (): int = req.body.find(boundary.stop)
+    let contentTypeIndex = proc (): int = req.body.toLower.find("content-type")
+    let contentDispositionIndex = proc (): int = req.body.toLower.find("content-disposition")
+
+    while boundaryStartIndex() != -1:
+      if boundaryStartIndex() == 0 and crlfIndex() != -1:
+        if boundaryEndIndex() == 0:
+          req.body = ""
+        else:
+          req.body = req.body.substr(boundaryStartIndex() + boundary.start.len + crlf.len, req.body.high)
+
+        if filename != "" and metaName != "":
+          await formData.files[metaName][^1].file.write("\n")
+          formData.files[metaName][^1].close()
+          formData.files[metaName][^1].isAccessible = formData.files[metaName][^1].path.fileExists
+
+        filename = ""
+        metaName = ""
+        contentType = ""
+
+      elif contentTypeIndex() == 0 and crlfIndex() != -1:
+        let data = req.body.substr(0, crlfIndex())
+
+        for metaList in data.split(";"):
+          let meta = metaList.split(":")
+          if meta.len == 2:
+            let metaKey = meta[0].strip
+            let metaValue = meta[1].strip
+            if metaKey.toLower == "content-type":
+              contentType = metaValue
+
+        if filename != "":
+          formData.files[metaName][^1].mimeType = contentType
+          formData.files[metaName][^1].extension = filename.splitFile.ext
+
+        req.body = req.body.substr(crlfIndex() + doubleCrlf.len, req.body.high)
+
+      elif contentDispositionIndex() == 0 and crlfIndex() != -1:
+        let data = req.body.substr(0, crlfIndex())
+
+        for metaList in data.split(";"):
+          let meta = metaList.split("=")
+          if meta.len == 2:
+            let metaKey = meta[0].strip
+            let metaValue = meta[1].strip
+            if metaKey == "name":
+              metaName = metaValue.replace("\"", "").replace("[]", "")
+            if metaKey == "filename":
+              filename = metaValue.replace("\"", "")
+
+        if filename != "":
+          formData.addFile(
+            metaName,
+            newStaticFile(
+              settings.storagesUploadDir.joinPath(filename)
+            )
+          )
+
+          formData.files[metaName][^1].mimeType = contentType
+          formData.files[metaName][^1].open(fmWrite)
+          formData.files[metaName][^1].name = filename
+
+        else:
+          formData.data[metaName] = ""
+
+        req.body = req.body.substr(crlfIndex() + crlf.len, req.body.high)
+
+      elif filename != "" and metaName != "" and contentType != "":
+        var data = req.body
+        if boundaryStartIndex() != -1:
+          data = req.body.substr(0, boundaryStartIndex() - crlf.len)
+          req.body = req.body.substr(boundaryStartIndex(), req.body.high)
+
+        await formData.files[metaName][^1].file.write(data)
+
+      elif metaName != "":
+        var data = req.body
+        if boundaryStartIndex() != -1:
+          data = req.body.substr(0, boundaryStartIndex() - crlf.len).strip(trailing = false)
+          req.body = req.body.substr(boundaryStartIndex(), req.body.high)
+
+        formData.data[metaName] &= data
+
+    #[
+    let multipartStartIndex = proc (): int = req.body.find(boundary.start)
+    while true:
+      if multipartStartIndex() == -1: break
+      if multipartStartIndex() == 0:
+        req.body = req.body.substr(boundary.start.len + crlf.len, req.body.high)
+
+      let data = req.body.substr(0, multipartStartIndex() - 1)
+
+      req.body = req.body.substr(multipartStartIndex() + boundary.start.len + crlf.len, req.body.high)
+    ]#
+
+    #[
     # parse multipart if contains boundary
     let findStart = req.body.find(boundary.start)
     let findEnd = req.body.find(crlf)
-    if findStart != -1 and
+    if multipartParseStep == PrepareStep and
+      findStart != -1 and
       findEnd != -1 and
       findStart < findEnd:
 
@@ -306,20 +402,22 @@ proc parseFormMultipart*(
         req.body = req.body.substr(findEnd + crlf.len, req.body.high)
       else:
         if isFile:
-          await formData.files[metaName].file.write(
+          await formData.files[metaName][^1].file.write(
               req.body.substr(0, findStart - 1)
             )
         else:
           if formData.data[metaName].len < settings.maxBodySize:
             formData.data[metaName] &= req.body.substr(0, findStart - 1)
+
         req.body = req.body.substr(findStart, req.body.high)
 
-      isCollectMeta = true
+      #isCollectMeta = true
+      multipartParseStep = CollectMetaStep
 
-    if isCollectMeta:
+    #if isCollectMeta:
+    if multipartParseStep == CollectMetaStep:
       # get all each boundary header information
-      let findStart = req.body.
-        toLower.find("content-disposition")
+      let findStart = req.body.toLower.find("content-disposition")
       let findEnd = req.body.find(doubleCrlf)
 
       if findStart != -1 and
@@ -337,8 +435,7 @@ proc parseFormMultipart*(
         for boundaryHeader in
           boundaryHeaders.strip.split(crlf):
           if boundaryHeader.strip == "": continue
-          if boundaryHeader.
-            strip.toLower.startsWith("content-disposition"):
+          if boundaryHeader.strip.toLower.startsWith("content-disposition"):
             for meta in boundaryHeader.split(";"):
               let kv = meta.split("=")
               if kv.len == 2:
@@ -357,45 +454,49 @@ proc parseFormMultipart*(
           if isFile:
             formData.addFile(
               metaName,
-              settings.storagesUploadDir.joinPath(metaValue.strip)
+              newStaticFile(
+                settings.storagesUploadDir.joinPath(metaValue.strip)
+              )
             )
 
-            if metaContentType != "":
-              formData.files[metaName].mimeType = metaContentType
+            formData.files[metaName][^1].mimeType = metaContentType
 
             # if file open file for write
-            formData.files[metaName].open(fmWrite)
+            formData.files[metaName][^1].open(fmWrite)
           else:
             formData.addData(metaName, metaValue.strip)
 
-        isCollectMeta = false
-        isCollectData = true
+        #isCollectMeta = false
+        #isCollectData = true
+        multipartParseStep = CollectDataStep
 
-    if isCollectData:
+    #if isCollectData:
+    if multipartParseStep == CollectDataStep:
       let findStart = req.body.find(boundary.start)
       if findStart > 0:
         if isFile:
-          await formData.files[metaName].file.write(
+          await formData.files[metaName][^1].file.write(
               req.body.substr(0, findStart - 1)
             )
-          formData.files[metaName].close
+          formData.files[metaName][^1].close
         else:
           if formData.data[metaName].len < settings.maxBodySize:
             formData.data[metaName] &= req.body.substr(0, findStart - 1)
 
-        isCollectData = false
+        multipartParseStep = PrepareStep
+        #isCollectData = false
         isFile = false
-        isCollectMeta = false
+        #isCollectMeta = false
         metaName = ""
 
         req.body = req.body.substr(findStart, req.body.high)
       elif isFile:
-        await formData.files[metaName].file.write(req.body)
+        await formData.files[metaName][^1].file.write(req.body)
         req.body = ""
       else:
         if formData.data[metaName].len < settings.maxBodySize:
           formData.data[metaName] &= req.body
-        req.body = ""
+        req.body = ""]#
 
   # set context request paramter
   req.param.form = formData
