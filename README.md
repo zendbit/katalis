@@ -805,9 +805,21 @@ import
 
 ```
 ## 10. Response Message
-Response message is universal response message, we can use it as response message.
-
-
+Response message is universal response message, using this response message will always response application/json. See *katalis/core/replyMsg*
+```nim
+@!App:
+  @!Get "/test-replymsg":
+    ## see core katalis/core/replyMsg.nim
+    @!Context.reply(newReplyMsg(
+      httpCode = Http200,
+      success = true,
+      data = %*{
+        "username": "tian",
+        "address": "Guangdong"
+      },
+      error = %*{}
+    ))
+```
 ## 11. Validation
 in progress
 
