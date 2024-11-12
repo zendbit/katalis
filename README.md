@@ -920,17 +920,34 @@ Then add file *index.mustache, header.mustache, footer.mustache*. Mustache specs
 </div>
 ```
 
+Then we will include partials *header.mustache and footer.mustache*
+
 *index.mustache*
 ```mustache
 <html>
   <head><title>mustache example</title></head>
   <body>
     <div>
-      <h3>This is content section<h3>
+      {{> header}}
+      <div>
+        <h3>This is content section<h3>
+        <h3>{{post.title}}</h3>
+        <p>{{post.article}}</p>
+      </div>
+      {{> footer}}
     </div>
   </body>
 </html>
 ```
+
+Mustache using *{{tag_mustache}}* for data binding, in current nim it support JsonNode, Tables and mustache Context it serf.
+
+Let do with the code
+
+```nim
+
+```
+
 ## 13. Web Socket
 in progress
 
