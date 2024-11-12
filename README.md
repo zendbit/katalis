@@ -569,6 +569,68 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
     await @!Context.replyXml(Http200, data)
 ```
 ### 8.5 Handling uploaded files
+```nim
+  @![Get, Post] "/test-upload":
+    ## lets do upload multipart data
+    ## katalis come with mustache template engine
+    ## for template engine we will explain later
+    ##
+    let tpl = 
+      """
+        <html>
+          <head>
+            <title>upload test</title>
+          </head>
+          <body>
+            <h3>Upload files</h3>
+            <form method="POST" enctype="multipart/form-data">
+              Upload Single
+              <br>
+              <input name="onefile" type="file" />
+              <br>
+              <br>
+              Upload Multiple
+              <br>
+              <input name="multiplefiles[]" type="file" multiple />
+              <br>
+              <br>
+              <button type="submit">Upload</button>
+            </form>
+          </body>
+        </html>
+      """
+
+    if @!Req.httpMethod == HttpPost:
+      ## test show uploaded file info to console
+      if @!Form.files.len != 0:
+        for name, files in @!Form.files:
+          echo name
+          for file in files:
+            echo file.extension
+            echo file.path
+            echo file.mimetype
+            echo file.isAccessible
+
+      ## create directory uploaded if not exist
+      if not "uploaded".dirExists:
+        "uploaded".createDir
+
+      ## check if files exists
+      if "onefile" in @!Form.files:
+        let onefile = @!Form.files["onefile"][0]
+        ## move files to uploaded dir
+        onefile.path.moveFile("uploaded".joinPath(onefile.name))
+
+      if "multiplefiles" in @!Form.files:
+        let multiplefiles = @!Form.files["multiplefiles"]
+        for file in multiplefiles:
+          ## move files to uploaded dir
+          file.path.moveFile("uploaded".joinPath(file.name))
+
+    let m = newMustache()
+    @!Context.reply(Http200, m.render(tpl))
+```
+
 ## 9. Before, After, OnReply, Cleanup Pipelines
 ## 10. Validation
 in progress
