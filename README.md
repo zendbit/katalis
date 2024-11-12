@@ -821,8 +821,9 @@ Response message is universal response message, using this response message will
     ))
 ```
 ## 11. Validation
-Katalis come with validation feature. See katalis/extension/validation.nim
-Available validation
+Katalis comes with validations feature. See katalis/extension/validation.nim.
+
+Available validations are:
 - isRequired
 - isEmail
 - minValue
@@ -892,7 +893,9 @@ Available validation
 ```
 
 ## 12. Template engine (Mustache)
-in progress
+Nim come with *Mustache* template engine. see katalis/extension/mustache.nim, this template based on [https://github.com/fenekku/moustachu](https://github.com/fenekku/moustachu).
+
+For mustache spec, you can refer to [https://mustache.github.io/](https://mustache.github.io/)
 
 ## 13. Web Socket
 in progress
