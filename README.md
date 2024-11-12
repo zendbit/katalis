@@ -662,11 +662,11 @@ After pipeline will execute after routing process, also after serving staticfile
   @!After:
     ## your code here
 
-  if something_wrong:
-    @!Res.headers["Location"] = "/home"
-    @!Context.reply(Http307, "")
-    ## return true for skip all routing definition
-    return true
+    if something_wrong:
+      @!Res.headers["Location"] = "/home"
+      @!Context.reply(Http307, "")
+      ## return true for skip all routing definition
+      return true
 ```
 ### 9.3 OnReply
 ### 9.4 Cleanup
