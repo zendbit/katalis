@@ -669,9 +669,144 @@ After pipeline will execute after routing process, also after serving staticfile
       return true
 ```
 ### 9.3 OnReply
+OnReply pipeline will process before sending request to client, we can modify for all response from route. This example is from katalis/pipelines/onReply/httpChunked.nim, this code is for converting all response to chunked data before sending to client
+```nim
+##
+## katalis framework
+## This framework if free to use and to modify
+## License: MIT
+## Author: Amru Rosyada
+## Email: amru.rosyada@gmail.com, amru.rosyada@amscloud.co.id
+## Git: https://github.com/zendbit/katalis
+##
+
+##
+## add pipeline onreply
+## as http protocol handler
+## check if chunked Transfer-Encoding enabled or not
+##
+
+
+import std/
+[
+  streams,
+  strutils
+]
+
+
+import
+  ../../core/routes,
+  ../../macros/sugar,
+  ../../core/environment
+
+
+proc composeChunkPayload(
+    ctx: HttpContext,
+    env: Environment = environment.instance()
+  ): string {.gcsafe.} =
+  ## compose chunk payload
+  ## chunked transfer encoding must follow this role
+  ## for more details see about Transfer-Encoding: chunked
+
+  result = ctx.response.body
+
+  let bodyLength = ctx.response.body.len
+  var chunkSize = env.settings.chunkSize
+
+  if env.settings.enableChunkedTransfer and
+    bodyLength >= chunkSize:
+
+    proc constructChunk(
+        chunkSize: string,
+        chunk: string
+      ): string =
+
+      result = chunkSize &
+        $CRLF &
+        chunk &
+        $CRLF
+
+
+    let numberOfChunks = (bodyLength / chunkSize).int
+    var chunkSizeInHex = chunkSize.toHex
+    let bodyStream = newStringStream(result)
+    var bodyBuffer: string = ""
+
+    for _ in 1..numberOfChunks:
+      bodyBuffer &= constructChunk(
+        chunkSizeInHex,
+        bodyStream.readStr(chunkSize)
+      )
+
+    if bodyLength > chunkSize:
+      chunkSize = bodyLength mod chunkSize
+      bodyBuffer &= constructChunk(
+        chunkSize.toHex,
+        bodyStream.readStr(chunkSize)
+      )
+
+    bodyBuffer &= constructChunk("0", "")
+    bodyStream.close()
+
+    result = bodyBuffer
+
+
+@!App:
+  @!OnReply:
+    if @!Req.httpMethod == HttpHead: return
+
+    if not @!Settings.enableChunkedTransfer or
+      @!Res.body.len > @!Env.settings.chunkSize:
+
+      @!Res.body = @!Context.composeChunkPayload(@!Env)
+      @!Res.headers["transfer-encoding"] = "chunked"
+```
 ### 9.4 Cleanup
+Cleanup pipeline will process after all pipeline finished, this usually for cleanup resource. This example is from katalis/pipelines/cleanup/httpContext.nim
+```nim
+##
+## katalis framework
+## This framework if free to use and to modify
+## License: MIT
+## Author: Amru Rosyada
+## Email: amru.rosyada@gmail.com, amru.rosyada@amscloud.co.id
+## Git: https://github.com/zendbit/katalis
+##
+
+##
+## Cleanup body request cache
+##
+
+
+import
+  ../../core/routes,
+  ../../macros/sugar,
+  ../../core/environment
+
+
+@!App:
+  @!Cleanup:
+    if @!Req.body.fileExists:
+      @!Req.body.removeFile
+
+    if @!Req.param.form.files.len != 0:
+      ## remove file after file uploaded
+      ## uploaded file should be move after finished
+      ## file uploaded before cleanup present
+      for _, files in @!Req.param.form.files:
+        for file in files:
+          if not file.isAccessible or not file.path.fileExists:
+            continue
+
+          file.path.removeFile
+
+    ## clear http context
+    @!Context.clear
+
+```
 ## 10. Response Message
-in progress
+Response message is universal response message, we can use it as response message.
+
 
 ## 11. Validation
 in progress
