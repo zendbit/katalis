@@ -481,7 +481,7 @@ import katalis/extension/mustache
 @!Emit
 ```
 
-## 8. Query string, form (urlencoded/multipart), json, xml, upload
+## 8. Query string, form (urlencoded/multipart), json, xml, upload, Redirect
 ### 8.1 Handling query string request
 ```nim
 import katalis/katalisApp
@@ -630,8 +630,49 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
     let m = newMustache()
     @!Context.reply(Http200, m.render(tpl))
 ```
+### 8.6 Redirect
+We can modify response header for redirection purpose
+```nim
+@!App:
+  @!Get "/home":
+    @!Context.reply(Http200, "<h3>Welcome home!</h3>")
 
+  @!Get "/test-redirect":
+    ## modify response header add redirect location to /home
+    @!Res.headers["Location"] = "/home"
+    @!Context.reply(Http307, "")
+```
 ## 9. Before, After, OnReply, Cleanup Pipelines
+### 9.1 Before pipeline
+Before pipeline will execute before routing process, also before serving staticfile. We can use it to check for all route before route process. We can skip all route by returning *true* statement
+```nim
+@!App:
+  @!Before:
+    ## your code here
+
+    if something_wrong:
+      @!Context.reply(Http403, "Anauthorized access!")
+      ## by returning true, will skip all process and return the error message, this is simplify for checking
+      return true
+```
+### 9.2 After pipeline
+After pipeline will execute after routing process, also after serving staticfile
+```
+@!App:
+  @!After:
+    ## your code here
+
+  if something_wrong:
+    @!Res.headers["Location"] = "/home"
+    @!Context.reply(Http307, "")
+    ## return true for skip all routing definition
+    return true
+```
+### 9.3 OnReply
+### 9.4 Cleanup
+## 10. Response Message
+in progress
+
 ## 10. Validation
 in progress
 
