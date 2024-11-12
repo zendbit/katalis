@@ -945,7 +945,7 @@ Then we will include partials *header.mustache and footer.mustache*
 </html>
 ```
 
-Mustache using *{{tag_mustache}}* for data binding, in current nim it support JsonNode, Tables and mustache Context it serf.
+Mustache using *{{tag_mustache}}* for data binding, in current nim it support JsonNode, Tables, and mustache Context it self.
 
 Let do with the code
 ```nim
