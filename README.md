@@ -986,7 +986,7 @@ Out of the box with webscoket. See *katalis/core/webSocket.nim*
 ## 14. Serve SSL
 Katalis also support serve SSL, we just need ssl certificate or we can use self signed certificate for development purpose.
 
-Hot to create self signed SSL?, you can follow this instruction [https://devcenter.heroku.com/articles/ssl-certificate-self](https://devcenter.heroku.com/articles/ssl-certificate-self). Or you can find other resource from the internet world.
+Hot to create self signed SSL?, you can follow this instruction [https://devcenter.heroku.com/articles/ssl-certificate-self](https://devcenter.heroku.com/articles/ssl-certificate-self). Or you can find other resources from the internet world.
 
 Then you can pass the certificate to the katalis settings
 ```nim
