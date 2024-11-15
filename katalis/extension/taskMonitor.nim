@@ -34,12 +34,12 @@ type
     DTime
 
 
-  TaskToDo* = ref object of RootObj ## \
+  TaskToDo*[T] = ref object of RootObj ## \
     ## Task to do item
 
     id*: string ## \
     ## task identifier, this will treat as unique
-    toDo*: proc (p: Any) {.gcsafe.} ## \
+    toDo*: proc (p: T) {.gcsafe.} ## \
     ## task todo callback to execute
     schedules*: seq[string] ## \
     ## taskSchedule is string format
@@ -50,25 +50,25 @@ type
     ## - if using offset days = 3#day
     whenSchedules*: seq[int64] ## \
     ## this automatically set by system
-    toDoParam: Any ## \
+    toDoParam: T ## \
     ## task todo param
 
 
-  TaskMonitor* = ref object of RootObj ## \
+  TaskMonitor*[T] = ref object of RootObj ## \
     ## Task monitor object
 
-    toDoList*: seq[TaskToDo] ## \
+    toDoList*: seq[TaskToDo[T]] ## \
     ## task list
-    taskMonitorThread: Thread[TaskMonitor] ## \
+    taskMonitorThread: Thread[TaskMonitor[T]] ## \
     ## task monitor thread
     taskMonitorThreadLock: Lock ## \
     ## Task Monitor Lock
 
 
-proc newTaskMonitor*: TaskMonitor = ## \
+proc newTaskMonitor*[T]: TaskMonitor[T] = ## \
   ## create new TaskMonitor
   
-  TaskMonitor()
+  TaskMonitor[T]()
 
 
 proc findTaskToDo*(
@@ -149,18 +149,18 @@ proc addTaskSchedule*(
       toDo.whenSchedules.add(taskSchedule.parseTaskSchedule)
 
 
-proc addTaskToDo*(
-    self: TaskMonitor,
+proc addTaskToDo*[T](
+    self: TaskMonitor[T],
     id: string,
-    toDo: proc (p: Any) {.gcsafe.},
+    toDo: proc (p: T) {.gcsafe.},
     schedules: seq[string],
-    toDoParam: Any
+    toDoParam: T
   ) {.gcsafe.} = ## \
   ## add new TaskToDo item to toDoList
 
   let toDoIndex = self.findTaskToDo(id)
   if toDoIndex < 0:
-    let task = TaskToDo(
+    let task = TaskToDo[T](
       id: id,
       toDo: toDo,
       schedules: schedules,

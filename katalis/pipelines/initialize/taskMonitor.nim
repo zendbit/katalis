@@ -26,19 +26,17 @@ import
   ../../extension/taskMonitor
 
 
-var tm: TaskMonitor
-tm = newTaskMonitor()
+var tm {.threadvar.}: TaskMonitor[Settings]
+tm = newTaskMonitor[Settings]()
 
 
 if not tm.isRunning:
-  var settings: ptr Settings = addr @!Settings
   ## Storages Monitor
   ## will check storages especially for session, upload and body folder
   ## find unused file then delete it
   tm.addTaskToDo(
     "Storages Monitor",
-    (proc (p: Any) {.gcsafe.} =
-      let settings = cast[ptr Settings](p.getPointer)
+    (proc (settings: Settings) {.gcsafe.} =
       let storagePaths = [
           settings.storagesUploadDir,
           settings.storagesBodyDir,
@@ -57,7 +55,7 @@ if not tm.isRunning:
             dirItem.removeFile
     ),
     @["24#hour"], ## check each 24 hour
-    settings.toAny
+    @!Settings
   )
 
   tm.emit()
