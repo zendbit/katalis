@@ -21,8 +21,13 @@ Katalis always focusing on protocol implementation and performance improvement. 
 If you want to use katalis as fullstack nim, you can read on fullstack section in this documentation.
 
 ## 1. Install
-```
+```bash
 nimble install katalis
+```
+
+If some reason failed to install using nimble directory, you can install directly from the github
+```bash
+nimble install https://github.com/zendbit/katalis
 ```
 
 ## 2. Running simple app
