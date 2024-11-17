@@ -28,6 +28,9 @@ export
   routes,
   session
 
+import net
+export net
+
 
 var
   envInstance {.threadvar.}: Environment
@@ -90,11 +93,11 @@ proc initialize() {.gcsafe.} = ## \
 
       var certFile = sslSettings.certFile
       if not certFile.fileExists:
-        certFile = getCurrentDir().joinPath(certFile)
+        certFile = ($paths.getCurrentDir()).joinPath(certFile)
 
       var keyFile = sslSettings.keyFile
       if not keyFile.fileExists:
-        keyFile = getCurrentDir().joinPath(keyFile)
+        keyFile = ($paths.getCurrentDir()).joinPath(keyFile)
 
       if certFile.fileExists and keyFile.fileExists:
         sslSettings.certFile = certFile
@@ -188,15 +191,15 @@ when WithSsl:
       let (host, port) = katalisInstance.sslSocketServer.getLocalAddr
       # set siteUrl to shared envInstance
       envInstance.shared["siteUrl"] = &"http://{host}:{port}"
-      echo &"Listening secure on {envInstance.shared["siteUrl"]}"
+      echo &"""Listening secure on {envInstance.shared["siteUrl"]}"""
 
       var verifyMode = SslCVerifyMode.CVerifyNone
-      if sslSettings.verify:
+      if sslSettings.enableVerify:
         verifyMode = SslCVerifyMode.CVerifyPeer
 
       var sslContext: SslContext
 
-      if sslSettings.useEnv:
+      if sslSettings.enableUseEnv:
         # CVerifyPeerUseEnvVars mode
         sslContext = newContext(
             verifyMode = SslCVerifyMode.CVerifyPeerUseEnvVars,
