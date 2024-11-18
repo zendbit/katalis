@@ -108,21 +108,23 @@ proc toMultipart*(self: Form): Future[Multipart] {.gcsafe async.} = ## \
   ## convert Form to multipart
 
   result = newMultipart()
-  for k, v in self.data:
+  for key, value in self.data:
     await result.add(
-      v,
-      @[("Content-Disposition", &"form-data;name=\"{k}\"")]
+      {
+        "Content-Disposition": &"form-data;name=\"{key}\""
+      }.newTable,
+      value
     )
 
-  for k, v in self.files:
-    let name = if v.len > 1: &"{k}[]" else: k
-    for file in v:
+  for key, value in self.files:
+    let name = if value.len > 1: &"{key}[]" else: key
+    for file in value:
       await result.add(
-        (await file.readContents())[0],
-        @[
-          ("Content-Disposition", &"form-data;name=\"{name}\";filename=\"{file.name}\""),
-          ("Content-Type", file.mimeType)
-        ]
+        {
+          "Content-Disposition": &"form-data;name=\"{name}\";filename=\"{file.name}\"",
+          "Content-Type": file.mimeType
+        }.newTable,
+        (await file.contents())[0]
       )
 
   await result.done

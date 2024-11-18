@@ -66,11 +66,11 @@ import
       headers["content-length"] = &"{staticFile.info.size}"
       contentBody =
         if staticFile.info.size < @!Settings.maxSendSize:
-          (await staticFile.readContents())[0]
+          (await staticFile.contents())[0]
 
         else:
           (
-            await staticFile.readContents(
+            await staticFile.contents(
               @[(0.int64, @!Settings.maxSendSize.int64 - 1)]
             )
           )[0]
@@ -82,14 +82,14 @@ import
       if ranges.len == 1:
         # single request only non multipart ranges
         let rangesData = await staticFile.
-          readContentsAsBytesRanges(ranges[0])
+          contentsAsBytesRanges(ranges[0])
         contentBody = rangesData.content
         headers &= rangesData.headers
 
       else:
         # ranges with multipart
         let multipartRangesData = await staticFile.
-          readContentsAsBytesRangesMultipart(ranges)
+          contentsAsBytesRangesMultipart(ranges)
 
         contentBody = multipartRangesData.content
         headers &= multipartRangesData.headers

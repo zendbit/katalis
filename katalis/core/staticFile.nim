@@ -121,7 +121,7 @@ proc close*(self: StaticFile) {.gcsafe.} =
     self.file = nil
 
 
-proc readContents*(
+proc contents*(
     self: StaticFile,
     ranges: seq[tuple[start: BiggestInt, stop: BiggestInt]] = @[],
     env: Environment = environment.instance()
@@ -149,13 +149,13 @@ proc readContents*(
   self.close
 
 
-proc readContentsAsBytesRanges*(
+proc contentsAsBytesRanges*(
     self: StaticFile,
     ranges: tuple[start: BiggestInt, stop: BiggestInt]
   ): Future[tuple[content: string, headers: HttpHeaders]] {.gcsafe async.} =
   ## get content as bytes ranges
 
-  let contentRanges = (await self.readContents(@[ranges]))[0]
+  let contentRanges = (await self.contents(@[ranges]))[0]
 
   let headers = newHttpHeaders()
   headers.add("content-type", self.mimeType)
@@ -167,23 +167,23 @@ proc readContentsAsBytesRanges*(
   (contentRanges, headers)
 
 
-proc readContentsAsBytesRangesMultipart*(
+proc contentsAsBytesRangesMultipart*(
     self: StaticFile,
     ranges: seq[tuple[start: BiggestInt, stop: BiggestInt]]
   ): Future[tuple[content: string, headers: HttpHeaders]] {.gcsafe async.} =
   ## get content as bytes ranges multipart
 
   let multipart = newMultipart()
-  let contentsRanges = await self.readContents(ranges)
+  let contentsRanges = await self.contents(ranges)
 
   for i in 0..contentsRanges.high:
     # meta info for each part
-    var metaData = @[
-        ("content-type", self.mimeType),
-        ("content-range", &"bytes {ranges[i].start}-{ranges[i].stop}/{self.info.size}")
-      ]
+    let metaData = {
+        "content-type": self.mimeType,
+        "content-range": &"bytes {ranges[i].start}-{ranges[i].stop}/{self.info.size}"
+      }.newTable
 
-    await multipart.add(contentsRanges[i], metaData)
+    await multipart.add(metaData, contentsRanges[i])
 
   await multipart.done
 

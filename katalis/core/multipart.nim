@@ -73,16 +73,16 @@ proc newMultipart*(
 
 proc add*(
     self: Multipart,
-    content: string,
-    metaData: seq[tuple[name: string, value: string]]
+    metaData: TableRef[string, string],
+    content: string
   ) {.gcsafe async.} = ## \
   ## add content section into multipart
   
   # write boundary
   var data = &"--{self.boundary}{CRLF}"
   # add meta header section
-  for (k, v) in metaData:
-    data &= &"""{k}: {v}{CRLF}"""
+  for key, value in metaData:
+    data &= &"""{key}: {value}{CRLF}"""
 
   ## CRLF after ending of metadata info
   data &= CRLF
