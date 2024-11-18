@@ -177,17 +177,15 @@ proc readContentsAsBytesRangesMultipart*(
   let contentsRanges = await self.readContents(ranges)
 
   for i in 0..contentsRanges.high:
-    # header info for each part
-    let headers = newHttpHeaders()
-    headers.add("content-type", self.mimeType)
-    headers.add(
-      "content-cange",
-      &"bytes {ranges[i].start}-{ranges[i].stop}/{self.info.size}"
-    )
+    # meta info for each part
+    var metaData = @[
+        ("content-type", self.mimeType),
+        ("content-range", &"bytes {ranges[i].start}-{ranges[i].stop}/{self.info.size}")
+      ]
 
-    await multipart.add(contentsRanges[i], headers)
+    await multipart.add(contentsRanges[i], metaData)
 
-  await multipart.finalize
+  await multipart.done
 
   # header info for the response
   let headers = newHttpHeaders()
@@ -197,9 +195,7 @@ proc readContentsAsBytesRangesMultipart*(
   )
 
   result = (
-      await multipart.getContents(),
+      await multipart.content(),
       headers
     )
-
-  multipart.cleanup
 

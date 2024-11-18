@@ -38,7 +38,7 @@ import
     var requestStaticPath = @!Req.
       uri.
       getPathSegments().
-      join($DirSep).decodeURI()
+      join($DirSep).decodeUri()
 
     # construct static path dir with request static path
     requestStaticPath = @!Settings.

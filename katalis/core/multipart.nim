@@ -26,7 +26,6 @@ export
   asyncdispatch,
   asyncfile,
   os,
-  httpcore,
   strformat
 
 
@@ -50,6 +49,8 @@ type
     ## multipart data boundary
     contentBuffer*: AsyncFile ## \
     ## multipart data section
+    contentBufferUri*: string ## \
+    ## content buffer uri file location
 
 
 proc newMultipart*(
@@ -58,10 +59,13 @@ proc newMultipart*(
   ): Multipart = ## \
   ## create multipart object
 
+  let contentBufferUri = env.settings.storagesCacheDir.joinPath(boundary)
   result = Multipart(
       boundary: boundary,
+      contentType: "multipart/form-data",
+      contentBufferUri: contentBufferUri,
       contentBuffer: openAsync(
-          env.settings.storagesDir.joinPath(boundary),
+          contentBufferUri,
           fmReadWrite
         )
     )
@@ -70,50 +74,39 @@ proc newMultipart*(
 proc add*(
     self: Multipart,
     content: string,
-    headers: HttpHeaders = nil
+    metaData: seq[tuple[name: string, value: string]]
   ) {.gcsafe async.} = ## \
   ## add content section into multipart
   
   # write boundary
   var data = &"--{self.boundary}{CRLF}"
-  await self.contentBuffer.write(data)
-  self.contentLength += data.len
+  # add meta header section
+  for (k, v) in metaData:
+    data &= &"""{k}: {v}{CRLF}"""
 
-  # add header section
-  if not headers.isNil:
-    for (k, v) in headers.pairs:
-      data = &"{k}: {v}{CRLF}"
-      await self.contentBuffer.write(data)
-      self.contentLength += data.len
-
-    data = &"{CRLF}"
-    await self.contentBuffer.write(data)
-    self.contentLength += data.len
+  ## CRLF after ending of metadata info
+  data &= CRLF
 
   # add content sectioni
-  data = &"{content}{CRLF}"
+  data &= &"{content}{CRLF}"
   await self.contentBuffer.write(data)
   self.contentLength += data.len
 
 
-proc finalize*(self: Multipart) {.gcsafe async.} = ## \
+proc done*(self: Multipart) {.gcsafe async.} = ## \
   ## finalize multipart data section
   ## with ending boundary
 
   let data = &"--{self.boundary}--{CRLF}"
   await self.contentBuffer.write(data)
   self.contentLength += data.len
-
-
-proc cleanup*(self: Multipart) {.gcsafe.} = ## \
-  ## cleanup resource used by multipart
-
   self.contentBuffer.close()
 
 
-proc getContents*(self: Multipart): Future[string] {.gcsafe async.} = ## \
+proc content*(self: Multipart): Future[string] {.gcsafe async.} = ## \
   ## read multipart contents
 
-  self.contentBuffer.setFilePos(0)
-  await self.contentBuffer.readAll
+  let openBuffer = openAsync(self.contentBufferUri, fmRead)
+  result = await openBuffer.readAll
+  openBuffer.close
 

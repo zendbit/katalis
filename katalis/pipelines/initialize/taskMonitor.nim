@@ -40,7 +40,8 @@ if not tm.isRunning:
       let storagePaths = [
           settings.storagesUploadDir,
           settings.storagesBodyDir,
-          settings.storagesSessionDir
+          settings.storagesSessionDir,
+          settings.storagesCacheDir
         ]
 
       for storagesPath in storagePaths:

@@ -59,6 +59,10 @@ proc initialize() {.gcsafe.} = ## \
     # check storage for session dir
     settings.storagesSessionDir.createDir
 
+  if not settings.storagesCacheDir.dirExists:
+    # check storage for cache dir
+    settings.storagesCacheDir.createDir
+
   # show traceging output
   @!Trace:
     echo ""

@@ -47,7 +47,7 @@ import
         return
 
       let reqParts = line.strip().split(" ")
-      # make sure header parts contain 3 parts (RFC 2616 HTTP Request-URI)
+      # make sure header parts contain 3 parts (RFC 2616 HTTP Request-Uri)
       # first part is HTTP method
       # second part is location to request
       # third part is HTTP version

@@ -393,8 +393,8 @@ proc matchRoute(
   let settings = env.settings
   let routes = self.routeTable
   var requestStaticPath = request.uri.getPathSegments().
-    join($DirSep).decodeURI()
-  var requestPath = request.uri.getPath().decodeURI()
+    join($DirSep).decodeUri()
+  var requestPath = request.uri.getPath().decodeUri()
 
   # static route found
   # if found then set reqest isStatic to true

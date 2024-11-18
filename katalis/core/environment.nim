@@ -90,6 +90,8 @@ type
     ## storage body for request/response process
     storagesSessionDir*: string ## \
     ## storage session for request/response process
+    storagesCacheDir*: string ## \
+    ## storage for cache file
     staticDir*: string ##\
     ## static directory to serve
     enableServeStatic*: bool ##\
@@ -142,6 +144,7 @@ proc newSettings*(
     storagesUploadDir: string = getCurrentDir().joinPath("storages", "upload"),
     storagesBodyDir: string = getCurrentDir().joinPath("storages", "body"),
     storagesSessionDir: string = getCurrentDir().joinPath("storages", "session"),
+    storagesCacheDir: string = getCurrentDir().joinPath("storages", "cache"),
     staticDir: string = getCurrentDir().joinPath("static"),
     enableServeStatic: bool = false,
     readRecvBuffer: int = 524288,
@@ -171,6 +174,7 @@ proc newSettings*(
       storagesUploadDir: storagesUploadDir,
       storagesBodyDir: storagesBodyDir,
       storagesSessionDir: storagesSessionDir,
+      storagesCacheDir: storagesCacheDir,
       staticDir: staticDir,
       enableServeStatic: enableServeStatic,
       readRecvBuffer: readRecvBuffer,
