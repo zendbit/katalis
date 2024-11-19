@@ -13,11 +13,14 @@
 
 
 ## stdlib import
-import
-  std/random,
-  strutils,
-  asyncfile,
-  strtabs
+import std/[
+    random,
+    strutils,
+    asyncfile,
+    strtabs,
+    paths,
+    files
+  ]
 
 ## nimble import
 import checksums/sha1
@@ -30,7 +33,7 @@ import
 
 const SessionId = "_SessId"
 
-var sessionDir {.threadvar.}: string
+var sessionDir {.threadvar.}: Path
 
 
 proc initSession*() {.gcsafe.} = ## \
@@ -51,7 +54,7 @@ proc isSessionExists*(sessionToken: string): bool {.gcsafe.} = ## \
   ##
   ##  this will check the session token.
   ##
-  result = sessionDir.joinPath(sessionToken).fileExists
+  result = (sessionDir/sessionToken.Path).fileExists
 
 
 proc writeSession*(
@@ -63,7 +66,7 @@ proc writeSession*(
   ##
   ##  the session data information in json format and will encrypted for security reason.
   ##
-  let f = sessionDir.joinPath(sessionToken).openAsync(fmWrite)
+  let f = ($(sessionDir/sessionToken.Path)).openAsync(fmWrite)
   await f.write(xorEncodeDecode($data, sessionToken))
   f.close
   sessionToken.isSessionExists
@@ -114,7 +117,7 @@ proc readSession*(sessionToken: string): Future[JsonNode] {.gcsafe async.} = ## 
   ##  read session data with given token.
   ##
   if sessionToken.isSessionExists:
-    let f = sessionDir.joinPath(sessionToken).openAsync
+    let f = ($(sessionDir/sessionToken.Path)).openAsync
     result = (await f.readAll()).xorEncodeDecode(sessionToken).parseJson
     f.close
 
@@ -126,7 +129,7 @@ proc destroySession*(sessionToken: string) {.gcsafe.} = ## \
   ##  read session data with given token.
   ##
   if sessionToken.isSessionExists:
-    sessionDir.joinPath(sessionToken).removeFile
+    (sessionDir/sessionToken.Path).removeFile
 
 
 proc getCookieSession*(

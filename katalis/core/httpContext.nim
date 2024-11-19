@@ -24,7 +24,8 @@ import std/
   options,
   math,
   cookies,
-  strtabs
+  strtabs,
+  paths
 ]
 ## std import
 
@@ -353,7 +354,7 @@ proc parseFormMultipart*(
             formData.addFile(
               metaName,
               newStaticFile(
-                settings.storagesUploadDir.joinPath(filename)
+                settings.storagesUploadDir/filename.Path
               )
             )
 
@@ -375,7 +376,7 @@ proc parseFormMultipart*(
 
           if filename != "":
             formData.files[metaName][^1].mimeType = contentType
-            formData.files[metaName][^1].extension = filename.splitFile.ext
+            formData.files[metaName][^1].extension = filename.Path.splitFile.ext
 
         req.body = req.body.substr(crlfIndex() + crlf.len, req.body.high)
 

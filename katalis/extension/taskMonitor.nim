@@ -13,15 +13,16 @@
 ##
 
 
-import
-  os,
-  std/locks,
-  strutils,
-  times,
-  parseutils,
-  strformat,
-  std/typeinfo
+import std/[
+    locks,
+    strutils,
+    times,
+    parseutils,
+    strformat,
+    typeinfo
+  ]
 
+from os import sleep
 
 type
   TaskScheduleType* = enum ## \

@@ -12,6 +12,8 @@
 ##
 
 
+import std/files
+
 import
   ../../core/routes,
   ../../macros/sugar,
@@ -20,8 +22,8 @@ import
 
 @!App:
   @!Cleanup:
-    if @!Req.body.fileExists:
-      @!Req.body.removeFile
+    if @!Req.body.Path.fileExists:
+      @!Req.body.Path.removeFile
 
     if @!Req.param.form.files.len != 0:
       ## remove file after file uploaded

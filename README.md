@@ -311,11 +311,11 @@ Configuration can be set using *@!Settings* macro. See katalis/core/environment.
 ## enableOOBInline: bool = false
 ## enableBroadcast: bool = false
 ## enableDontRoute: bool = false
-## storagesDir: string = getCurrentDir().joinPath("storages")
-## storagesUploadDir: string = getCurrentDir().joinPath("storages", "upload")
-## storagesBodyDir: string = getCurrentDir().joinPath("storages", "body")
-## storagesSessionDir: string = getCurrentDir().joinPath("storages", "session")
-## staticDir: string = getCurrentDir().joinPath("static")
+## storagesDir: string = getCurrentDir()/"storages".Path
+## storagesUploadDir: string = getCurrentDir()/"storages".Path/"upload".Path
+## storagesBodyDir: string = getCurrentDir()/"storages".Path/"body".Path
+## storagesSessionDir: string = getCurrentDir()/"storages".Path/"session".Path
+## staticDir: string = getCurrentDir()/"static".Path
 ## enableServeStatic: bool = false
 ## readRecvBuffer: int = 524288
 ## enableTrace: bool = false
@@ -624,13 +624,13 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
       if "onefile" in @!Form.files:
         let onefile = @!Form.files["onefile"][0]
         ## move files to uploaded dir
-        onefile.path.moveFile("uploaded".joinPath(onefile.name))
+        onefile.path.moveFile("uploaded".Path/onefile.Path)
 
       if "multiplefiles" in @!Form.files:
         let multiplefiles = @!Form.files["multiplefiles"]
         for file in multiplefiles:
           ## move files to uploaded dir
-          file.path.moveFile("uploaded".joinPath(file.name))
+          file.path.moveFile("uploaded"/file.name.Path)
 
     let m = newMustache()
     @!Context.reply(Http200, m.render(tpl))

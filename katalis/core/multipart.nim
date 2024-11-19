@@ -16,17 +16,17 @@ import std/
   oids,
   asyncdispatch,
   asyncfile,
-  os,
   httpcore,
-  strformat
+  strformat,
+  paths
 ]
 
 export
   oids,
   asyncdispatch,
   asyncfile,
-  os,
-  strformat
+  strformat,
+  paths
 
 
 import
@@ -49,7 +49,7 @@ type
     ## multipart data boundary
     contentBuffer*: AsyncFile ## \
     ## multipart data section
-    contentBufferUri*: string ## \
+    contentBufferUri*: Path ## \
     ## content buffer uri file location
 
 
@@ -59,13 +59,13 @@ proc newMultipart*(
   ): Multipart = ## \
   ## create multipart object
 
-  let contentBufferUri = env.settings.storagesCacheDir.joinPath(boundary)
+  let contentBufferUri = env.settings.storagesCacheDir/boundary.Path
   result = Multipart(
       boundary: boundary,
       contentType: "multipart/form-data",
       contentBufferUri: contentBufferUri,
       contentBuffer: openAsync(
-          contentBufferUri,
+          $contentBufferUri,
           fmReadWrite
         )
     )
@@ -106,7 +106,7 @@ proc done*(self: Multipart) {.gcsafe async.} = ## \
 proc content*(self: Multipart): Future[string] {.gcsafe async.} = ## \
   ## read multipart contents
 
-  let openBuffer = openAsync(self.contentBufferUri, fmRead)
+  let openBuffer = openAsync($self.contentBufferUri, fmRead)
   result = await openBuffer.readAll
   openBuffer.close
 

@@ -15,7 +15,7 @@
 import std/
 [
   tables,
-  os
+  paths
 ]
 from std/nativesockets import Port
 
@@ -80,19 +80,19 @@ type
     ## max body length server can handle
     ## can be vary on setting
     ## value in bytes
-    storagesDir*: string ## \
+    storagesDir*: Path ## \
     ## storage working directory
-    storagesUploadDir*: string ## \
+    storagesUploadDir*: Path ## \
     ## storage upload directory
     readRecvBuffer*: int ## \
     ## read body buffer
-    storagesBodyDir*: string ## \
+    storagesBodyDir*: Path ## \
     ## storage body for request/response process
-    storagesSessionDir*: string ## \
+    storagesSessionDir*: Path ## \
     ## storage session for request/response process
-    storagesCacheDir*: string ## \
+    storagesCacheDir*: Path ## \
     ## storage for cache file
-    staticDir*: string ##\
+    staticDir*: Path ##\
     ## static directory to serve
     enableServeStatic*: bool ##\
     ## enable/disable serve static directory
@@ -140,12 +140,12 @@ proc newSettings*(
     enableOOBInline: bool = false,
     enableBroadcast: bool = false,
     enableDontRoute: bool = false,
-    storagesDir: string = getCurrentDir().joinPath("storages"),
-    storagesUploadDir: string = getCurrentDir().joinPath("storages", "upload"),
-    storagesBodyDir: string = getCurrentDir().joinPath("storages", "body"),
-    storagesSessionDir: string = getCurrentDir().joinPath("storages", "session"),
-    storagesCacheDir: string = getCurrentDir().joinPath("storages", "cache"),
-    staticDir: string = getCurrentDir().joinPath("static"),
+    storagesDir: Path = getCurrentDir()/"storages".Path,
+    storagesUploadDir: Path = getCurrentDir()/"storages".Path/"upload".Path,
+    storagesBodyDir: Path = getCurrentDir()/"storages".Path/"body".Path,
+    storagesSessionDir: Path = getCurrentDir()/"storages".Path/"session".Path,
+    storagesCacheDir: Path = getCurrentDir()/"storages".Path/"cache".Path,
+    staticDir: Path = getCurrentDir()/"static".Path,
     enableServeStatic: bool = false,
     readRecvBuffer: int = 524288,
     enableTrace: bool = false,

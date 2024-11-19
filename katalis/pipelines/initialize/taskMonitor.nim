@@ -14,11 +14,15 @@
 ##
 
 
-import
-  os,
-  std/typeinfo,
-  times
+import std/[
+    dirs,
+    typeinfo,
+    times,
+    paths,
+    files
+  ]
 
+from std/os import getFileInfo
 
 import
   ../../macros/sugar,
@@ -47,7 +51,7 @@ if not tm.isRunning:
       for storagesPath in storagePaths:
         if not storagesPath.dirExists: continue
         for dirItem in storagesPath.walkDirRec:
-          let fileInfo = dirItem.getFileInfo
+          let fileInfo = ($dirItem).getFileInfo
           if fileInfo.kind != pcFile: continue ## \
           ## only process file
           if (fileInfo.lastAccessTime.utc.toTime.toUnix + 604800) < now().utc.toTime.toUnix:

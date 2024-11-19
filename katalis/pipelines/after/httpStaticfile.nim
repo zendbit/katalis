@@ -22,6 +22,9 @@
 ##
 
 
+import std/files
+
+
 import
   ../../core/routes,
   ../../macros/sugar,
@@ -38,14 +41,10 @@ import
     var requestStaticPath = @!Req.
       uri.
       getPathSegments().
-      join($DirSep).decodeUri()
+      join($DirSep).decodeUri().Path
 
     # construct static path dir with request static path
-    requestStaticPath = @!Settings.
-      staticDir.
-      joinPath(
-        requestStaticPath
-      )
+    requestStaticPath = @!Settings.staticDir/requestStaticPath.Path
 
     # create static file route is static file
     let staticFile = newStaticFile(requestStaticPath)

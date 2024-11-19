@@ -20,18 +20,20 @@ import std/
   tables,
   strformat,
   strutils,
-  os,
-  json
+  json,
+  paths,
+  files
 ]
 ## stdlib
 
 export
   tables,
   strutils,
-  os,
   asyncdispatch,
   json,
-  strformat
+  strformat,
+  paths,
+  files
 
 
 import
@@ -399,7 +401,7 @@ proc matchRoute(
   # static route found
   # if found then set reqest isStatic to true
   if settings.enableServeStatic and
-    settings.staticDir.joinPath(requestStaticPath).fileExists and
+    (settings.staticDir/requestStaticPath.Path).fileExists and
     request.httpMethod in [HttpGet, HttpOptions, HttpHead]:
     request.isStaticfile = true
 

@@ -15,22 +15,27 @@
 import std/
 [
   mimetypes,
-  os,
   paths,
   asyncfile,
   asyncdispatch,
   httpcore,
-  strformat
+  strformat,
+  files
 ]
+
+
+from os import FileInfo, getFileInfo
+
 
 export
   mimetypes,
-  os,
   paths,
   asyncfile,
   asyncdispatch,
   httpcore,
-  strformat
+  strformat,
+  FileInfo,
+  files
 
 
 import
@@ -51,7 +56,7 @@ type
     ## flag to check if file is accessible
     msg*: string ## \
     ## hold message during action
-    path*: string ## \
+    path*: Path ## \
     ## hold path of the file
     extension*: string ## \
     ## hold file extension
@@ -64,7 +69,7 @@ type
 
 
 proc newStaticFile*(
-    path: string,
+    path: Path,
     safeMode: bool = false,
     env: Environment = environment.instance()
   ): StaticFile {.gcsafe.} =
@@ -75,10 +80,10 @@ proc newStaticFile*(
 
   if staticFile.path.fileExists:
     try:
-      staticFile.info = staticFile.path.getFileInfo()
+      staticFile.info = ($staticFile.path).getFileInfo()
       staticFile.isAccessible = true
       staticFile.msg = "Success"
-      staticFile.name = staticFile.path.extractFilename
+      staticFile.name = $staticFile.path.extractFilename
 
       let fileParts = staticFile.path.splitFile()
       let mimetype = newMimetypes()
@@ -110,7 +115,7 @@ proc open*(
   ## open file
 
   if self.file.isNil:
-    self.file = openAsync(self.path, mode)
+    self.file = openAsync($self.path, mode)
 
 
 proc close*(self: StaticFile) {.gcsafe.} =
