@@ -63,9 +63,9 @@ import katalis/katalisApp
 @!Emit
 ```
 
-Compile the source with --threads:on switch to enable thread support and run it!
+Compile the source with --threads:on switch to enable thread support and run it!. We suggest using boehm memory management for better performance with shared heap, using boehm memory management need to install gc library (libgc).
 ```bash
-nim c -r --threads:on app.nim
+nim c -r --threads:on --mm:boehm app.nim
 ```
 
 Katalis will run on port 8000 as default port
@@ -76,7 +76,7 @@ Listening non secure (plain) on http://0.0.0.0:8000
 Lets open with the browser [http://localhost:8000](http://localhost:8000)
 
 ![Alt http://localhost:8000](https://github.com/zendbit/katalis-readme-assets/blob/981946bf0fee5acaa341edc04ed3e26f82263e5c/Screenshot%20From%202024-11-03%2021-38-44.png)
---threads:on
+
 ## 3. Katalis structure
 Internal katalis structure is devided into some folders structure
 ### 3.1 core (folder)
