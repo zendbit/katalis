@@ -134,7 +134,6 @@ Static file must be placed is in *static* folder, but we can also changes defaul
 OnReply pipeline will be evaluate before sending response to client, this pipeline used for modifying payload.
 |Filename|Description|
 |--------|-----------|
-|httpChunked.nim|handle chunked payload response, default is chunked as http standard|
 |httpComposePayload.nim|handle composing payload header + body for response|
 |httpCompress.nim|handle compression support (gzip) if client support zip compression|
 
@@ -319,9 +318,7 @@ Configuration can be set using *@!Settings* macro. See katalis/core/environment.
 ## enableServeStatic: bool = false
 ## readRecvBuffer: int = 524288
 ## enableTrace: bool = false
-## chunkSize: int = 16384
 ## maxSendSize: int = 52428800
-## enableChunkedTransfer: bool = true
 ## enableRanges: bool = true
 ## rangesSize: int = 2097152
 ## enableCompression: bool = true
@@ -689,7 +686,7 @@ After pipeline will execute after routing process, also after serving staticfile
       return true
 ```
 ### 9.3 OnReply
-OnReply pipeline will process before sending request to client, we can modify for all response from route. This example is from katalis/pipelines/onReply/httpChunked.nim, this code is for converting all response to chunked data before sending to client
+OnReply pipeline will process before sending request to client, we can modify for all response from route. This example is from katalis/pipelines/onReply/httpCompress.nim, will compress before zending to client
 ```nim
 ##
 ## katalis framework
@@ -701,17 +698,12 @@ OnReply pipeline will process before sending request to client, we can modify fo
 ##
 
 ##
-## add pipeline onreply
-## as http protocol handler
-## check if chunked Transfer-Encoding enabled or not
+## add pipeline on onreply
+## check if client support compression then compress
 ##
 
 
-import std/
-[
-  streams,
-  strutils
-]
+import zippy
 
 
 import
@@ -720,66 +712,16 @@ import
   ../../core/environment
 
 
-proc composeChunkPayload(
-    ctx: HttpContext,
-    env: Environment = environment.instance()
-  ): string {.gcsafe.} =
-  ## compose chunk payload
-  ## chunked transfer encoding must follow this role
-  ## for more details see about Transfer-Encoding: chunked
-
-  result = ctx.response.body
-
-  let bodyLength = ctx.response.body.len
-  var chunkSize = env.settings.chunkSize
-
-  if env.settings.enableChunkedTransfer and
-    bodyLength >= chunkSize:
-
-    proc constructChunk(
-        chunkSize: string,
-        chunk: string
-      ): string =
-
-      result = chunkSize &
-        $CRLF &
-        chunk &
-        $CRLF
-
-
-    let numberOfChunks = (bodyLength / chunkSize).int
-    var chunkSizeInHex = chunkSize.toHex
-    let bodyStream = newStringStream(result)
-    var bodyBuffer: string = ""
-
-    for _ in 1..numberOfChunks:
-      bodyBuffer &= constructChunk(
-        chunkSizeInHex,
-        bodyStream.readStr(chunkSize)
-      )
-
-    if bodyLength > chunkSize:
-      chunkSize = bodyLength mod chunkSize
-      bodyBuffer &= constructChunk(
-        chunkSize.toHex,
-        bodyStream.readStr(chunkSize)
-      )
-
-    bodyBuffer &= constructChunk("0", "")
-    bodyStream.close()
-
-    result = bodyBuffer
-
-
 @!App:
   @!OnReply:
-    if @!Req.httpMethod == HttpHead: return
+    # if client support gzip
+    # and enableCompression enabled
+    if "gzip" in
+      @!Req.headers.getValues("accept-encoding") and
+      @!Settings.enableCompression:
 
-    if not @!Settings.enableChunkedTransfer or
-      @!Res.body.len > @!Env.settings.chunkSize:
-
-      @!Res.body = @!Context.composeChunkPayload(@!Env)
-      @!Res.headers["transfer-encoding"] = "chunked"
+      @!Res.headers["content-encoding"] = "gzip"
+      @!Res.body = compress(@!Res.body, BestSpeed, dfGzip)
 ```
 ### 9.4 Cleanup
 Cleanup pipeline will process after all pipeline finished, this usually for cleanup resource. This example is from katalis/pipelines/cleanup/httpContext.nim
