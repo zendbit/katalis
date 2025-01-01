@@ -466,9 +466,6 @@ proc doRoute*(
               error = %*{"msg": "Resource not found!."}
             )
           )
-    # do cleanup process
-    # after all action
-    await self.doCleanup(ctx, env)
 
   except Exception as ex:
     await ctx.replyJson(
@@ -479,3 +476,9 @@ proc doRoute*(
           error = %*{"msg": &"{ex.msg}"}
         )
       )
+
+  await ctx.reply(env)
+
+  # do cleanup process
+  # after all action
+  await self.doCleanup(ctx, env)

@@ -60,9 +60,8 @@ import
     var httpCode = Http200
     var contentBody = ""
 
+    headers["content-type"] = staticFile.mimetype
     if ranges.len == 0:
-      headers["content-type"] = staticFile.mimetype
-      headers["content-length"] = &"{staticFile.info.size}"
       contentBody =
         if staticFile.info.size < @!Settings.maxSendSize:
           (await staticFile.contents())[0]
@@ -75,9 +74,9 @@ import
           )[0]
 
     else:
+      httpCode = Http206
       # for ranges request set httpcode to Http206
       # for continues request
-      httpCode = Http206
       if ranges.len == 1:
         # single request only non multipart ranges
         let rangesData = await staticFile.

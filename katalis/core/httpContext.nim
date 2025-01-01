@@ -206,8 +206,6 @@ proc reply*(
   self.response.httpCode = httpCode
   self.response.body = body
 
-  await self.reply()
-
 
 proc replyJson*(
     self: HttpContext,

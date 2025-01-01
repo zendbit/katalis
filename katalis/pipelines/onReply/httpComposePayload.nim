@@ -40,11 +40,8 @@ import
 
     else:
       @!Res.headers["connection"] = "close"
-  
-    if "chunked" in @!Res.headers.getValues("transfer-encoding"):
-      @!Res.headers.del("content-length")
-
-    else:
+ 
+    if @!Res.headers.getValues("content-length").len == 0:
       @!Res.headers["content-length"] =  &"{@!Res.body.len}"
 
     # add additional headers into response header
@@ -58,3 +55,4 @@ import
       
     else:
       @!Res.body = header & @!Res.body
+

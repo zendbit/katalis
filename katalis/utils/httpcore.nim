@@ -55,7 +55,7 @@ proc getValues*(
   ): seq[string] =
   ## get seq of HttpHeader values
 
-  result = @[""]
+  result = @[]
 
   let k = key.strip()
   if httpHeaders.table.hasKey(k.toLower()):

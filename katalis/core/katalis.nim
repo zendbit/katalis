@@ -15,24 +15,28 @@
 import std/[
   nativesockets,
   strutils,
-  os,
+  files,
+  dirs,
   base64,
   math,
   streams,
   asyncnet,
-  asyncdispatch
+  asyncdispatch,
+  paths
 ]
 
 ## stdlib
 export
   nativesockets,
   strutils,
-  os,
+  files,
+  dirs,
   base64,
   math,
   streams,
   asyncnet,
-  asyncdispatch
+  asyncdispatch,
+  paths
 
 
 import routes

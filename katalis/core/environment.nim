@@ -96,15 +96,11 @@ type
     ## static directory to serve
     enableServeStatic*: bool ##\
     ## enable/disable serve static directory
-    chunkSize*: int ## \
-    ## chunked size transfer encoding size block
     maxSendSize*: int ## \
     ## max data can send from server
     ## when client request
     ## use ranges if
     ## data is big
-    enableChunkedTransfer*: bool ## \
-    ## enable chunked transfer encoding
     enableRanges*: bool ## \
     ## enable ranges as bytes request
     ## accept-ranges: bytes
@@ -149,13 +145,11 @@ proc newSettings*(
     enableServeStatic: bool = false,
     readRecvBuffer: int = 524288,
     enableTrace: bool = false,
-    chunkSize: int = 16384,
-    maxSendSize: int = 52428800,
-    enableChunkedTransfer: bool = true,
+    maxSendSize: int = 10485760,
     enableRanges: bool = true,
     rangesSize: int = 2097152,
     enableCompression: bool = true,
-    maxBodySize: int = 52428800
+    maxBodySize: int = 10485760
   ): Settings {.gcsafe.} =
   ## new server configuration
 
@@ -179,9 +173,7 @@ proc newSettings*(
       enableServeStatic: enableServeStatic,
       readRecvBuffer: readRecvBuffer,
       enableTrace: enableTrace,
-      chunkSize: chunkSize,
       maxSendSize: maxSendSize,
-      enableChunkedTransfer: enableChunkedTransfer,
       enableRanges: enableRanges,
       rangesSize: rangesSize,
       enableCompression: enableCompression,
