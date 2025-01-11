@@ -12,23 +12,16 @@
 ## check if client support compression then compress
 ##
 
-
-import zippy
-
-
 import
   ../../core/routes,
   ../../macros/sugar,
-  ../../core/environment
+  ../../extension/httpCompress
 
 
 @!App:
   @!OnReply:
-    # if client support gzip
-    # and enableCompression enabled
-    if "gzip" in
-      @!Req.headers.getValues("accept-encoding") and
-      @!Settings.enableCompression:
-
-      @!Res.headers["content-encoding"] = "gzip"
-      @!Res.body = compress(@!Res.body, BestSpeed, dfGzip)
+    let contentType = @!Res.headers.getValues("Content-Type")
+    if contentType.len != 0 and
+      (contentType[0].toLower.contains("video/") or
+        contentType[0].toLower.contains("audio/")): return
+    await @!Context.gzipCompress(@!Env)

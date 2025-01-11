@@ -24,8 +24,7 @@ import std/
   options,
   math,
   cookies,
-  strtabs,
-  paths
+  strtabs
 ]
 ## std import
 
@@ -52,7 +51,8 @@ import
   environment,
   staticFile,
   request,
-  response
+  response,
+  json
 
 export
   constants,
@@ -61,7 +61,8 @@ export
   staticfile,
   utilsHttpCore,
   request,
-  response
+  response,
+  json
 
 
 const CookieDateFormat = "ddd, dd MMM yyyy HH:mm:ss"
@@ -84,30 +85,7 @@ type
       ) {.gcsafe async.} ## \
     ## onreply action
     ## this code will execute before data send to client
-
-
-proc getRanges*(
-    self: Request,
-    bodySize: BiggestInt,
-    env: Environment = environment.instance()
-  ): seq[tuple[start: BiggestInt, stop: BiggestInt]] {.gcsafe.} =
-  ## get seq[tuple[start: Option[BiggestInt], stop: Option[BiggestInt]]]
-  ## to seq[tuple[start: BiggestInt, stop: BiggestInt]]
-
-  for (startOpt, stopOpt) in self.ranges:
-    var start, stop: BiggestInt
-    start = startOpt.get(0)
-
-    if stopOpt.isNone:
-      if start < 0:
-        start = bodySize + start
-        stop = bodySize - 1
-      else:
-        stop = start + env.settings.rangesSize - 1
-    else:
-      stop = stopOpt.get(env.settings.rangesSize - 1)
-
-    result.add((start, stop))
+    properties*: JsonNode
 
 
 proc cleanUri*(
@@ -129,6 +107,7 @@ proc clear*(self: HttpContext) {.gcsafe.} =
 
   self.request = newRequest()
   self.response = newResponse()
+  self.properties = %*{}
 
 
 proc newHttpContext*(
@@ -146,7 +125,8 @@ proc newHttpContext*(
   HttpContext(
     client: client,
     request: request,
-    response: response
+    response: response,
+    properties: %*{}
   )
 
 
@@ -468,10 +448,7 @@ proc parseNonFormMultipart*(
   let settings = env.settings
   let client = self.client
   let req = self.request
-
-  var bodyLen = req.headers.contentLength
-  if bodyLen > settings.maxBodySize:
-    bodyLen = settings.maxBodySize
+  let bodyLen = req.headers.contentLength
 
   if bodyLen <= settings.readRecvBuffer:
     req.body = await client.recv(bodyLen)

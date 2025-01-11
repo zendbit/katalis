@@ -59,13 +59,6 @@ type
     ## contains request body from client
     param*: RequestParam ## \
     ## request parameter
-    ranges*: seq[
-        tuple[
-        start: Option[BiggestInt],
-        stop: Option[BiggestInt]
-        ]
-    ] ## \
-    ## hold ranges request info from client
     isStaticfile*: bool ## \
     ## hold if request is static file or not
     ## this will set on route process

@@ -24,22 +24,23 @@ import
 import nim_moustachu
 export nim_moustachu
 
+var templatesDir {.threadvar.}: string
+templatesDir = $(paths.getCurrentDir()/"templates".Path)
 
 type
   Mustache* = ref object of RootObj ## \
     ## view object
 
-    context*: Context ## \
+    data*: Context ## \
     ## moustache context
     templatesDir*: Path ## \
     ## path to templatesDir
-
 
 proc newMustache*(templatesDir: string = $(getCurrentDir() / Path("templates"))): Mustache = ## \
   ## create new view with partials dir for optional param
   ## default partialsDir is in templates dir
 
-  Mustache(context: newContext(), templatesDir: Path(templatesDir))
+  Mustache(data: newContext(), templatesDir: Path(templatesDir))
 
 
 proc render*(
@@ -50,6 +51,6 @@ proc render*(
 
   let templatesPath = self.templatesDir / Path(templates & ".mustache")
   if fileExists(templatesPath):
-    renderFile($templatesPath, self.context, $self.templatesDir)
+    renderFile($templatesPath, self.data, $self.templatesDir)
   else:
-    render(templates, self.context, $self.templatesDir)
+    render(templates, self.data, $self.templatesDir)

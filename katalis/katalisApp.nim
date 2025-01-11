@@ -12,21 +12,21 @@
 ##
 
 
-include pipelines
-
 import
   core/katalis,
   macros/sugar,
   core/environment,
   core/routes,
-  core/session
+  core/session,
+  pipelines
 
 export
   katalis,
   sugar,
   environment,
   routes,
-  session
+  session,
+  pipelines
 
 import net
 export net
@@ -159,8 +159,9 @@ proc doServe(callback: proc (ctx: HttpContext) {.gcsafe async.}) {.async gcsafe.
 
     let (host, port) = katalisInstance.socketServer.getLocalAddr
     # set siteUrl to shared envInstance
-    envInstance.shared["siteUrl"] = &"http://{host}:{port}"
-    echo &"""Listening non secure (plain) on {envInstance.shared["siteUrl"]}"""
+    let siteUrl = % &"http://{host}:{port}"
+    envInstance.shared["siteUrl"] = siteUrl
+    echo &"""Listening non secure (plain) on {siteUrl}"""
 
     while true:
       try:
@@ -194,8 +195,9 @@ when WithSsl:
 
       let (host, port) = katalisInstance.sslSocketServer.getLocalAddr
       # set siteUrl to shared envInstance
-      envInstance.shared["siteUrl"] = &"http://{host}:{port}"
-      echo &"""Listening secure on {envInstance.shared["siteUrl"]}"""
+      let siteUrl = % &"https://{host}:{port}"
+      envInstance.shared["siteUrl"] = siteUrl
+      echo &"""Listening secure on {siteUrl}"""
 
       var verifyMode = SslCVerifyMode.CVerifyNone
       if sslSettings.enableVerify:

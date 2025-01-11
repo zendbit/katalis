@@ -468,9 +468,9 @@ import katalis/extension/mustache
       """
 
     let m = newMustache()
-    m.context["errorMsg"] = errorMsg
-    m.context["username"] = username
-    m.context["password"] = password
+    m.data["errorMsg"] = errorMsg
+    m.data["username"] = username
+    m.data["password"] = password
     @!Context.reply(Http200, m.render(tpl))
 
 ## we can have multiple @!App for routes separation
@@ -906,7 +906,7 @@ Available validations are:
 
       ## set mustache context send data to template
       for fieldName, fieldData in v.fields:
-        m.context[fieldName] = %fieldData
+        m.data[fieldName] = %fieldData
 
     @!Context.reply(Http200, m.render(tpl))
 
@@ -972,9 +972,8 @@ Let do with the code
 @!App:
   @!Get "/test-mustache":
     let m = newMustache()
-    m.context["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
-    ## call the index.mustache in the templates folder with m.render("index")
-    await @!Context.reply(Http200, m.render("index"))
+    m.data["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
+    ## call the index.mustache in the templates folder with m.render("index"mustacheawait @!Context.reply(Http200, m.render("index"))
 ```
 
 ## 13. Web Socket

@@ -96,11 +96,15 @@ type
     ## static directory to serve
     enableServeStatic*: bool ##\
     ## enable/disable serve static directory
+    chunkSize*: int ## \
+    ## chunked size transfer encoding size block
     maxSendSize*: int ## \
     ## max data can send from server
     ## when client request
     ## use ranges if
     ## data is big
+    enableChunkedTransfer*: bool ## \
+    ## enable chunked transfer encoding
     enableRanges*: bool ## \
     ## enable ranges as bytes request
     ## accept-ranges: bytes
@@ -110,10 +114,6 @@ type
     ## enable compression check
     ## if client support accept-encoding: gzip
     ## then do compression on response
-    maxBodySize*: int ## \
-    ## set maximum body size
-    ## to prevent sending big file from client
-    ## save serve from flooding
 
 
   Environment* = ref object of RootObj
@@ -121,8 +121,8 @@ type
 
     settings*: Settings ## \
     ## sever settings and configuration
-    shared*: TableRef[string, string] ## \
-    ## shared environment as hashtable TableRef[string, string]
+    shared*: JsonNode ## \
+    ## shared environment as JsonNode
 
 
 proc newSettings*(
@@ -131,7 +131,7 @@ proc newSettings*(
     enableReuseAddress: bool = true,
     enableReusePort:bool = true,
     sslSettings: SslSettings = nil,
-    maxRecvSize: int64 = 209715200,
+    maxRecvSize: int64 = 104857600,
     enableKeepAlive: bool = true,
     enableOOBInline: bool = false,
     enableBroadcast: bool = false,
@@ -143,13 +143,14 @@ proc newSettings*(
     storagesCacheDir: Path = getCurrentDir()/"storages".Path/"cache".Path,
     staticDir: Path = getCurrentDir()/"static".Path,
     enableServeStatic: bool = false,
+    chunkSize: int = 32768,
     readRecvBuffer: int = 524288,
     enableTrace: bool = false,
-    maxSendSize: int = 10485760,
+    maxSendSize: int = 1048576,
+    enableChunkedTransfer: bool = true,
     enableRanges: bool = true,
-    rangesSize: int = 2097152,
-    enableCompression: bool = true,
-    maxBodySize: int = 10485760
+    rangesSize: int = 131072,
+    enableCompression: bool = true
   ): Settings {.gcsafe.} =
   ## new server configuration
 
@@ -171,13 +172,14 @@ proc newSettings*(
       storagesCacheDir: storagesCacheDir,
       staticDir: staticDir,
       enableServeStatic: enableServeStatic,
+      chunkSize: chunkSize,
       readRecvBuffer: readRecvBuffer,
       enableTrace: enableTrace,
       maxSendSize: maxSendSize,
+      enableChunkedTransfer: enableChunkedTransfer,
       enableRanges: enableRanges,
       rangesSize: rangesSize,
-      enableCompression: enableCompression,
-      maxBodySize: maxBodySize
+      enableCompression: enableCompression
     )
 
 
@@ -205,7 +207,7 @@ proc newEnvironment*(): Environment {.gcsafe.} =
 
   Environment(
     settings: newSettings(),
-    shared: newTable[string, string]()
+    shared: %*{}
   )
 
 

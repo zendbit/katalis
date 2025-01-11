@@ -70,7 +70,6 @@ type
 
 proc newStaticFile*(
     path: Path,
-    safeMode: bool = false,
     env: Environment = environment.instance()
   ): StaticFile {.gcsafe.} =
   ## create new static file object
@@ -95,17 +94,6 @@ proc newStaticFile*(
   else:
     staticFile.msg = &"{staticFile.path} doesn't exist."
 
-  # check if safe mode
-  # safe mode will check filesize
-  # if filesize larger than maxBodySize
-  # then set isAccessible to false
-  # and msg to body is to big
-  if safeMode:
-    staticFile.isAccessible =
-      staticFile.info.size <= env.settings.maxBodySize
-    if not staticFile.isAccessible:
-      staticFile.msg = "body is too big ({staticFile.info.size} bytes)."
-
   staticFile
 
 
@@ -124,6 +112,19 @@ proc close*(self: StaticFile) {.gcsafe.} =
   if not self.file.isNil:
     self.file.close
     self.file = nil
+
+
+proc contents*(
+    content: string,
+    ranges: seq[tuple[start: BiggestInt, stop: BiggestInt]] = @[],
+  ): Future[seq[string]] {.gcsafe async.} = ## \
+  ## get contents range of string
+  
+  if ranges.len == 0:
+    result.add(content)
+  else:
+    for (start, stop) in ranges:
+      result.add(content.substr(start, stop))
 
 
 proc contents*(
@@ -154,7 +155,26 @@ proc contents*(
   self.close
 
 
-proc contentsAsBytesRanges*(
+proc asBytesRanges*(
+    content: string,
+    mimeType: string,
+    ranges: tuple[start: BiggestInt, stop: BiggestInt]
+  ): Future[tuple[content: string, headers: HttpHeaders]] {.gcsafe async.} =
+  ## get content as bytes ranges
+
+  let contentRanges = (await content.contents(@[ranges]))[0]
+
+  let headers = newHttpHeaders()
+  headers.add("content-type", mimeType)
+  headers.add(
+    "content-range",
+    &"bytes {ranges.start}-{ranges.stop}/{content.len}"
+  )
+
+  (contentRanges, headers)
+
+
+proc asBytesRanges*(
     self: StaticFile,
     ranges: tuple[start: BiggestInt, stop: BiggestInt]
   ): Future[tuple[content: string, headers: HttpHeaders]] {.gcsafe async.} =
@@ -172,10 +192,44 @@ proc contentsAsBytesRanges*(
   (contentRanges, headers)
 
 
-proc contentsAsBytesRangesMultipart*(
+proc asBytesRangesMultipart*(
+    content: string,
+    mimeType: string,
+    ranges: seq[tuple[start: BiggestInt, stop: BiggestInt]]
+  ): Future[tuple[content: string, headers: HttpHeaders]] {.gcsafe async.} = ## \
+  ## string as bytes range multipart
+
+  let multipart = newMultipart()
+  let contentsRanges = await content.contents(ranges)
+
+  for i in 0..contentsRanges.high:
+    # meta info for each part
+    let metaData = {
+        "content-type": mimeType,
+        "content-range": &"bytes {ranges[i].start}-{ranges[i].stop}/{content.len}"
+      }.newTable
+
+    await multipart.add(metaData, contentsRanges[i])
+
+  await multipart.done
+
+  # header info for the response
+  let headers = newHttpHeaders()
+  headers.add(
+    "content-type",
+    &"multipart/byteranges; boundary={multipart.boundary}"
+  )
+
+  result = (
+      await multipart.content(),
+      headers
+    )
+
+
+proc asBytesRangesMultipart*(
     self: StaticFile,
     ranges: seq[tuple[start: BiggestInt, stop: BiggestInt]]
-  ): Future[tuple[content: string, headers: HttpHeaders]] {.gcsafe async.} =
+  ): Future[tuple[content: string, headers: HttpHeaders]] {.gcsafe async.} = ## \
   ## get content as bytes ranges multipart
 
   let multipart = newMultipart()

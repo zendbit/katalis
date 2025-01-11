@@ -12,11 +12,13 @@
 ##
 
 
-import std/httpcore
+import
+  std/httpcore,
+  json
 ## std import
-
 export
-  httpcore
+  httpcore,
+  json
 ## std export
 
 

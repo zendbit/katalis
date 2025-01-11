@@ -28,7 +28,8 @@ import std/files
 import
   ../../core/routes,
   ../../macros/sugar,
-  ../../core/environment
+  ../../core/environment,
+  ../../extension/httpStaticFile
 
 
 @!App:
@@ -38,61 +39,10 @@ import
     if not @!Req.isStaticfile: return false
 
     # static path request location
-    var requestStaticPath = @!Req.
-      uri.
-      getPathSegments().
+    let requestStaticPath = @!Settings.staticDir/
+      @!Req.uri.getPathSegments().
       join($DirSep).decodeUri().Path
 
-    # construct static path dir with request static path
-    requestStaticPath = @!Settings.staticDir/requestStaticPath.Path
-
-    # create static file route is static file
-    let staticFile = newStaticFile(requestStaticPath)
-
-    # file not accessible then return false
-    # to continue other pipeline chain
-    if not staticFile.isAccessible: return false
-
-    # create ranges if request using Ranges: header
-    let ranges = @!Req.getRanges(staticFile.info.size)
-
-    var headers = newHttpHeaders()
-    var httpCode = Http200
-    var contentBody = ""
-
-    headers["content-type"] = staticFile.mimetype
-    if ranges.len == 0:
-      contentBody =
-        if staticFile.info.size < @!Settings.maxSendSize:
-          (await staticFile.contents())[0]
-
-        else:
-          (
-            await staticFile.contents(
-              @[(0.int64, @!Settings.maxSendSize.int64 - 1)]
-            )
-          )[0]
-
-    else:
-      httpCode = Http206
-      # for ranges request set httpcode to Http206
-      # for continues request
-      if ranges.len == 1:
-        # single request only non multipart ranges
-        let rangesData = await staticFile.
-          contentsAsBytesRanges(ranges[0])
-        contentBody = rangesData.content
-        headers &= rangesData.headers
-
-      else:
-        # ranges with multipart
-        let multipartRangesData = await staticFile.
-          contentsAsBytesRangesMultipart(ranges)
-
-        contentBody = multipartRangesData.content
-        headers &= multipartRangesData.headers
-
-    # return static file as response
-    await @!Context.reply(httpCode, contentBody, headers)
-    # return true break other after route sequence
+    # return with reply sendFile with specific path
+    await @!Context.replySendFile(requestStaticPath)
     return true

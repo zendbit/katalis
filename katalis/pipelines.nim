@@ -47,6 +47,7 @@ include pipelines/after/
 include pipelines/onReply/
 [
   httpCompress,
+  httpChunked,
   httpComposePayload
 ]
 
