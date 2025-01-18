@@ -63,9 +63,9 @@ import katalis/katalisApp
 @!Emit
 ```
 
-Compile the source with --threads:on switch to enable thread support and run it!. We suggest using boehm memory management for better performance with shared heap, using boehm memory management need to install gc library (libgc).
+Compile the source with --threads:on switch to enable thread support and run it!.
 ```bash
-nim c -r --threads:on --mm:boehm app.nim
+nim c -r --threads:on --mm:orc app.nim
 ```
 
 Katalis will run on port 8000 as default port
