@@ -143,13 +143,13 @@ proc newSettings*(
     storagesCacheDir: Path = getCurrentDir()/"storages".Path/"cache".Path,
     staticDir: Path = getCurrentDir()/"static".Path,
     enableServeStatic: bool = false,
-    chunkSize: int = 32768,
-    readRecvBuffer: int = 524288,
+    chunkSize: int = 8129,
+    readRecvBuffer: int = 32768,
     enableTrace: bool = false,
-    maxSendSize: int = 1048576,
+    maxSendSize: int = 32768,
     enableChunkedTransfer: bool = true,
     enableRanges: bool = true,
-    rangesSize: int = 131072,
+    rangesSize: int = 32768,
     enableCompression: bool = true
   ): Settings {.gcsafe.} =
   ## new server configuration

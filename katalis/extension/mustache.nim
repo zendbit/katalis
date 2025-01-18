@@ -16,7 +16,8 @@
 
 import
   std/paths,
-  std/files
+  std/files,
+  strutils
 
 import
   ../core/environment
@@ -24,8 +25,6 @@ import
 import nim_moustachu
 export nim_moustachu
 
-var templatesDir {.threadvar.}: string
-templatesDir = $(paths.getCurrentDir()/"templates".Path)
 
 type
   Mustache* = ref object of RootObj ## \
@@ -49,7 +48,12 @@ proc render*(
   ): string = ## \
   ## render moustache templates
 
-  let templatesPath = self.templatesDir / Path(templates & ".mustache")
+  var templatesPath = self.templatesDir
+  for p in templates.split("/"):
+    templatesPath = templatesPath/p.Path
+  
+  templatesPath = ($templatesPath & ".mustache").Path
+
   if fileExists(templatesPath):
     renderFile($templatesPath, self.data, $self.templatesDir)
   else:
