@@ -1,8 +1,9 @@
 # Package
-version     = "0.4.2"
+version     = "0.5.0"
 author      = "Amru Rosyada"
 description = "Katalis is micro web framework for nim programming language."
 license     = "MIT"
+srcDir      = "src"
 
 # Deps
 requires "nim >= 2.0.0"

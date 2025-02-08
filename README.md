@@ -65,7 +65,7 @@ import katalis/katalisApp
 
 Compile the source with --threads:on switch to enable thread support and run it!.
 ```bash
-nim c -r --threads:on --mm:orc app.nim
+nim c -r --threads:on app.nim
 ```
 
 Katalis will run on port 8000 as default port
@@ -157,11 +157,11 @@ Utilities and helper for katalis framework
 |--------|-----------|
 |crypt.nim|some cryptohraphy algorithm|
 |debug.nim|debug msg|
-|httpcore.nim|http core stdlib extension|
-|json.nim|some json stdlib extension|
+|httpcore.nim|http core stdlib [plugins|](plugins|)
+|json.nim|some json stdlib plugins|
 
-### 3.5 Extension (folder)
-Internal extension for katalis framework
+### 3.5 Plugins (folder)
+Internal plugins for katalis framework
 |Filename|Description|
 |--------|-----------|
 |mustache.nim|mustache template engine using [mustachu](https://github.com/fenekku/moustachu) nimble pkg|
@@ -364,7 +364,7 @@ Open with browser [http://localhost:8000/index.html](http://localhost:8000/index
 ## 7. Create routes and handling request
 ```nim
 import katalis/katalisApp
-import katalis/extension/mustache
+import katalis/plugins/mustache
 
 @!Settings.enableServeStatic = true
 @!Settings.enableKeepAlive = true
@@ -608,7 +608,7 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
         for name, files in @!Form.files:
           echo name
           for file in files:
-            echo file.extension
+            echo file.plugins
             echo file.path
             echo file.mimetype
             echo file.isAccessible
@@ -783,7 +783,7 @@ Response message is universal response message, using this response message will
     ))
 ```
 ## 11. Validation
-Katalis comes with validations feature. See katalis/extension/validation.nim.
+Katalis comes with validations feature. See katalis/plugins/validation.nim.
 
 Available validations are:
 - isRequired
@@ -800,8 +800,8 @@ Available validations are:
 ```nim
 @!App:
   @![Get, Post] "/test-validation":
-    ## validation is extension on katalis
-    ## see katalis/extension/validation.nim
+    ## validation is plugins on katalis
+    ## see katalis/plugins/validation.nim
     let tpl =
       """
         <html>
@@ -855,11 +855,11 @@ Available validations are:
 ```
 
 ## 12. Template engine (Mustache)
-Nim come with *Mustache* template engine. see katalis/extension/mustache.nim, this template based on [https://github.com/fenekku/moustachu](https://github.com/fenekku/moustachu).
+Nim come with *Mustache* template engine. see katalis/plugins/mustache.nim, this template based on [https://github.com/fenekku/moustachu](https://github.com/fenekku/moustachu).
 
-For using mustache, we need to import mustache from the extension
+For using mustache, we need to import mustache from the plugins
 ```nim
-import katalis/extension/mustache.nim
+import katalis/plugins/mustache.nim
 ```
 
 For mustache specs, you can refer to [https://mustache.github.io/](https://mustache.github.io/)
