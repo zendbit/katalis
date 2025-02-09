@@ -200,7 +200,7 @@ proc isNumber*(
   try:
     discard self.field.value.parseFloat
 
-  except:
+  except CatchableError:
     self.field.isValid = false
 
   self.setMsg(failedMsg, okMsg)
@@ -236,7 +236,7 @@ proc minValue*[T: int | float](
     if parsedValue < value:
       self.field.isValid = false
 
-  except:
+  except CatchableError:
     self.field.isValid = false
 
   self.setMsg(failedMsg.replace("{value}", $value), okMsg)
@@ -272,7 +272,7 @@ proc maxValue*[T: int | float](
     if parsedValue > value:
       self.field.isValid = false
 
-  except:
+  except CatchableError:
     self.field.isValid = false
 
   self.setMsg(failedMsg.replace("{value}", $value), okMsg)
@@ -296,7 +296,7 @@ proc isDateTime*(
   try:
     discard times.parse(self.field.value, dateTimeFormat, tz)
 
-  except:
+  except CatchableError:
     self.field.isValid = false
 
   self.setMsg(failedMsg, okMsg)
@@ -324,7 +324,7 @@ proc minDateTime*(
     if parsedValue < dateTime:
       self.field.isValid = false
 
-  except:
+  except CatchableError:
     self.field.isValid = false
 
   self.setMsg(
@@ -357,7 +357,7 @@ proc maxDateTime*(
     if parsedValue > dateTime:
       self.field.isValid = false
 
-  except:
+  except CatchableError:
     self.field.isValid = false
 
   self.setMsg(

@@ -388,7 +388,7 @@ proc parseJson*(
 
   try:
     req.param.json = req.body.parseJson
-  except Exception as ex:
+  except CatchableError as ex:
     await self.replyJson(
         Http400,
         %newReplyMsg(
@@ -409,7 +409,7 @@ proc parseXml*(
 
   try:
     req.param.xml = req.body.parseXml
-  except Exception as ex:
+  except CatchableError as ex:
     await self.replyJson(
         Http400,
         %newReplyMsg(

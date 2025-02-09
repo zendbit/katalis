@@ -171,7 +171,7 @@ proc parseWebSocketRequest*(
       await self.webSocket.handShake(handshakeKey)
       self.webSocket.statusCode = WsStatusCode.Ok
 
-    except:
+    except CatchableError:
       self.webSocket.state = WsState.Close
       self.webSocket.statusCode = WsStatusCode.HandShakeFailed
 

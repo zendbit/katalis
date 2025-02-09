@@ -22,7 +22,7 @@ const
   ## http version header
   ServerId* = "katalis (Nim)" ## \
   ## server header identifier
-  ServerVersion* = "0.5.0" ## \
+  ServerVersion* = "0.5.1" ## \
   ## server build version
 
 # utility

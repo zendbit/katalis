@@ -72,7 +72,7 @@ proc contentLength*(headers: HttpHeaders): BiggestInt {.gcsafe.} =
     let length = headers.getValues("content-length")
     if length.len != 0: result = length[0].parseBiggestInt
 
-  except:
+  except CatchableError:
     discard
 
 

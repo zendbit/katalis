@@ -84,7 +84,7 @@ proc newStaticFile*(
       staticFile.extension = fileParts.ext
       staticFile.mimeType = mimetype.
         getMimetype(fileParts.ext, default = "application/octet-stream")
-    except Exception as e:
+    except CatchableError as e:
       staticFile.msg = e.msg
   else:
     staticFile.msg = &"{staticFile.path} doesn't exist."

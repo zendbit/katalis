@@ -467,7 +467,7 @@ proc doRoute*(
             )
           )
 
-  except Exception as ex:
+  except CatchableError as ex:
     await ctx.replyJson(
         Http500,
         %newReplyMsg(

@@ -133,7 +133,7 @@ proc clientListener(
       # callback(httpContext)
       await httpContext.callback
 
-  except Exception as ex:
+  except CatchableError as ex:
     @!Trace:
       echo ""
       echo "#== start"
@@ -167,7 +167,7 @@ proc doServe(callback: proc (ctx: HttpContext) {.gcsafe async.}) {.async gcsafe.
         var client = await katalisInstance.socketServer.accept()
         asyncCheck clientListener(client, callback)
 
-      except Exception as ex:
+      except CatchableError as ex:
         # show trace
         @!Trace:
           echo ""
@@ -230,7 +230,7 @@ when WithSsl:
             SslHandshakeType.handshakeAsServer, &"{host}:{port}")
 
           asyncCheck clientListener(client, callback)
-        except Exception as ex:
+        except CatchableError as ex:
           @!Trace:
             echo ""
             echo "#== start"
@@ -251,7 +251,7 @@ proc serve*() {.gcsafe.} = ## \
     try:
       await katalisInstance.r.doRoute(ctx, envInstance)
 
-    except Exception as e:
+    except CatchableError as e:
       echo e.msg
 
   asyncCheck doServe(callback)
