@@ -972,6 +972,7 @@ Frontend:
 Databse (ORM):
 - [norm](https://norm.nim.town/)
 - [norman](https://norman.nim.town/)
+- [katabase](https://github.com/zendbit/katabase)
 
 ## 16. Katalis Coding Style Guideline
 Katalis coding style guideline is simple
