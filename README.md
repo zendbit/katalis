@@ -164,7 +164,7 @@ Utilities and helper for katalis framework
 Internal plugins for katalis framework
 |Filename|Description|
 |--------|-----------|
-|mustache.nim|mustache template engine using [mustachu](https://github.com/fenekku/moustachu) nimble pkg|
+|nimMustache.nim|mustache template engine using [mustache](https://github.com/soasme/nim-mustache) nimble pkg|
 |taskMonitor.nim|simple cron job for katalis|
 |validation.nim|simplify validation for form, json, and Table[string, string]|
 
@@ -364,7 +364,7 @@ Open with browser [http://localhost:8000/index.html](http://localhost:8000/index
 ## 7. Create routes and handling request
 ```nim
 import katalis/katalisApp
-import katalis/plugins/mustache
+import katalis/plugins/nimMustache
 
 @!Settings.enableServeStatic = true
 @!Settings.enableKeepAlive = true
@@ -855,11 +855,11 @@ Available validations are:
 ```
 
 ## 12. Template engine (Mustache)
-Nim come with *Mustache* template engine. see katalis/plugins/mustache.nim, this template based on [https://github.com/fenekku/moustachu](https://github.com/fenekku/moustachu).
+Nim come with *Mustache* template engine. see katalis/plugins/nimMustache.nim, this template based on [https://github.com/soasme/nim-mustache](https://github.com/soasme/nim-mustache).
 
 For using mustache, we need to import mustache from the plugins
 ```nim
-import katalis/plugins/mustache.nim
+import katalis/plugins/nimMustache.nim
 ```
 
 For mustache specs, you can refer to [https://mustache.github.io/](https://mustache.github.io/)
@@ -972,6 +972,7 @@ Frontend:
 Databse (ORM):
 - [norm](https://norm.nim.town/)
 - [norman](https://norman.nim.town/)
+- [katabase](https://github.com/zendbit/katabase)
 
 ## 16. Katalis Coding Style Guideline
 Katalis coding style guideline is simple
