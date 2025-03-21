@@ -258,7 +258,7 @@ proc serve*() {.gcsafe.} = ## \
 
   when WithSsl:
     asyncCheck doServeSecure(callback)
-    
+
   runForever()
 
 

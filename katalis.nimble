@@ -1,5 +1,5 @@
 # Package
-version     = "0.5.1"
+version     = "0.5.2"
 author      = "Amru Rosyada"
 description = "Katalis is micro web framework for nim programming language."
 license     = "MIT"
@@ -11,5 +11,5 @@ requires "uri3"
 requires "checksums"
 requires "zippy"
 requires "regex"
-requires https://github.com/zendbit/nim_moustachu
+requires "mustache"
 requires "sha1"

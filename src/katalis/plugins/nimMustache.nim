@@ -17,15 +17,16 @@
 import
   std/[
     paths,
-    files
+    files,
+    tables
   ],
   strutils
 
 import
   ../core/environment
 
-import nim_moustachu
-export nim_moustachu
+import mustache
+export mustache, tables
 
 
 type
@@ -34,14 +35,20 @@ type
 
     data*: Context ## \
     ## moustache context
-    templatesDir*: Path ## \
+    templatesDir: Path ## \
     ## path to templatesDir
+
 
 proc newMustache*(templatesDir: string = $(getCurrentDir() / Path("templates"))): Mustache = ## \
   ## create new view with partials dir for optional param
   ## default partialsDir is in templates dir
 
-  Mustache(data: newContext(), templatesDir: Path(templatesDir))
+  Mustache(
+    data: newContext(
+      searchDirs = @[templatesDir]
+    ),
+    templatesDir: Path(templatesDir)
+  )
 
 
 proc render*(
@@ -53,10 +60,10 @@ proc render*(
   var templatesPath = self.templatesDir
   for p in templates.split("/"):
     templatesPath = templatesPath/p.Path
-  
+
   templatesPath = ($templatesPath & ".mustache").Path
 
   if fileExists(templatesPath):
-    renderFile($templatesPath, self.data, $self.templatesDir)
+    readFile($templatesPath).render(self.data)
   else:
-    render(templates, self.data, $self.templatesDir)
+    templates.render(self.data)
