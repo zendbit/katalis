@@ -18,6 +18,10 @@ import
   ../../macros/sugar,
   ../../core/routes,
   ../../plugins/webSocket
+export
+  sugar,
+  routes,
+  webSocket
 
 
 @!App:

@@ -463,7 +463,7 @@ proc parseNonFormMultipart*(
 
   if req.headers.isJson:
     await self.parseJson
-    
+
   elif req.headers.isXml:
     await self.parseXml
 

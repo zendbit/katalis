@@ -18,6 +18,10 @@ import
   ../../core/routes,
   ../../macros/sugar,
   ../../core/environment
+export
+  routes,
+  sugar,
+  environment
 
 
 @!App:

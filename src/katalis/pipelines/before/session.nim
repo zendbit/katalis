@@ -17,6 +17,11 @@ import
   ../../macros/sugar,
   ../../core/environment,
   ../../core/session
+export
+  routes,
+  sugar,
+  environment,
+  session
 
 
 @!App:

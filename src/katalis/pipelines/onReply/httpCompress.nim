@@ -16,6 +16,10 @@ import
   ../../core/routes,
   ../../macros/sugar,
   ../../plugins/httpCompress
+export
+  routes,
+  sugar,
+  httpCompress
 
 
 @!App:

@@ -19,6 +19,10 @@ import
   ../../core/routes,
   ../../macros/sugar,
   ../../plugins/http
+export
+  routes,
+  sugar,
+  http
 
 
 @!App:

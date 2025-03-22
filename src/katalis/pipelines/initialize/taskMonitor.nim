@@ -28,6 +28,10 @@ import
   ../../macros/sugar,
   ../../core/environment,
   ../../plugins/taskMonitor
+export
+  sugar,
+  environment,
+  taskMonitor
 
 
 var tm {.threadvar.}: TaskMonitor[Settings]

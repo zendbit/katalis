@@ -145,7 +145,7 @@ proc replyRanges*[T: StaticFile|string](
         let multipartRangesData = await body.asBytesRangesMultipart(mimeType, ranges)
         contentBody = multipartRangesData.content
         headers &= multipartRangesData.headers
-      
+
   else:
     ## if body is static file then use file operation
     let ranges = self.httpRanges(body.info.size)

@@ -24,6 +24,11 @@ import
   ../../macros/sugar,
   ../../core/environment,
   ../../plugins/httpRanges
+export
+  routes,
+  sugar,
+  environment,
+  httpRanges
 
 
 @!App:

@@ -444,7 +444,7 @@ proc doRoute*(
         ctx: HttpContext,
         env: Environment = environment.instance()
       ) {.gcsafe async.} =
-      
+
       await self.doOnreply(ctx, env)
 
     # call before route action

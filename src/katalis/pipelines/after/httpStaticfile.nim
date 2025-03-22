@@ -30,6 +30,11 @@ import
   ../../macros/sugar,
   ../../core/environment,
   ../../plugins/httpStaticFile
+export
+  routes,
+  sugar,
+  environment,
+  httpStaticFile
 
 
 @!App:

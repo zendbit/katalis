@@ -19,6 +19,10 @@ import
   ../../core/routes,
   ../../macros/sugar,
   ../../plugins/httpChunked
+export
+  routes,
+  sugar,
+  httpChunked
 
 
 @!App:

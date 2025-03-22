@@ -310,7 +310,7 @@ Configuration can be set using *@!Settings* macro. See katalis/core/environment.
 ## enableReuseAddress: bool = true
 ## enableReusePort:bool = true
 ## sslSettings: SslSettings = nil
-## maxRecvSize: int64 = 209715200
+## maxRecvSize: int64 = 104857600
 ## enableKeepAlive: bool = true
 ## enableOOBInline: bool = false
 ## enableBroadcast: bool = false
@@ -321,16 +321,32 @@ Configuration can be set using *@!Settings* macro. See katalis/core/environment.
 ## storagesSessionDir: string = getCurrentDir()/"storages".Path/"session".Path
 ## staticDir: string = getCurrentDir()/"static".Path
 ## enableServeStatic: bool = false
-## readRecvBuffer: int = 524288
+## chunkSize: int = 8129
+## readRecvBuffer: int = 32768
 ## enableTrace: bool = false
-## maxSendSize: int = 52428800
+## maxSendSize: int = 104857600
 ## enableRanges: bool = true
-## rangesSize: int = 2097152
+## rangesSize: int = 32768
 ## enableCompression: bool = true
-## maxBodySize: int = 52428800
 ```
 
 ## 6. Serve static file
+
+Serving static file size default value is arround 100M max, if you want to
+increase max send file size value you can increase @!Settings.maxSendSize. But
+be mindfull, make sure you have good server resource to handle it.
+
+### Serve individual file with app route
+```nim
+@!App:
+  @!Get "/my-picture-profile":
+    @!Context.replySendFile("my-profile-image.png".Path)
+
+  @!Get "/my-funny-video":
+    @!Context.replySendFile("funny-video.mp4".Path)
+```
+
+### Serve plugin static file
 For serving static file like static html, css, image, video, etc. We only need to enable *enableServeStatic* in katalis settings.
 
 Lets create *serverstatic-example* folder.
