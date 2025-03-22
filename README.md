@@ -929,24 +929,33 @@ Out of the box with webscoket. See *katalis/core/webSocket.nim*
 @!App:
   ## it will accessed with ws://localhost:8000/ws
   @!WebSocket "/ws":
-    case @!WebSocket.state
-    of WsState.Open:
-      case @!WebSocket.inFrame.opCode
-      of WsOpCode.TextFrame.uint8:
-        await @!WebSocket.reply("This is from end point.")
-      of WsOpCode.ContinuationFrame.uint8:
-        ## code here
-      of WsOpCode.BinaryFrame.uint8:
-        ## code here
-      else:
-        discard
+    if @!WebSocket.isOpen:
+      if @!WebSocket.isRecvText:
+        if not @!WebSocket.isRecvContinuation: ## \
+          ## handle msg without continuation flag
+          echo @!WebSocket.recvMsg ## \
+          ## recieve message from client
+          await @!WebSocket.reply("This is from end point.") ## \
+          ## send message to client
 
-    of WsState.Close:
+        else: ## \
+          ## handle msg with continuation flag
+          echo @!WebSocket.recvMsg
+          echo "handle with continuation message here"
+
+      if @!WebSocket.isRecvBinary: ## \
+        ## recv binary msg
+        if not @!WebSocket.isRecvContinuation: ## \
+          ## handle msg without continuation flag
+          echo @!WebSocket.recvMsg
+
+        else: ## \
+          ## handle msg with continuation flag
+          echo @!WebSocket.recvMsg
+          echo "handle with continuation message here"
+
+    if @!WebSocket.isClose:
       echo "Closed"
-      
-    else:
-      discard
-
 ```
 
 ## 14. Serve SSL

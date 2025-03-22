@@ -180,7 +180,7 @@ proc encodeDecode*(self: WsFrame): string =
     result = self.payloadData
 
 
-proc toString*(self: WsFrame, mask: uint8 = 0x0): string =
+proc `$`*(self: WsFrame, mask: uint8 = 0x0): string =
   ## websocket frame to string representation
 
   self.mask = mask
@@ -313,7 +313,7 @@ proc handShake*(
 
 proc reply*(self: WebSocket) {.gcsafe async.} =
   ## send the websocket payload
-  await self.client.send(self.outFrame.toString)
+  await self.client.send($self.outFrame)
 
 
 proc reply*(
@@ -323,7 +323,7 @@ proc reply*(
   ## send the websocket payload overwrite current outFrame with frame
 
   self.outFrame = frame
-  await self.client.send(self.outFrame.toString)
+  await self.client.send($self.outFrame)
 
 
 proc reply*(
@@ -335,3 +335,41 @@ proc reply*(
   ## send websocket payload default is text frame
 
   await self.reply(newWsFrame(msg, fin, opCode))
+
+
+proc recvMsg*(self: WebSocket): string = ## \
+  ## get input frame message
+
+  self.inFrame.encodeDecode
+
+
+proc isRecvContinuation*(self: WebSocket): bool = ## \
+  ## return true if recieve continuation frame
+  ## fin 0 == continuation
+  ## fin 1 == no continuation
+
+  self.inFrame.fin == 0x0
+
+
+proc isOpen*(self: WebSocket): bool = ## \
+  ## return true if websocket state is open
+
+  self.state == Open
+
+
+proc isClose*(self: WebSocket): bool = ## \
+  ## return true if websocket state closed
+
+  self.state == Close
+
+
+proc isRecvText*(self: WebSocket): bool = ## \
+  ## return true if message is text frame
+
+  self.inFrame.opCode == TextFrame.uint8
+
+
+proc isRecvBinary*(self: WebSocket): bool = ## \
+  ## return true if message is text frame
+
+  self.inFrame.opCode == BinaryFrame.uint8
