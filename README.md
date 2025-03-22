@@ -935,8 +935,17 @@ Out of the box with webscoket. See *katalis/core/webSocket.nim*
           ## handle msg without continuation flag
           echo @!WebSocket.recvMsg ## \
           ## recieve message from client
-          await @!WebSocket.reply("This is from end point.") ## \
+          await @!WebSocket.replyText("This is from end point.") ## \
           ## send message to client
+
+          ## for continuation text use
+          ## await @!WebSocket.replyTextContinuation("data") ## \
+
+          ## for send binary use
+          ## await @!WebSocket.replyBinary("data")
+
+          ## for send binary continuation use
+          ## await @!WebSocket.replyBinaryContinuation("data")
 
         else: ## \
           ## handle msg with continuation flag
