@@ -68,6 +68,11 @@ Compile the source with --threads:on switch to enable thread support and run it!
 nim c -r --threads:on app.nim
 ```
 
+Katalis also support for chronos async/await framework [https://github.com/status-im/nim-chronos](https://github.com/status-im/nim-chronos) as asyncdispatch backend
+```bash
+nim c -r --thread:on -d:asyncBackend=chronos
+```
+
 Katalis will run on port 8000 as default port
 ```bash
 Listening non secure (plain) on http://0.0.0.0:8000
