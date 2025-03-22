@@ -337,6 +337,42 @@ proc reply*(
   await self.reply(newWsFrame(msg, fin, opCode))
 
 
+proc replyText*(
+    self: WebSocket,
+    msg: string,
+  ) {.gcsafe async.} = ## \
+  ## send with text data frame
+
+  await self.reply(msg, 0x1, TextFrame.uint8)
+
+
+proc replyTextContinuation*(
+    self: WebSocket,
+    msg: string,
+  ) {.gcsafe async.} = ## \
+  ## send with text data continuation frame
+
+  await self.reply(msg, 0x0, TextFrame.uint8)
+
+
+proc replyBinary*(
+    self: WebSocket,
+    msg: string,
+  ) {.gcsafe async.} = ## \
+  ## send with binary data frame
+
+  await self.reply(msg, 0x1, BinaryFrame.uint8)
+
+
+proc replyBinaryContinuation*(
+    self: WebSocket,
+    msg: string,
+  ) {.gcsafe async.} = ## \
+  ## send with binary data continuation frame
+
+  await self.reply(msg, 0x0, BinaryFrame.uint8)
+
+
 proc recvMsg*(self: WebSocket): string = ## \
   ## get input frame message
 
