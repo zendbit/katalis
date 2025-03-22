@@ -39,7 +39,6 @@ var
 
 envInstance = environment.instance()
 settings = envInstance.settings
-sslSettings = settings.sslSettings
 katalisInstance = katalis.instance()
 
 
@@ -49,7 +48,7 @@ proc initialize() {.gcsafe.} = ## \
   if not settings.storagesBodyDir.dirExists:
     # check storage for body dir
     settings.storagesBodyDir.createDir
-  
+
   if not settings.storagesUploadDir.dirExists:
     # check storage for upload dir
     settings.storagesUploadDir.createDir
@@ -86,35 +85,36 @@ proc initialize() {.gcsafe.} = ## \
     echo ""
 
   ## init http katalis socket
-  if isNil(katalisInstance.socketServer):
+  if katalisInstance.socketServer.isNil:
     katalisInstance.socketServer = newAsyncSocket()
 
   # init https katalis socket
   when WithSsl:
-    if not sslSettings.isNil and
+    if not settings.sslSettings.isNil and
       katalisInstance.sslSocketServer.isNil:
 
-      var certFile = sslSettings.certFile
+      var certFile = settings.sslSettings.certFile
       if not certFile.fileExists:
-        certFile = ($paths.getCurrentDir()).joinPath(certFile)
+        certFile = paths.getCurrentDir()/certFile
 
-      var keyFile = sslSettings.keyFile
+      var keyFile = settings.sslSettings.keyFile
       if not keyFile.fileExists:
-        keyFile = ($paths.getCurrentDir()).joinPath(keyFile)
+        keyFile = paths.getCurrentDir()/keyFile
 
       if certFile.fileExists and keyFile.fileExists:
-        sslSettings.certFile = certFile
-        sslSettings.keyFile = keyFile
+        settings.sslSettings.certFile = certFile
+        settings.sslSettings.keyFile = keyFile
         katalisInstance.sslSocketServer = newAsyncSocket()
 
-      else:
-        echo "--"
-        echo &"Certificate: {certFile}"
-        echo &"Certificate found: {certFile.fileExists}"
-        echo "--"
-        echo &"Key: {keyFile}"
-        echo &"Key found: {keyFile.fileExists}"
-        echo "--"
+      echo ""
+      echo "#== Certificate Info"
+      echo &"Certificate: {certFile}"
+      echo &"Certificate found: {certFile.fileExists}"
+      echo ""
+      echo &"Key: {keyFile}"
+      echo &"Key found: {keyFile.fileExists}"
+      echo "#=="
+      echo ""
 
 
 proc clientListener(
@@ -199,25 +199,25 @@ when WithSsl:
       echo &"""Listening secure on {siteUrl}"""
 
       var verifyMode = SslCVerifyMode.CVerifyNone
-      if sslSettings.enableVerify:
+      if settings.sslSettings.enableVerify:
         verifyMode = SslCVerifyMode.CVerifyPeer
 
       var sslContext: SslContext
 
-      if sslSettings.enableUseEnv:
+      if settings.sslSettings.enableUseEnv:
         # CVerifyPeerUseEnvVars mode
         sslContext = newContext(
             verifyMode = SslCVerifyMode.CVerifyPeerUseEnvVars,
-            certFile = sslSettings.certFile,
-            keyFile = sslSettings.keyFile,
-            caDir = sslSettings.caDir,
-            caFile = sslSettings.caFile
+            certFile = $settings.sslSettings.certFile,
+            keyFile = $settings.sslSettings.keyFile,
+            caDir = $settings.sslSettings.caDir,
+            caFile = $settings.sslSettings.caFile
           )
       else:
         sslContext = newContext(
             verifyMode = verifyMode,
-            certFile = sslSettings.certFile,
-            keyFile = sslSettings.keyFile
+            certFile = $settings.sslSettings.certFile,
+            keyFile = $settings.sslSettings.keyFile
           )
 
 

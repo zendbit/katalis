@@ -31,9 +31,9 @@ type
   SslSettings* = ref object of RootObj
     ## SslSettings type for secure connection
 
-    certFile*: string ## \
+    certFile*: Path ## \
     ## path to certificate file (.pem)
-    keyFile*: string ## \
+    keyFile*: Path ## \
     ## path to private key file (.pem)
     enableVerify*: bool ## \
     ## verify mode
@@ -41,9 +41,9 @@ type
     ## verify = true -> use SslCVerifyMode.CVerifyPeer for valid certificate
     port*: Port ## \
     ## port for ssl
-    caDir*: string ## \
+    caDir*: Path ## \
     ## for CVerifyPeerUseEnvVars
-    caFile*: string ## \
+    caFile*: Path ## \
     ## for CVerifyPeerUseEnvVars
     enableUseEnv*: bool ## \
     ## for CVerifyPeerUseEnvVars
@@ -184,12 +184,12 @@ proc newSettings*(
 
 
 proc newSslSettings*(
-    certFile: string,
-    keyFile: string,
+    certFile: Path,
+    keyFile: Path,
     port: Port = Port(8443),
     enableVerify: bool = false,
-    caDir: string = "",
-    caFile: string = "",
+    caDir: Path = "".Path,
+    caFile: Path = "".Path,
     enableUseEnv: bool = false
   ): SslSettings {.gcsafe.} =
   ## new ssl server configuration
@@ -198,7 +198,10 @@ proc newSslSettings*(
     certFile: certFile,
     keyFile: keyFile,
     enableVerify: enableVerify,
-    port: port
+    port: port,
+    caDir: caDir,
+    caFile: caFile,
+    enableUseEnv: enableUseEnv
   )
 
 

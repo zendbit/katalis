@@ -991,8 +991,8 @@ Hot to create self signed SSL?, you can follow this instruction [https://devcent
 Then you can pass the certificate to the katalis settings
 ```nim
 @!Settings.sslSettings = newSslSettings(
-    certFile = "path to certificate",
-    keyFile = "path to key file",
+    certFile = "domain.crt".Path,
+    keyFile = "domain.key".Path,
     port = Port(8443), ## default value
     enableVerify = false ## set to true if using production and valid ssl certificate
   )
