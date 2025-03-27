@@ -1032,7 +1032,7 @@ Using server sent event from katalis just do like this
 
 ```
 
-## 14. Serve SSL
+## 15. Serve SSL
 Katalis also support serve SSL, we just need ssl certificate or we can use self signed certificate for development purpose.
 
 Hot to create self signed SSL?, you can follow this instruction [https://devcenter.heroku.com/articles/ssl-certificate-self](https://devcenter.heroku.com/articles/ssl-certificate-self). Or you can find other resources from the internet world.
@@ -1049,7 +1049,7 @@ Then you can pass the certificate to the katalis settings
 
 it will server on [https://localhost:8443](https://localhost:8443)
 
-## 15. Fullstack
+## 16. Fullstack
 Katalis is not fullstack framework, but if you want to use katalis as part of your stack you can use with others framework.
 
 Frontend:
