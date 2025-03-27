@@ -91,11 +91,11 @@ proc getValue(self: Validation): string {.gcsafe.} = ## \
 
   when self.toCheck is Form:
     result = self.toCheck.data.getOrDefault(self.field.name)
-  
+
   when self.toCheck is JsonNode:
     if not self.toCheck{self.field.name}.isNil:
       result = $self.toCheck{self.field.name}
-    
+
   when self.toCheck is TableRef[string, string]:
     result = self.toCheck.getOrDefault(self.field.name)
 

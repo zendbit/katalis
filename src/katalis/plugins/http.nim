@@ -175,6 +175,6 @@ proc composeHttpPayload*(
 
   if self.request.httpMethod == HttpHead:
     self.response.body = header
-    
+
   else:
     self.response.body = header & self.response.body

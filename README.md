@@ -983,6 +983,55 @@ Out of the box with webscoket. See *katalis/core/webSocket.nim*
       echo "Closed"
 ```
 
+## 14. SSE (Server Sent Event)
+Using server sent event from katalis just do like this
+```nim
+  ## test sse
+  @!Get "/test-sse": ## \
+  ## page template for html sse example
+    let tpl = 
+      """
+        <html>
+          <head>
+            <title>example sse</title>
+          </head>
+          <body>
+            <h4>Test sse</h4>
+          </body>
+          <ul id="list">
+          </ul>
+          <script>
+            document.addEventListener("DOMContentLoaded", function(e) {
+              const evtSource = new EventSource(
+                "/test-sse-event"
+              )
+
+              evtSource.onmessage = (event) => {
+                const newElement = document.createElement("li")
+                const eventList = document.getElementById("list")
+
+                newElement.textContent = `message: ${event.data}`
+                eventList.appendChild(newElement)
+              }
+            })
+          </script>
+        </html>
+      """
+
+    let v = newMustache()
+    @!Context.reply(Http200, v.render(tpl))
+
+  @!Get "/test-sse-event": ## \
+  ## this is event listen by sse event
+    await @!Context.replyEventStream(Http200, "message from server..")
+    ## default sse using message as default event name
+    ## if you want to using custom name event pass the event name
+    ##
+    ## await @!Context.replyEventStream(Http200, "message from server..", event: "data")
+    ##
+
+```
+
 ## 14. Serve SSL
 Katalis also support serve SSL, we just need ssl certificate or we can use self signed certificate for development purpose.
 

@@ -220,7 +220,6 @@ when WithSsl:
             keyFile = $settings.sslSettings.keyFile
           )
 
-
       while true:
         try:
           var client = await katalisInstance.sslSocketServer.accept()

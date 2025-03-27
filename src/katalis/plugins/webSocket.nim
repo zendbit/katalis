@@ -137,7 +137,7 @@ proc parseWebSocketRequest*(
     of WsOpCode.Ping.uint8:
       self.webSocket.outFrame = self.webSocket.inFrame
       self.webSocket.outFrame.opCode = WsOpCode.Pong.uint8
-      
+
       await self.webSocket.reply()
 
     # check if pong message same with socket hash id

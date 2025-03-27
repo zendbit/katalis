@@ -86,11 +86,13 @@ type
     ## onreply action
     ## this code will execute before data send to client
     properties*: JsonNode
+    ## extra data for ssl context
+    sslExtraData*: string
 
 
 proc cleanUri*(
     path: string
-  ): tuple[origin: string, clean: string] {.gcsafe.} =
+  ): tuple[origin: string, clean: string] {.gcsafe.} = ## \
   ## clean the path if at the and of path contains /
   ## remove the / from the end of path
   ## return origin and clean uri
@@ -98,11 +100,11 @@ proc cleanUri*(
   var uri = path
   if uri.endsWith("/") and path != "/":
     uri.removeSuffix("/")
-  
+
   (path, uri)
 
 
-proc clear*(self: HttpContext) {.gcsafe.} =
+proc clear*(self: HttpContext) {.gcsafe.} = ## \
   ## clear the context for next persistent connection
 
   self.request = newRequest()
@@ -114,7 +116,7 @@ proc newHttpContext*(
     client: AsyncSocket,
     request: Request = newRequest(),
     response: Response = newResponse(body = "")
-  ): HttpContext {.gcsafe.} =
+  ): HttpContext {.gcsafe.} = ## \
   ## create HttpContext instance
   ## this will be the main HttpContext
   ## will be contain:
@@ -133,7 +135,7 @@ proc newHttpContext*(
 proc isKeepAlive*(
     self: HttpContext,
     env: Environment = environment.instance()
-  ): bool {.gcsafe.} =
+  ): bool {.gcsafe.} = ## \
   ## check if the server using keepalive mode or not
 
   let keepAliveHeader = self.request.headers.getValues("connection")
@@ -145,7 +147,7 @@ proc isKeepAlive*(
 proc reply*(
     self: HttpContext,
     env: Environment = environment.instance()
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## send response to client socket directly
   ## through socket instance context.client
 
@@ -175,7 +177,7 @@ proc reply*(
     httpCode: HttpCode,
     body: string,
     httpHeaders: HttpHeaders = nil
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## send response
 
   self.response.headers &= httpHeaders
@@ -192,7 +194,7 @@ proc replyJson*(
     httpCode: HttpCode,
     body: JsonNode,
     httpHeaders: HttpHeaders = nil
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## send http resp as json
 
   let headers = newHttpHeaders()
@@ -205,7 +207,7 @@ proc reply*(
     self: HttpContext,
     msg: ReplyMsg,
     httpHeaders: HttpHeaders = nil
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## send http resp as json
 
   let headers = newHttpHeaders()
@@ -219,7 +221,7 @@ proc replyXml*(
     httpCode: HttpCode,
     body: XmlNode,
     httpHeaders: HttpHeaders = nil
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## send http resp as xml
 
   let headers = newHttpHeaders()
@@ -233,8 +235,8 @@ proc replyOctetStream*(
     httpCode: HttpCode,
     body: string,
     httpHeaders: HttpHeaders = nil
-  ) {.gcsafe async.} =
-  ## send http resp as xml
+  ) {.gcsafe async.} = ## \
+  ## send http resp as octet stream
 
   let headers = newHttpHeaders()
   headers["content-type"] = "application/octet-stream"
@@ -242,10 +244,30 @@ proc replyOctetStream*(
   await self.reply(httpCode, body, headers & httpHeaders)
 
 
+proc replyEventStream*(
+    self: HttpContext,
+    httpCode: HttpCode,
+    body: string,
+    event: string = "message",
+    httpHeaders: HttpHeaders = nil
+  ) {.gcsafe async.} = ## \
+  ## send http resp as event stream (SSE)
+
+  let headers = newHttpHeaders()
+  headers["content-type"] = "text/event-stream"
+  headers["cache-control"] = "no-cache"
+
+  await self.reply(
+    httpCode,
+    &"event: {event}\ndata: {body}\n\n",
+    headers & httpHeaders
+  )
+
+
 proc parseFormMultipart*(
     self: HttpContext,
     env: Environment = environment.instance()
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## parse form multipart
   # try get form multipart boundary
 
@@ -381,7 +403,7 @@ proc parseFormMultipart*(
 proc parseJson*(
     self: HttpContext,
     env: Environment = environment.instance()
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## parse json request from client
 
   let req = self.request
@@ -402,7 +424,7 @@ proc parseJson*(
 proc parseXml*(
     self: HttpContext,
     env: Environment = environment.instance()
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## parse json request from client
 
   let req = self.request
@@ -423,7 +445,7 @@ proc parseXml*(
 proc parseFormUrlencoded*(
     self: HttpContext,
     env: Environment = environment.instance()
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
 
     # collect form data urlencoded from client
     let formData = newForm()
@@ -441,7 +463,7 @@ proc parseFormUrlencoded*(
 proc parseNonFormMultipart*(
     self: HttpContext,
     env: Environment = environment.instance()
-  ) {.gcsafe async.} =
+  ) {.gcsafe async.} = ## \
   ## parse request parameter content to json
 
   let settings = env.settings
