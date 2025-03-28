@@ -26,11 +26,12 @@ proc `&`*(
   ): HttpHeaders {.gcsafe.} =
   ## merge http headers
 
-  result = newHttpHeaders()
+  result = httpHeadersFirst
+  if result.isNil: result = newHttpHeaders()
 
-  for headers in [httpHeadersFirst, httpHeadersSecond]:
-    if headers.isNil: continue
-    for k, v in httpheadersFirst:
+  if not httpHeadersSecond.isNil:
+    for k, v in httpheadersSecond:
+      if result.getOrDefault(k) != "": continue
       result.add(k, v)
 
 

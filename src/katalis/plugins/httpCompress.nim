@@ -34,9 +34,6 @@ proc gzipCompress*(
 
   # if client support gzip
   # and enableCompression enabled
-  if "gzip" in
-    self.request.headers.getValues("accept-encoding") and
-    env.settings.enableCompression:
-
+  if self.isGzipCompressSupported:
     self.response.headers["content-encoding"] = "gzip"
     self.response.body = compress(self.response.body, BestSpeed, dfGzip)
