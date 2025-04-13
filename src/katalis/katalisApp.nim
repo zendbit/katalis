@@ -150,9 +150,6 @@ proc doServe(callback: proc (ctx: HttpContext) {.gcsafe async.}) {.async gcsafe.
     katalisInstance.socketServer.setSockOpt(OptReuseAddr, settings.enableReuseAddress)
     katalisInstance.socketServer.setSockOpt(OptReusePort, settings.enableReusePort)
     katalisInstance.socketServer.setSockOpt(OptKeepAlive, settings.enableKeepAlive)
-    katalisInstance.socketServer.setSockOpt(OptBroadcast, settings.enableBroadcast)
-    katalisInstance.socketServer.setSockOpt(OptDontRoute, settings.enableDontRoute)
-    katalisInstance.socketServer.setSockOpt(OptOOBInline, settings.enableOOBInline)
     katalisInstance.socketServer.bindAddr(settings.port, settings.address)
     katalisInstance.socketServer.listen
 
@@ -186,9 +183,6 @@ when WithSsl:
       katalisInstance.sslSocketServer.setSockOpt(OptReuseAddr, settings.enableReuseAddress)
       katalisInstance.sslSocketServer.setSockOpt(OptReusePort, settings.enableReusePort)
       katalisInstance.sslSocketServer.setSockOpt(OptKeepAlive, settings.enableKeepAlive)
-      katalisInstance.sslSocketServer.setSockOpt(OptBroadcast, settings.enableBroadcast)
-      katalisInstance.sslSocketServer.setSockOpt(OptDontRoute, settings.enableDontRoute)
-      katalisInstance.sslSocketServer.setSockOpt(OptOOBInline, settings.enableOOBInline)
       katalisInstance.sslSocketServer.bindAddr(settings.sslSettings.port, settings.address)
       katalisInstance.sslSocketServer.listen
 

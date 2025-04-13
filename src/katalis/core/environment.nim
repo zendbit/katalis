@@ -64,12 +64,6 @@ type
     ## trace mode
     sslSettings*: SslSettings ## \
     ## SslSettings instance type
-    enableBroadcast*: bool ## \
-    ## socket option OptBroadcast
-    enableDontRoute*: bool ## \
-    ## socket option OptDontRoute
-    enableOOBInline*: bool ## \
-    ## socket option OptOOBInline
     enableKeepAlive*: bool ## \
     ## socket option OptKeepAlive
     ## Keep-Alive header max request with given persistent timeout
@@ -133,9 +127,6 @@ proc newSettings*(
     sslSettings: SslSettings = nil,
     maxRecvSize: int64 = 104857600,
     enableKeepAlive: bool = true,
-    enableOOBInline: bool = false,
-    enableBroadcast: bool = false,
-    enableDontRoute: bool = false,
     storagesDir: Path = getCurrentDir()/"storages".Path,
     storagesUploadDir: Path = getCurrentDir()/"storages".Path/"upload".Path,
     storagesBodyDir: Path = getCurrentDir()/"storages".Path/"body".Path,
@@ -162,9 +153,6 @@ proc newSettings*(
       sslSettings: sslSettings,
       maxRecvSize: maxRecvSize,
       enableKeepAlive: enableKeepAlive,
-      enableOOBInline: enableOOBInline,
-      enableBroadcast: enableBroadcast,
-      enableDontRoute: enableDontRoute,
       storagesDir: storagesDir,
       storagesUploadDir: storagesUploadDir,
       storagesBodyDir: storagesBodyDir,
