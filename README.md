@@ -1,7 +1,3 @@
-# Do you think this is good project? support us for better development and support
-- **USDT (TRC20): TSGAgbb3fVdJfjHagDWhSySojo6bK89LMN**
-- **USDT (BEP20): 0x26772823bdd8db6fbd010c1b15a1ba7496ce76fe**
-
 # Gold Sponsor
 <table>
   <tr>
@@ -23,6 +19,10 @@ Katalis is [nim lang](https://nim-lang.org) micro web framework
 Katalis always focusing on protocol implementation and performance improvement. For fullstack framework using katalis it will be depends on developer needs, we will not provides frontend engine or database layer engine (ORM) because it will vary for each developer taste!.
 
 If you want to use katalis as fullstack nim, you can read on fullstack section in this documentation.
+
+## Do you think this is good project? support us for better development and support
+- **USDT (TRC20): TSGAgbb3fVdJfjHagDWhSySojo6bK89LMN**
+- **USDT (BEP20): 0x26772823bdd8db6fbd010c1b15a1ba7496ce76fe**
 
 ## 1. Install
 ```bash
