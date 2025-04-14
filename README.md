@@ -384,6 +384,10 @@ Don't forget to put your static files into *static* folder
 
 ![Alt static folders](https://github.com/zendbit/katalis-readme-assets/blob/94adfbcf3d80eb3eaec2d60974203b7c1737382a/Screenshot%20From%202024-11-09%2016-09-16.png)
 
+Access to static file should not include root of static dir in this case "static" dir:
+
+For example want to access under css folder, we can access it using http://localhost:8000/css/somestyle.css
+
 Open with browser [http://localhost:8000/index.html](http://localhost:8000/index.html)
 
 ## 7. Create routes and handling request
