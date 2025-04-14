@@ -264,6 +264,30 @@ proc replyEventStream*(
   )
 
 
+proc replyRedirect*(
+    self: HttpContext,
+    target: string
+  ) {.gcsafe async.} = ## \
+  ## reply with temporary redirect http 307
+
+  let headers = newHttpHeaders()
+  headers["Location"] = target
+
+  await self.reply(Http307, "", headers)
+
+
+proc replyPermanentRedirect*(
+    self: HttpContext,
+    target: string
+  ) {.gcsafe async.} = ## \
+  ## reply with permanent redirect http 308
+
+  let headers = newHttpHeaders()
+  headers["Location"] = target
+
+  await self.reply(Http308, "", headers)
+
+
 proc parseFormMultipart*(
     self: HttpContext,
     env: Environment = environment.instance()

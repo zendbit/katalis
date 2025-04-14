@@ -660,10 +660,21 @@ We can modify response header for redirection purpose
   @!Get "/home":
     @!Context.reply(Http200, "<h3>Welcome home!</h3>")
 
-  @!Get "/test-redirect":
-    ## modify response header add redirect location to /home
+  @!Get "/test-redirect-custom":
     @!Res.headers["Location"] = "/home"
+    #
+    # Http302, Http301, Http308, Http303, Http307
+    # see https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections
+    #
     @!Context.reply(Http307, "")
+
+  @!Get "/test-redirect-temporary":
+    # http code 307
+    @!Context.replyRedirect("/home")
+
+  @!Get "/test-redirect-permanent":
+    ## http code 308
+    @!Context.replyPermanentRedirect("/home")
 ```
 ### 8.7 Session
 See *katalis/core/session.nim*
