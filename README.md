@@ -403,6 +403,17 @@ import katalis/plugins/nimMustache
 @!Emit
 ```
 
+we can also define route handler outside the ***@!App*** route and call it from the route definition, sometimes we want to split the logic from the route to make the code manageable
+```nim
+proc testHandler(ctx: HttpContext) {.async.} =
+  ## ctx == @!Context
+  await @!Context.reply(Http200, "hello")
+
+@!App:
+  @!Get "/test-handler":
+    await @!Context.testHandler
+```
+
 ## 7. Query string, form (urlencoded/multipart), json, xml, upload, Redirect, Session
 ### 7.1 Handling query string request
 ```nim
