@@ -89,7 +89,7 @@ Lets open with the browser [http://localhost:8000](http://localhost:8000)
 ## 3. Katalis DSL (Domain Specific Language)
 Katalis come with Domain Specific Language, the purpose using DSL is for simplify the development and write less code. Katalis using *@!* prefix for the DSL to prevent confict and make it easy for coding convention. Katalis DSL available in *katalis/macros/sugar.nim*. There are some macros that only can be called inside *@!App* block and block pipeline in katalis let see the table.
 
-Available on outside *@!App* block
+#### Available on outside *@!App* block
 |Name|Description|
 |----|-----------|
 |@!Settings|katalis settings instance, related to Settings type object in katalis/core/environment.nim|
@@ -100,7 +100,9 @@ Available on outside *@!App* block
 |@!SharedEnv|katalis shared Table[string, string] type object for sharing between the app instance, related to Environment type object in katalis/core/environment.nim|
 |@!Trace|trace block for displaying debug message, available when @!Settings.enableTrace = true|
 
-Available only inside *@!App* block
+
+#### Available only inside *@!App* block
+Route pipeline
 |Name|Description|
 |----|-----------|
 |@!Before|before route block pipeline|
@@ -109,6 +111,11 @@ Available only inside *@!App* block
 |@!Cleanup|cleanup pipeline|
 |@!EndPoint|set endpoint for each route prefix (Optional)|
 |@![Get, Post, Patch, Delete, Put, Options, Trace, Head, Connect]|http method for routing|
+
+#### Available only inside *@!App* block
+HttpContext and Environment
+|Name|Description|
+|----|-----------|
 |@!Context|http context route parameter, related to HttpContext type object in katalis/core/httpContext.nim|
 |@!Env|environment route parameter, related to Environment type object in katalis/core/environment.nim|
 |@!Req|request context from client, related to Request type object in katalis/core/request.nim|
