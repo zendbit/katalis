@@ -409,9 +409,26 @@ proc testHandler(ctx: HttpContext) {.async.} =
   ## ctx == @!Context
   await @!Context.reply(Http200, "hello")
 
+## if you want to pass environment to handler you can add more option to it
+proc testHandler(ctx: HttpContext, env: Environment) {.async.} =
+  ## ctx == @!Context
+  ## env == @!Env
+  await @!Context.reply(Http200, "handler with env")
+
+## pass other param is also straight forward
+proc testHandler(ctx: HttpContext, myCarsBrand: seq[string]) {.async.} =
+  ## ctx == @!Context
+  await @!Context.reply(Http200, "handler with custom param")
+
 @!App:
   @!Get "/test-handler":
     await @!Context.testHandler
+
+  @!Get "/test-handler-1":
+    await @!Context.testHandler(@!Env)
+
+  @!Get "/test-handler-2":
+    await @!Context.testHandler(@["Toyota", "Ferrari", "Ford"])
 ```
 
 ## 7. Query string, form (urlencoded/multipart), json, xml, upload, Redirect, Session
