@@ -925,6 +925,9 @@ Out of the box with webscoket. See *katalis/core/webSocket.nim*
           echo "handle with continuation message here"
 
     if @!WebSocket.isClose:
+      if @!WebSocket.isError:
+        echo @!WebSocket.errMsg
+
       echo "Closed"
 ```
 
