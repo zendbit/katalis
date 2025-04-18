@@ -63,7 +63,7 @@ type
     UnknownOpcode = 1003,
     BadPayload = 1007,
     ViolatesPolicy = 1008,
-    PayloadToBig = 1009,
+    PayloadTooBig = 1009,
     HandShakeFailed = 1010
     UnexpectedClose = 1011
 
@@ -105,6 +105,7 @@ type
     hashId*: string
     handShakeResHeaders*: HttpHeaders
     handShakeReqHeaders*: HttpHeaders
+    errMsg*: string
 
 
 const WsMagicString* = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11" ## \
@@ -397,6 +398,12 @@ proc isClose*(self: WebSocket): bool = ## \
   ## return true if websocket state closed
 
   self.state == Close
+
+
+proc isError*(self: WebSocket): bool = ## \
+  ## return true if websocket has error message
+
+  self.errMsg != ""
 
 
 proc isRecvText*(self: WebSocket): bool = ## \

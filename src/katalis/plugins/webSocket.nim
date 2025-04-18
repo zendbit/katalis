@@ -43,7 +43,10 @@ proc parseWebSocketRequest*(
 
   # if websocket still nil then return
   # don't evaluate rest of websocket handler
-  if self.webSocket.isNil: return
+  if self.webSocket.isNil:
+    self.webSocket.statusCode = WsStatusCode.GoingAway
+    self.webSocket.errMsg = "Websocket creation failed."
+    return
 
   # check if state is handshake and
   # status code ok
@@ -123,12 +126,14 @@ proc parseWebSocketRequest*(
 
       else:
         self.webSocket.state = WsState.Close
-        self.webSocket.statusCode = WsStatusCode.PayloadToBig
+        self.webSocket.statusCode = WsStatusCode.PayloadTooBig
+        self.webSocket.errMsg = "Payload is too big."
         self.webSocket.client.close
 
     else:
       self.webSocket.state = WsState.Close
       self.webSocket.statusCode = WsStatusCode.BadPayload
+      self.webSocket.errMsg = "Bad payload."
       self.webSocket.client.close
 
 
@@ -146,11 +151,13 @@ proc parseWebSocketRequest*(
       if self.webSocket.inFrame.encodeDecode() != self.webSocket.hashId:
         self.webSocket.state = WsState.Close
         self.webSocket.statusCode = WsStatusCode.UnknownOpcode
+        self.webSocket.errMsg = "Unknown opcode."
         self.webSocket.client.close
 
     of WsOpCode.ConnectionClose.uint8:
       self.webSocket.state = WsState.Close
       self.webSocket.statusCode = WsStatusCode.UnexpectedClose
+      self.webSocket.errMsg = "Unexpected close."
       self.webSocket.client.close
 
     else:
@@ -174,6 +181,8 @@ proc parseWebSocketRequest*(
     except CatchableError:
       self.webSocket.state = WsState.Close
       self.webSocket.statusCode = WsStatusCode.HandShakeFailed
+      self.webSocket.errMsg = "Handshake failed."
+      self.webSocket.client.close
 
   of WsState.Close:
     @!Trace:
