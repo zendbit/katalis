@@ -1017,7 +1017,7 @@ Katalis coding style guideline is simple
 
 ## 17. Katalis structure
 Internal katalis structure is devided into some folders structure
-### 16.1 core (folder)
+### 17.1 core (folder)
 Core folder contains base katalis framework it's focused on http protocol implementataion and some protocols enhancements
 |Filename|Description|
 |--------|-----------|
