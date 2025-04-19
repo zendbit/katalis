@@ -44,8 +44,6 @@ proc parseWebSocketRequest*(
   # if websocket still nil then return
   # don't evaluate rest of websocket handler
   if self.webSocket.isNil:
-    self.webSocket.statusCode = WsStatusCode.GoingAway
-    self.webSocket.errMsg = "Websocket creation failed."
     return
 
   # check if state is handshake and
