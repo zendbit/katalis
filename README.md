@@ -619,7 +619,16 @@ See *katalis/core/session.nim*
     await @!Context.initCookieSession()
 
   @!Get "/hello":
-    await @!Context.addCookieSession("name", %"Tian Long")
+    await @!Context.addCookieSession("name", %"Tian Long") ## \
+    ## addCookieSession value must JsonNode
+    ## example
+    ## addCookieSession("profile", %*{"username": "tianlong", "email": "tianlong@mail.com"})
+    ## addCookieSession("brand", %["Toyota", "Ford", "BYD"])
+    ## addCookieSession("counter", %0)
+    ## addCookieSession("temperature", %0.5)
+    ## etc
+    ##
+
     let name = await @!Context.getCookieSession("name")
     ## remove individual session with @!Context.deleteCookieSession("name")
     ## destroy all session value with @!Context.destroyCookieSession()
