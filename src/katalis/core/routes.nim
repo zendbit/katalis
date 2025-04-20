@@ -22,7 +22,8 @@ import
     strutils,
     json,
     paths,
-    files
+    files,
+    sequtils
   ]
 ## stdlib
 
@@ -33,7 +34,8 @@ export
   json,
   strformat,
   paths,
-  files
+  files,
+  sequtils
 
 
 import
@@ -82,7 +84,7 @@ type
   Routes* = ref object of RootObj ## \
     ## Routes object for routing
 
-    routeTable: TableRef[string, Route] ## \
+    routeList: seq[Route] ## \
     ## hold route list
     before: seq[
         proc (
@@ -119,7 +121,8 @@ var routesInstance {.threadvar.}: Routes ## \
 
 proc newRoutes*(): Routes {.gcsafe.} =
   ## create new route object
-  Routes(routeTable: newTable[string, Route]())
+  ## Routes(routeTable: newTable[string, Route]())
+  Routes()
 
 
 routesInstance = newRoutes() ## \
@@ -169,18 +172,52 @@ proc add*(
   ##   )
 
   let path = path.normalizePath
-  self.routeTable[path] = Route(
+  self.routeList.add(
+    Route(
       httpMethod: httpMethod,
       path: path,
       thenDo: thenDo,
       segments: parseUri3(path).getPathSegments()
     )
+  )
 
 
-proc routeTable*(self: Routes): TableRef[string, Route] {.gcsafe.} =
+proc routeList*(self: Routes): seq[Route] {.gcsafe.} =
   ## return route context list
 
-  self.routeTable
+  self.routeList
+
+
+proc findRoute*(
+    self: Routes,
+    httpMethod: HttpMethod,
+    path: string
+  ): Route {.gcsafe.} = ## \
+  ## find route
+
+  let routeList = self.routeList.filter(
+      proc (r: Route): bool =
+        httpMethod in r.httpMethod and
+          r.path == path
+    )
+
+  if routeList.len != 0:
+    result = routeList[0]
+
+
+proc findRoute*(
+    self: Routes,
+    path: string
+  ): Route {.gcsafe.} = ## \
+  ## find route
+
+  let routeList = self.routeList.filter(
+      proc (r: Route): bool =
+        r.path == path
+    )
+
+  if routeList.len != 0:
+    result = routeList[0]
 
 
 proc addBefore*(
@@ -306,14 +343,14 @@ proc matchRoute(
   let segmentRegexMatchPatternIds = ":([0-9a-zA-Z]+)\\("
   # get params segments name
   # ex extract from /profile/:id/details/:address
-  for rKey, rVal in routes.routeTable.pairs:
+  for r in routes.routeList:
     # if http method different just skip
-    if requestMethod notin rVal.httpMethod: continue
+    if requestMethod notin r.httpMethod: continue
 
     # find all :context
     # clean unused for macthing
     # re<...>
-    var routePathMatchPattern: string = (rKey & "$").
+    var routePathMatchPattern: string = (r.path & "$").
       replace("/re<", "/").
       replace(">/", "/").
       replace(">", "")
@@ -323,14 +360,15 @@ proc matchRoute(
       # without match any variable name
       # will match with this kind of route path
       # GET "/regex-test/re<[0-9]+_[a-z]+_[0-9]+>/ok":
-      result = (routes.routeTable[rKey], param)
+      result = (r, param)
       break
 
-    for segmentRegex in rKey.findAll(re2 segmentRegexMatchPattern):
+    #for segmentRegex in rKey.findAll(re2 segmentRegexMatchPattern):
+    for segmentRegex in r.path.findAll(re2 segmentRegexMatchPattern):
       # match with multiple variable name
       # will match with this kind of route path
       # GET "/regex-test/re<:id([0-9]+)_:name([a-zA-Z0-9]+)>/ok":
-      let currentSegmentRegex = rKey[segmentRegex.group(0)]
+      let currentSegmentRegex = r.path[segmentRegex.group(0)]
       for segmentRegexId in
         currentSegmentRegex.
         findAll(re2 segmentRegexMatchPatternIds):
@@ -351,9 +389,10 @@ proc matchRoute(
     # will match with this kind of route path
     # GET "/regex-test/:id/test":
     if captureSegmentIds.len == 0:
-      for segmentId in rKey.findAll(re2 segmentMatchPatternIds):
+      for segmentId in r.path.findAll(re2 segmentMatchPatternIds):
         # collect segmentId from route path pattern (:context)
-        captureSegmentIds.add(rKey[segmentId.group(0)])
+        # captureSegmentIds.add(rKey[segmentId.group(0)])
+        captureSegmentIds.add(r.path[segmentId.group(0)])
         # generate routePathMatcPattern regex match again requestPath
         # with given captureSegmentIds
         routePathMatchPattern = routePathMatchPattern.
@@ -375,7 +414,7 @@ proc matchRoute(
         # set value paramSegment on request httpContext
         for segmentIdIndex in 0..captureSegmentIds.high:
           param[captureSegmentIds[segmentIdIndex]] = captureSegmentValues[segmentIdIndex]
-          result = (routes.routeTable[rKey], param)
+          result = (r, param)
 
       # break if route regex match with given pattern
       break
@@ -393,7 +432,8 @@ proc matchRoute(
   var currentRoute: Route
   let request = ctx.request
   let settings = env.settings
-  let routes = self.routeTable
+  #let routes = self.routeTable
+  #let routes = self.routeList
   var requestStaticPath = request.uri.getPathSegments().
     join($DirSep).decodeUri()
   var requestPath = request.uri.getPath().decodeUri()
@@ -407,9 +447,10 @@ proc matchRoute(
 
   # if request path match with @!routes return matched route:
   if not request.isStaticfile:
-    if routes.hasKey(requestPath) and
-      request.httpMethod in routes[requestPath].httpMethod:
-      currentRoute = routes[requestPath]
+    #if routes.hasKey(requestPath) and
+    #  request.httpMethod in routes[requestPath].httpMethod:
+    #  currentRoute = routes[requestPath]
+    currentRoute = self.findRoute(request.httpMethod, requestPath)
 
     # if not match any, then try to match with
     # param segment variable

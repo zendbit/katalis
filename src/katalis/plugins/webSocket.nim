@@ -192,10 +192,13 @@ proc parseWebSocketRequest*(
 
   # check if websocket uri in the routes
   # then do callback
+  let webSocketRoute = routes.instance().findRoute(
+      self.webSocket.uri.getPath
+    )
+
   if self.webSocket.state != WsState.HandShake and
-    routes.instance().routeTable().hasKey(self.webSocket.uri.getPath):
-    await routes.instance().routeTable()[self.webSocket.uri.getPath]
-      .thenDo(self, env)
+    not webSocketRoute.isNil:
+    await webSocketRoute.thenDo(self, env)
 
   # discard all callback
   # only response websocket
