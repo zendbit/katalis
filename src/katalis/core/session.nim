@@ -39,13 +39,13 @@ var sessionDir {.threadvar.}: Path
 
 proc initSession*() {.gcsafe.} = ## \
   ## initialize session
-  
+
   sessionDir = environment.instance().settings.storagesSessionDir
 
 
 proc generateExpired(expired: int64): int64 {.gcsafe.} = ## \
   ## generate expired from current unixTime + expired in second
-  
+
   now().utc.toTime.toUnix + expired
 
 
@@ -67,9 +67,14 @@ proc writeSession*(
   ##
   ##  the session data information in json format and will encrypted for security reason.
   ##
-  let f = ($(sessionDir/sessionToken.Path)).openAsync(fmWrite)
-  await f.write(xorEncodeDecode($data, sessionToken))
-  f.close
+
+  try:
+    let f = ($(sessionDir/sessionToken.Path)).openAsync(fmWrite)
+    await f.write(xorEncodeDecode($data, sessionToken))
+    f.close
+
+  except CatchableError: discard
+
   sessionToken.isSessionExists
 
 
@@ -162,42 +167,38 @@ proc initCookieSession*(
   ##  add session data to katalis HttpContext. If key exists will overwrite existing data.
   ##
 
-  try:
-    var sessionData: JsonNode
-    let cookie = ctx.getCookie
-    var token = cookie.getOrDefault(SessionId)
+  var sessionData: JsonNode
+  let cookie = ctx.getCookie
+  var token = cookie.getOrDefault(SessionId)
 
-    if token.isSessionExists:
-      sessionData = await token.readSession
+  if token.isSessionExists:
+    sessionData = await token.readSession
 
-    elif token == "":
-      ##
-      ##  make sure token is already set in the client cookie
-      ##  prevent ddos attack
-      ##
-      var expiresFormat: string
-      var expiresVal: int64
-      if expires == "":
-        expiresFormat = ((now().utc + 7.days).toCookieDateFormat)
+  elif token == "":
+    ##
+    ##  make sure token is already set in the client cookie
+    ##  prevent ddos attack
+    ##
+    var expiresFormat: string
+    var expiresVal: int64
+    if expires == "":
+      expiresFormat = ((now().utc + 7.days).toCookieDateFormat)
 
-      expiresVal = expiresFormat.parseFromCookieDateFormat.toTime.toUnix
+    expiresVal = expiresFormat.parseFromCookieDateFormat.toTime.toUnix
 
-      token = await createSessionToken(expiresVal - now().utc.toTime.toUnix)
-      ctx.setCookie({SessionId: token}.newStringTable, domain, path, expiresFormat, secure, sameSite, httpOnly)
+    token = await createSessionToken(expiresVal - now().utc.toTime.toUnix)
+    ctx.setCookie({SessionId: token}.newStringTable, domain, path, expiresFormat, secure, sameSite, httpOnly)
 
-    token = cookie.getOrDefault(SessionId)
-    if token != "" and not token.isSessionExists:
-      discard await token.createSessionFromToken()
+  token = cookie.getOrDefault(SessionId)
+  if token != "" and not token.isSessionExists:
+    discard await token.createSessionFromToken()
 
-    if token.isSessionExists:
-      sessionData = await token.readSession
-      if sessionData.isNil or sessionData{"data"}.isNil:
-        sessionData = %*{"data": {}}
+  if token.isSessionExists:
+    sessionData = await token.readSession
+    if sessionData.isNil or sessionData{"data"}.isNil:
+      sessionData = %*{"data": {}}
 
-      discard await token.writeSession(sessionData)
-
-  except CatchableError as ex:
-    echo ex.msg
+    discard await token.writeSession(sessionData)
 
 
 proc deleteCookieSession*(
