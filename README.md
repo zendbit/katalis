@@ -890,7 +890,8 @@ Let do with the code
   @!Get "/test-mustache":
     let m = newMustache()
     m.data["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
-    ## call the index.mustache in the templates folder with m.render("index"mustacheawait @!Context.reply(Http200, m.render("index"))
+    ## call the index.mustache in the templates folder
+    await @!Context.reply(Http200, m.render("index"))
 ```
 
 ## 12. Web Socket
