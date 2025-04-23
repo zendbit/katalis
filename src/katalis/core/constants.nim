@@ -46,11 +46,11 @@ const
 const
   WithSsl* = defined(ssl) or defined(nimdoc) ## \
   ## SSL checking enable or not
-  IsReleaseMode = defined(release) or defined(nimdoc) ## \
+  IsReleaseMode* = defined(release) or defined(nimdoc) ## \
   ## check production mode
 
 when defined(release) or defined(nimdoc):
-  const BuildMode = "release"
+  const BuildMode* = "release"
 
 else:
-  const BuildMode = "debug"
+  const BuildMode* = "debug"
