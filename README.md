@@ -635,7 +635,7 @@ See *katalis/core/session.nim*
     ## destroy all session value with @!Context.destroyCookieSession()
     await @!Context.reply(Http200, &"Hello {name}!")
 ```
-## 8. Before, After, OnReply, Cleanup Pipelines
+## 8. Before, After, Middleware, OnReply, Cleanup Pipelines
 ### 8.1 Before pipeline
 Before pipeline will execute before routing process, also before serving staticfile. We can use it to check for all route before route process. We can skip all route by returning *true* statement
 ```nim
@@ -661,7 +661,51 @@ After pipeline will execute after routing process, also after serving staticfile
       ## return true for skip all routing definition
       return true
 ```
-### 8.3 OnReply
+### 8.3 Midleware
+Before and After act like middleware injection, because the block always execute and check before route and after route process.
+
+This is handy hack, for example if we want to validate if user already login or not and we can eliminate add code validation on each route block
+```nim
+  proc middlewareHandler(ctx: HttpContext, env: Environment): Future[bool] {.async.} = ## \
+    ##
+    ## return bool:
+    ## return true if something happend and want to skip all process
+    ##
+    ## ctx == @!Context
+    ## env == @!Env
+    ##
+
+   ## for example we want to check if user already login or not
+   ## if not login then just skip all process with return true
+   if @!Context.request.path.startsWith("/admin") and not checkIfUserIsLoginAndIsAdmin:
+     ## if request path start with /admin , and user is not admin we need to denied the access
+     ## then redirect to login page
+     await @!Context.replyRedirect("/login")
+
+     ## don't forget to return true to make sure rest of route not accessible and break the route pipeline
+     ## for unwanted access
+     result = true
+
+
+  @!App:
+    ## you can do in @!Before or @!After
+    @!Before:
+      ##
+      ## this block will always execute and check before route process
+      ## you can check every thing here
+      ##
+      ## you can call here
+      await @!Context.middlewareHandler(@!Env)
+
+   @!After:
+      ##
+      ## this block will always execute and check after route process
+      ## right before execute POST, GET
+      ## you can check every thing here
+      ## or you can also call here
+      await @!Context.middlewareHandler(@!Env)
+```
+### 8.4 OnReply
 OnReply pipeline will process before sending request to client, we can modify for all response from route. This example is from katalis/pipelines/onReply/httpCompress.nim, will compress before zending to client
 ```nim
 ##
@@ -699,7 +743,7 @@ import
       @!Res.headers["content-encoding"] = "gzip"
       @!Res.body = compress(@!Res.body, BestSpeed, dfGzip)
 ```
-### 8.4 Cleanup
+### 8.5 Cleanup
 Cleanup pipeline will process after all pipeline finished, this usually for cleanup resource. This example is from katalis/pipelines/cleanup/httpContext.nim
 ```nim
 ##
