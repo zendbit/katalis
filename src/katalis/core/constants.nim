@@ -50,7 +50,7 @@ const
   ## check production mode
 
 when defined(release) or defined(nimdoc):
-  const BuildMode = "relese"
+  const BuildMode = "release"
 
 else:
   const BuildMode = "debug"
