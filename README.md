@@ -25,6 +25,25 @@ If you want to use katalis as fullstack nim, you can read on [fullstack](https:/
 - **USDT (BEP20): 0x26772823bdd8db6fbd010c1b15a1ba7496ce76fe**
 - **Paypal : paypal.me/amrurosyada**
 
+## Table of Contents
+1. [Install](https://github.com/zendbit/katalis/tree/main#1-install)
+2. [Running simple app](https://github.com/zendbit/katalis/tree/main#2-running-simple-app)
+3. [Katalis DSL (Domain Specific Language)](https://github.com/zendbit/katalis/tree/main#3-katalis-dsl-domain-specific-language)
+4. [Configuration](https://github.com/zendbit/katalis/tree/main#4-configuration)
+5. [Serve static file](https://github.com/zendbit/katalis/tree/main#5-serve-static-file)
+6. [Create routes and handling request](https://github.com/zendbit/katalis/tree/main#6-create-routes-and-handling-request)
+7. [Query string, form (urlencoded/multipart), json, xml, upload, Redirect, Session](https://github.com/zendbit/katalis/tree/main#7-query-string-form-urlencodedmultipart-json-xml-upload-redirect-session)
+8. [Before, After, Middleware, OnReply, Cleanup Pipelines](https://github.com/zendbit/katalis/edit/main/README.md#8-before-after-middleware-onreply-cleanup-pipelines)
+9. [Response message](https://github.com/zendbit/katalis/tree/main#9-response-message)
+10. [Validatoin](https://github.com/zendbit/katalis/tree/main#10-validation)
+11. [Template engine (Mustache)](https://github.com/zendbit/katalis/tree/main#11-template-engine-mustache)
+12. [Websocket](https://github.com/zendbit/katalis/tree/main#12-web-socket)
+13. [SSE (Server Sent Event)](https://github.com/zendbit/katalis/tree/main#13-sse-server-sent-event)
+14. [Serve SSL](https://github.com/zendbit/katalis/tree/main#14-serve-ssl)
+15. [Katalis as fullstack](https://github.com/zendbit/katalis/tree/main#15-fullstack)
+16. [Katalis coding style guideline](https://github.com/zendbit/katalis/tree/main#16-katalis-coding-style-guideline)
+17. [Katalis structure](https://github.com/zendbit/katalis/tree/main#17-katalis-structure)
+
 ## 1. Install
 ```bash
 nimble install katalis
