@@ -35,7 +35,7 @@ If you want to use katalis as fullstack nim, you can read on [fullstack](https:/
 7. [Query string, form (urlencoded/multipart), json, xml, upload, Redirect, Session](https://github.com/zendbit/katalis/tree/main#7-query-string-form-urlencodedmultipart-json-xml-upload-redirect-session)
 8. [Before, After, Middleware, OnReply, Cleanup Pipelines](https://github.com/zendbit/katalis/edit/main/README.md#8-before-after-middleware-onreply-cleanup-pipelines)
 9. [Response message](https://github.com/zendbit/katalis/tree/main#9-response-message)
-10. [Validatoin](https://github.com/zendbit/katalis/tree/main#10-validation)
+10. [Validation](https://github.com/zendbit/katalis/tree/main#10-validation)
 11. [Template engine (Mustache)](https://github.com/zendbit/katalis/tree/main#11-template-engine-mustache)
 12. [Websocket](https://github.com/zendbit/katalis/tree/main#12-web-socket)
 13. [SSE (Server Sent Event)](https://github.com/zendbit/katalis/tree/main#13-sse-server-sent-event)
