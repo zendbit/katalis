@@ -60,7 +60,7 @@ var katalisInstance {.threadvar.}: Katalis ## \
 ## Katalist singleton
 
 
-proc newKatalis(): Katalis {.gcsafe.} = ## \
+proc newKatalis*(): Katalis {.gcsafe.} = ## \
   ## create katalis katalis with initial settings
   ## default value trace is off
   ## set trace to true if want to trace the data process

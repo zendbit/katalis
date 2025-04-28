@@ -22,7 +22,7 @@ const
   ## http version header
   ServerId* = "katalis (Nim)" ## \
   ## server header identifier
-  ServerVersion* = "0.6.2" ## \
+  ServerVersion* = "0.6.3" ## \
   ## server build version
 
 # utility
@@ -46,11 +46,11 @@ const
 const
   WithSsl* = defined(ssl) or defined(nimdoc) ## \
   ## SSL checking enable or not
-  IsReleaseMode = defined(release) or defined(nimdoc) ## \
+  IsReleaseMode* = defined(release) or defined(nimdoc) ## \
   ## check production mode
 
 when defined(release) or defined(nimdoc):
-  const BuildMode = "relese"
+  const BuildMode* = "release"
 
 else:
-  const BuildMode = "debug"
+  const BuildMode* = "debug"
