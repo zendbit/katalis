@@ -131,9 +131,9 @@ proc isEmail*(
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
-  
+
   self.field.value = self.getValue
-  
+
   if not self.field.value.contains("@") or
     self.field.value.split("@").len != 2:
     self.field.isValid = false
@@ -149,7 +149,7 @@ proc minLength*(
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field value minimum length
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
@@ -170,11 +170,11 @@ proc maxLength*(
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field value maximum length
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
-  
+
   self.field.value = self.getValue
 
   if self.field.value.len > length:
@@ -190,11 +190,11 @@ proc isNumber*(
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field value is number type
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
-  
+
   self.field.value = self.getValue
 
   try:
@@ -214,7 +214,7 @@ proc minValue*[T: int | float](
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field minimum value
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
@@ -250,7 +250,7 @@ proc maxValue*[T: int | float](
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field maximum value
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
@@ -287,7 +287,7 @@ proc isDateTime*(
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field value is datetime type
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
@@ -345,7 +345,7 @@ proc maxDateTime*(
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field value maximum datetime
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
@@ -369,20 +369,37 @@ proc maxDateTime*(
   self
 
 
-proc inList*(
+proc inList*[T: seq[string] | seq[float] | seq[int]](
     self: Validation,
-    values: seq[string],
+    values: seq[T],
     failedMsg: string = "Not in list",
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field value is in list of values
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
 
   self.field.value = self.getValue
   self.field.isValid = self.field.value in values
+
+  self.setMsg(failedMsg, okMsg)
+  self
+
+
+proc check*(
+    self: Validation,
+    cb: proc (v: string): bool,
+    failedMsg: string = "Failed",
+    okMsg: string = ""
+  ): Validation {.gcsafe discardable.} = ## \\
+  ## check field with callback procedure
+
+  if not self.field.isValid: return self
+
+  self.field.value = self.getValue
+  self.field.isValid = self.field.value.cb
 
   self.setMsg(failedMsg, okMsg)
   self
@@ -395,7 +412,7 @@ proc matchWith*(
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \
   ## check field value is in list of values
-  
+
   ## if not valid from previous validation
   ## don't validate just return
   if not self.field.isValid: return self
