@@ -405,7 +405,7 @@ proc inList*[T: seq[string] | seq[float] | seq[int]](
   except CatchableError:
     self.field.isValid = false
 
-  self.field.isValid = self.field.value in values
+  self.field.isValid = parsedValue in values
 
   self.setMsg(failedMsg, okMsg)
   self
