@@ -382,6 +382,29 @@ proc inList*[T: seq[string] | seq[float] | seq[int]](
   if not self.field.isValid: return self
 
   self.field.value = self.getValue
+
+  when T is seq[float]:
+    var parsedValue: float = 0
+
+  when T is seq[int]:
+    var parsedValue: int = 0
+
+  else:
+    var parsedValue: string = ""
+    parsedValue = self.field.value
+
+  try:
+    when T is seq[float]:
+      var parsedValue: float = 0
+      parsedValue = self.field.value.parseFloat
+
+    when T is seq[int]:
+      var parsedValue: int = 0
+      parsedValue = self.field.value.parseInt
+
+  except CatchableError:
+    self.field.isValid = false
+
   self.field.isValid = self.field.value in values
 
   self.setMsg(failedMsg, okMsg)
