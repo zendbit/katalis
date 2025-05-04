@@ -516,6 +516,8 @@ import katalis/katalisApp
     ## katalis will automatic response as json if we pass JsonNode
     ## lets pass JsonNode from client and we modify it
     await @!Context.replyJson(Http200, data)
+    ## this is also valid will automatic handle JsonNode
+    ## await @!Context.reply(Http200, data)
 ```
 
 ### 7.4 Handling XML data
@@ -544,6 +546,8 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
     ## katalis will automatic response as xml if we pass XmlNode
     ## lets pass XmlNode from client and we modify it
     await @!Context.replyXml(Http200, data)
+    ## this is also valid will automatic handle XmlNode
+    ## await @!Context.reply(Http200, data)
 ```
 ### 7.5 Handling uploaded files
 ```nim
