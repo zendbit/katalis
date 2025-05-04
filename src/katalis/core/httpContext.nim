@@ -172,15 +172,21 @@ proc reply*(
     self.client.close
 
 
-proc reply*(
+proc reply*[T](
     self: HttpContext,
     httpCode: HttpCode,
-    body: string,
+    body: T,
     httpHeaders: HttpHeaders = nil
   ) {.gcsafe async.} = ## \
   ## send response
 
   self.response.headers &= httpHeaders
+
+  when body is JsonNode:
+    self.response.headers["content-type"] = "application/json"
+  when body is XmlNode:
+    self.response.headers["content-type"] = "application/xml"
+
   if self.response.headers.getValues("content-type").len == 0: ## \
     ## set default value content-type to text/html
     ## if not set yet
