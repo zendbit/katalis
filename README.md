@@ -40,9 +40,10 @@ If you want to use katalis as fullstack nim, you can read on [fullstack](https:/
 12. [Websocket](https://github.com/zendbit/katalis/tree/main#12-web-socket)
 13. [SSE (Server Sent Event)](https://github.com/zendbit/katalis/tree/main#13-sse-server-sent-event)
 14. [Serve SSL](https://github.com/zendbit/katalis/tree/main#14-serve-ssl)
-15. [Katalis as fullstack](https://github.com/zendbit/katalis/tree/main#15-fullstack)
-16. [Katalis coding style guideline](https://github.com/zendbit/katalis/tree/main#16-katalis-coding-style-guideline)
-17. [Katalis structure](https://github.com/zendbit/katalis/tree/main#17-katalis-structure)
+15. [Deploy to shared hosting that support Common Gateway Interface CGI](https://github.com/zendbit/katalis/edit/main/README.md#15-deploy-to-shared-hosting-that-support-common-gateway-interface-cgi)
+16. [Katalis as fullstack](https://github.com/zendbit/katalis/tree/main#15-fullstack)
+17. [Katalis coding style guideline](https://github.com/zendbit/katalis/tree/main#16-katalis-coding-style-guideline)
+18. [Katalis structure](https://github.com/zendbit/katalis/tree/main#17-katalis-structure)
 
 ## 1. Install
 ```bash
@@ -1114,6 +1115,13 @@ See this example and this is just straight forward
   ## for full url example https://mydomain/cgi/app?uri=/user/add
   @!Get "/user/add":
     CODE_GOES_HERE
+
+  ## if your code implementation not supported in CgiApp mode
+  ## then use CgiApp as compile time checking to discard the code on compile time
+  when not CgiApp:
+    ## thi only work on katlais full framework
+    @!WebSocket "/chatbots":
+      CODE_GOES_HERE
 @Emit
 ```
 
