@@ -236,33 +236,42 @@ when WithSsl:
             echo "#== end"
             echo ""
 
+when not CgiApp:
+  proc serve*() {.gcsafe.} = ## \
+    ## serve the katalis
+    ## will have secure and unsecure connection if SslSettings given
 
-proc serve*() {.gcsafe.} = ## \
-  ## serve the katalis
-  ## will have secure and unsecure connection if SslSettings given
+    # setup katalis
+    initialize()
 
-  # setup katalis
-  initialize()
+    proc callback(ctx: HttpContext) {.gcsafe async.} =
+      try:
+        await katalisInstance.r.doRoute(ctx, envInstance)
 
-  proc callback(ctx: HttpContext) {.gcsafe async.} =
-    try:
-      await katalisInstance.r.doRoute(ctx, envInstance)
+      except CatchableError as e:
+        echo e.msg
 
-    except CatchableError as e:
-      echo e.msg
+    asyncCheck doServe(callback)
 
-  asyncCheck doServe(callback)
+    when WithSsl:
+      asyncCheck doServeSecure(callback)
 
-  when WithSsl:
-    asyncCheck doServeSecure(callback)
+    runForever()
 
-  runForever()
+else:
+  # build for CgiApp
+  proc serve*() {.gcsafe.} = ## \
+    ## serve the katalis
+    ## will have secure and unsecure connection if SslSettings given
+
+    # setup katalis
+    initialize()
+
+    # run for cgi app
+    waitFor katalisInstance.r.doRoute(newHttpContext(client = nil))
 
 
 proc emit*() {.gcsafe.} =
   ## run katalis
 
-  when not CgiApp:
-    serve()
-  else:
-    waitFor katalisInstance.r.doRoute(newHttpContext(client = nil))
+  serve()
