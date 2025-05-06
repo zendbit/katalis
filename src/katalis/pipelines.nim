@@ -28,6 +28,8 @@ when not CgiApp:
 include pipelines/before/http
 when not CgiApp:
   include pipelines/before/webSocket
+else:
+  include pipelines/before/cgi
 include pipelines/before/httpRanges
 include pipelines/before/session
 

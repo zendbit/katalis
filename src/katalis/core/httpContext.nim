@@ -289,6 +289,10 @@ proc replyRedirect*(
   let headers = newHttpHeaders()
   headers["Location"] = target
 
+  when CgiApp:
+    ## if CgiApp redirect to ?uri=<target>
+    headers["Location"] = &"?uri={target}"
+
   await self.reply(Http307, "", headers)
 
 
@@ -300,6 +304,10 @@ proc replyPermanentRedirect*(
 
   let headers = newHttpHeaders()
   headers["Location"] = target
+
+  when CgiApp:
+    ## if CgiApp redirect to ?uri=<target>
+    headers["Location"] = &"?uri={target}"
 
   await self.reply(Http308, "", headers)
 

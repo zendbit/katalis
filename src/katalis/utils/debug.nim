@@ -22,4 +22,6 @@ export
 proc trace*(cb: proc () {.gcsafe.}) {.gcsafe.} =
   ## trace message
 
-  if not isNil(cb): cb()
+  when not CgiApp:
+    if not isNil(cb): cb()
+  else: discard
