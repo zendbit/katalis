@@ -1139,6 +1139,7 @@ Frontend:
 - [htmx](https://htmx.org)
 - [karax](https://github.com/karaxnim/karax)
 - [nimja](https://github.com/enthus1ast/nimja)
+- [alpinejs](https://alpinejs.dev/)
 
 Databse (ORM):
 - [norm](https://norm.nim.town/)
