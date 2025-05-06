@@ -44,6 +44,7 @@ If you want to use katalis as fullstack nim, you can read on [fullstack](https:/
 16. [Katalis as fullstack](https://github.com/zendbit/katalis/tree/main#15-fullstack)
 17. [Katalis coding style guideline](https://github.com/zendbit/katalis/tree/main#16-katalis-coding-style-guideline)
 18. [Katalis structure](https://github.com/zendbit/katalis/tree/main#17-katalis-structure)
+19. [AI generated Docs](https://deepwiki.com/zendbit/katalis)
 
 ## 1. Install
 ```bash
