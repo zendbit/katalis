@@ -15,46 +15,36 @@
 ##
 
 
+import katalis/core/environment
+
 # include initialize section
 # this section will execute once on app start
-include
-  pipelines/initialize/[
-    taskMonitor
-  ]
+when not CgiApp:
+  include pipelines/initialize/taskMonitor
 
 
 # include before route pipeline
 # as chain sequence
-include
-  pipelines/before/[
-    http,
-    webSocket,
-    httpRanges,
-    session
-  ]
+include pipelines/before/http
+when not CgiApp:
+  include pipelines/before/webSocket
+include pipelines/before/httpRanges
+include pipelines/before/session
 
 
 # include after route pipeline
 # as chain sequence
-include
-  pipelines/after/[
-    httpStaticfile
-  ]
+include pipelines/after/httpStaticfile
 
 
 # include onreply pipeline
 # as chain sequence
-include
-  pipelines/onReply/[
-    httpCompress,
-    httpChunked,
-    httpComposePayload
-  ]
+include pipelines/onReply/httpCompress
+when not CgiApp:
+  include pipelines/onReply/httpChunked
+include pipelines/onReply/httpComposePayload
 
 
 # include cleanup pipeline
 # as chain sequence
-include
-  pipelines/cleanup/[
-    httpContext
-  ]
+include pipelines/cleanup/httpContext

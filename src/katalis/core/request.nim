@@ -66,7 +66,7 @@ type
 
   RequestParam* = ref object of RootObj ## \
     ## request parameter object
-  
+
     segment*: TableRef[string, string] ## \
     ## hold retrieved parameter segment
     ## match again route

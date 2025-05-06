@@ -51,7 +51,7 @@ type
 
   Settings* = ref object of RootObj
     ## settings type object
-  
+
     port*: Port ## \
     ## port for unsecure connection (http)
     address*: string ## \

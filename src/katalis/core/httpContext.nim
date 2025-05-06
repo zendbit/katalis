@@ -52,7 +52,8 @@ import
   staticFile,
   request,
   response,
-  json
+  json,
+  cgi
 
 export
   constants,
@@ -62,7 +63,8 @@ export
   utilsHttpCore,
   request,
   response,
-  json
+  json,
+  cgi
 
 
 const CookieDateFormat = "ddd, dd MMM yyyy HH:mm:ss"
@@ -87,7 +89,10 @@ type
     ## this code will execute before data send to client
     properties*: JsonNode
     ## extra data for ssl context
-    sslExtraData*: string
+    sslExtraData*: string ## \
+    ## ssl extra data
+    cgi*: CGI ## \
+    ## cgi app support
 
 
 proc cleanUri*(
@@ -115,7 +120,8 @@ proc clear*(self: HttpContext) {.gcsafe.} = ## \
 proc newHttpContext*(
     client: AsyncSocket,
     request: Request = newRequest(),
-    response: Response = newResponse(body = "")
+    response: Response = newResponse(body = ""),
+    cgi: CGI = newCgi()
   ): HttpContext {.gcsafe.} = ## \
   ## create HttpContext instance
   ## this will be the main HttpContext
@@ -128,7 +134,8 @@ proc newHttpContext*(
     client: client,
     request: request,
     response: response,
-    properties: %*{}
+    properties: %*{},
+    cgi: cgi
   )
 
 
@@ -165,11 +172,14 @@ proc reply*(
   if not self.onreply.isNil:
     await self.onreply(self, env)
 
-  if not self.client.isClosed:
-    await self.client.send(self.response.body)
+  when not CgiApp:
+    if not self.client.isClosed:
+      await self.client.send(self.response.body)
 
-  if not self.isKeepAlive:
-    self.client.close
+    if not self.isKeepAlive:
+      self.client.close
+  else:
+    write(stdout, self.response.body)
 
 
 proc reply*[T](
@@ -192,7 +202,7 @@ proc reply*[T](
     ## if not set yet
     self.response.headers["content-type"] = "text/html"
   self.response.httpCode = httpCode
-  self.response.body = body
+  self.response.body = $body
 
 
 proc replyJson*(
@@ -294,140 +304,282 @@ proc replyPermanentRedirect*(
   await self.reply(Http308, "", headers)
 
 
-proc parseFormMultipart*(
-    self: HttpContext,
-    env: Environment = environment.instance()
-  ) {.gcsafe async.} = ## \
-  ## parse form multipart
-  # try get form multipart boundary
+when not CgiApp:
+  proc parseFormMultipart*(
+      self: HttpContext,
+      env: Environment = environment.instance()
+    ) {.gcsafe async.} = ## \
+    ## parse form multipart
+    # try get form multipart boundary
 
-  type ParseStep = enum
-    ParseHeader
-    ParseContent
+    type ParseStep = enum
+      ParseHeader
+      ParseContent
 
-  let req = self.request
-  let settings = env.settings
-  let client = self.client
+    let req = self.request
+    let settings = env.settings
+    let client = self.client
 
-  let boundary = req.headers.multipartBoundary
-  if boundary.start == "": return
+    let boundary = req.headers.multipartBoundary
+    if boundary.start == "": return
 
-  # if any remain len to buff
-  var remainToBuff = 0
-  # number of req.body to recv
-  var numOfBuff = 0
-  let bodyLen = req.headers.contentLength
+    # if any remain len to buff
+    var remainToBuff = 0
+    # number of req.body to recv
+    var numOfBuff = 0
+    let bodyLen = req.headers.contentLength
 
-  # calculate remain req.body and num req.body
-  # if bodyLen larger than readRecvBuffer
-  if bodyLen > settings.readRecvBuffer:
-    numOfBuff = floor(bodyLen / settings.readRecvBuffer).int
-    remainToBuff = bodyLen mod settings.readRecvBuffer
+    # calculate remain req.body and num req.body
+    # if bodyLen larger than readRecvBuffer
+    if bodyLen > settings.readRecvBuffer:
+      numOfBuff = floor(bodyLen / settings.readRecvBuffer).int
+      remainToBuff = bodyLen mod settings.readRecvBuffer
 
-  let formData = newForm()
-  let crlf = &"{CRLF}"
-  var isParseMultipart = false
-  var filename = ""
-  var metaName = ""
-  var contentType = ""
-  var parseStep = ParseHeader
+    let formData = newForm()
+    let crlf = &"{CRLF}"
+    var isParseMultipart = false
+    var filename = ""
+    var metaName = ""
+    var contentType = ""
+    var parseStep = ParseHeader
 
-  for i in 0..numOfBuff:
-    if i == numOfBuff and remainToBuff != 0:
-      req.body &= await client.recv(remainToBuff)
-    elif bodyLen < settings.readRecvBuffer:
-      req.body &= await client.recv(bodyLen)
-    else:
-      req.body &= await client.recv(settings.readRecvBuffer)
+    for i in 0..numOfBuff:
+      if i == numOfBuff and remainToBuff != 0:
+        req.body &= await client.recv(remainToBuff)
+      elif bodyLen < settings.readRecvBuffer:
+        req.body &= await client.recv(bodyLen)
+      else:
+        req.body &= await client.recv(settings.readRecvBuffer)
 
-    let crlfIndex = proc (): int = req.body.find(crlf)
-    let boundaryStartIndex = proc (): int = req.body.find(boundary.start)
-    let boundaryEndIndex = proc (): int = req.body.find(boundary.stop)
+      let crlfIndex = proc (): int = req.body.find(crlf)
+      let boundaryStartIndex = proc (): int = req.body.find(boundary.start)
+      let boundaryEndIndex = proc (): int = req.body.find(boundary.stop)
 
-    while boundaryStartIndex() != -1:
-      if boundaryStartIndex() == 0 and crlfIndex() != -1:
-        if boundaryEndIndex() == 0:
-          req.body = ""
-        else:
-          req.body = req.body.substr(boundary.start.len + crlf.len, req.body.high)
+      while boundaryStartIndex() != -1:
+        if boundaryStartIndex() == 0 and crlfIndex() != -1:
+          if boundaryEndIndex() == 0:
+            req.body = ""
+          else:
+            req.body = req.body.substr(boundary.start.len + crlf.len, req.body.high)
 
-        if filename != "" and metaName != "":
-          await formData.files[metaName][^1].file.write("\n")
-          formData.files[metaName][^1].close()
-          formData.files[metaName][^1].isAccessible = formData.files[metaName][^1].path.fileExists
+          if filename != "" and metaName != "":
+            await formData.files[metaName][^1].file.write("\n")
+            formData.files[metaName][^1].close()
+            formData.files[metaName][^1].isAccessible = formData.files[metaName][^1].path.fileExists
 
-        filename = ""
-        metaName = ""
-        contentType = ""
-        parseStep = ParseHeader
+          filename = ""
+          metaName = ""
+          contentType = ""
+          parseStep = ParseHeader
 
-      elif parseStep == ParseHeader:
-        if crlfIndex() == 0:
-          req.body = req.body.substr(crlf.len, req.body.high)
-          parseStep = ParseContent
-          continue
+        elif parseStep == ParseHeader:
+          if crlfIndex() == 0:
+            req.body = req.body.substr(crlf.len, req.body.high)
+            parseStep = ParseContent
+            continue
 
-        let data = req.body.substr(0, crlfIndex())
+          let data = req.body.substr(0, crlfIndex())
 
-        if data.toLower.startsWith("content-disposition"):
-          for metaList in data.split(";"):
-            let meta = metaList.split("=")
-            if meta.len == 2:
-              let metaKey = meta[0].strip
-              let metaValue = meta[1].strip
-              if metaKey == "name":
-                metaName = metaValue.replace("\"", "").replace("[]", "")
-              if metaKey == "filename":
-                filename = metaValue.replace("\"", "")
+          if data.toLower.startsWith("content-disposition"):
+            for metaList in data.split(";"):
+              let meta = metaList.split("=")
+              if meta.len == 2:
+                let metaKey = meta[0].strip
+                let metaValue = meta[1].strip
+                if metaKey == "name":
+                  metaName = metaValue.replace("\"", "").replace("[]", "")
+                if metaKey == "filename":
+                  filename = metaValue.replace("\"", "")
 
-          if filename != "":
-            formData.addFile(
-              metaName,
-              newStaticFile(
-                settings.storagesUploadDir/filename.Path
+            if filename != "":
+              formData.addFile(
+                metaName,
+                newStaticFile(
+                  settings.storagesUploadDir/filename.Path
+                )
               )
-            )
 
-            formData.files[metaName][^1].mimeType = contentType
-            formData.files[metaName][^1].open(fmWrite)
-            formData.files[metaName][^1].name = filename
+              formData.files[metaName][^1].mimeType = contentType
+              formData.files[metaName][^1].open(fmWrite)
+              formData.files[metaName][^1].name = filename
+
+            else:
+              formData.data[metaName] = ""
+
+          elif data.toLower.startsWith("content-type"):
+            for metaList in data.split(";"):
+              let meta = metaList.split(":")
+              if meta.len == 2:
+                let metaKey = meta[0].strip
+                let metaValue = meta[1].strip
+                if metaKey.toLower == "content-type":
+                  contentType = metaValue
+
+            if filename != "":
+              formData.files[metaName][^1].mimeType = contentType
+              formData.files[metaName][^1].extension = filename.Path.splitFile.ext
+
+          req.body = req.body.substr(crlfIndex() + crlf.len, req.body.high)
+
+        elif parseStep == ParseContent:
+          if crlfIndex() == 0:
+            req.body = req.body.substr(crlf.len, req.body.high)
+            continue
+
+          var data = req.body
+          if boundaryStartIndex() != -1:
+            data = req.body.substr(0, boundaryStartIndex() - crlf.len)
+            req.body = req.body.substr(boundaryStartIndex(), req.body.high)
+
+          if filename != "" and contentType != "":
+            await formData.files[metaName][^1].file.write(data)
 
           else:
-            formData.data[metaName] = ""
+            formData.data[metaName] &= data
 
-        elif data.toLower.startsWith("content-type"):
-          for metaList in data.split(";"):
-            let meta = metaList.split(":")
-            if meta.len == 2:
-              let metaKey = meta[0].strip
-              let metaValue = meta[1].strip
-              if metaKey.toLower == "content-type":
-                contentType = metaValue
+    # set context request paramter
+    req.param.form = formData
 
-          if filename != "":
-            formData.files[metaName][^1].mimeType = contentType
-            formData.files[metaName][^1].extension = filename.Path.splitFile.ext
+else:
+  ## build for CgiApp
+  proc parseFormMultipart*(
+      self: HttpContext,
+      env: Environment = environment.instance()
+    ) {.gcsafe async.} = ## \
+    ## parse form multipart
+    # try get form multipart boundary
 
-        req.body = req.body.substr(crlfIndex() + crlf.len, req.body.high)
+    type ParseStep = enum
+      ParseHeader
+      ParseContent
 
-      elif parseStep == ParseContent:
-        if crlfIndex() == 0:
-          req.body = req.body.substr(crlf.len, req.body.high)
-          continue
+    let req = self.request
+    let settings = env.settings
 
-        var data = req.body
-        if boundaryStartIndex() != -1:
-          data = req.body.substr(0, boundaryStartIndex() - crlf.len)
-          req.body = req.body.substr(boundaryStartIndex(), req.body.high)
+    let boundary = req.headers.multipartBoundary
+    if boundary.start == "": return
 
-        if filename != "" and contentType != "":
-          await formData.files[metaName][^1].file.write(data)
+    # if any remain len to buff
+    var remainToBuff = 0
+    # number of req.body to recv
+    var numOfBuff = 0
+    let bodyLen = req.headers.contentLength
 
-        else:
-          formData.data[metaName] &= data
+    # calculate remain req.body and num req.body
+    # if bodyLen larger than readRecvBuffer
+    if bodyLen > settings.readRecvBuffer:
+      numOfBuff = floor(bodyLen / settings.readRecvBuffer).int
+      remainToBuff = bodyLen mod settings.readRecvBuffer
 
-  # set context request paramter
-  req.param.form = formData
+    let formData = newForm()
+    let crlf = "\c\L"
+    var isParseMultipart = false
+    var filename = ""
+    var metaName = ""
+    var contentType = ""
+    var parseStep = ParseHeader
+
+    for i in 0..numOfBuff:
+      var bufferSize = 0
+      if i == numOfBuff and remainToBuff != 0:
+        bufferSize = remainToBuff
+      elif bodyLen < settings.readRecvBuffer:
+        bufferSize = bodyLen
+      else:
+        bufferSize = settings.readRecvBuffer
+
+      var bodyBuffer: seq[char] = newSeq[char](bufferSize)
+      discard stdin.readBuffer(bodyBuffer[0].addr, bufferSize)
+      req.body &= bodyBuffer.join("")
+
+      let crlfIndex = proc (): int = req.body.find(crlf)
+      let boundaryStartIndex = proc (): int = req.body.find(boundary.start)
+      let boundaryEndIndex = proc (): int = req.body.find(boundary.stop)
+
+      while boundaryStartIndex() != -1:
+        if boundaryStartIndex() == 0 and crlfIndex() != -1:
+          if boundaryEndIndex() == 0:
+            req.body = ""
+          else:
+            req.body = req.body.substr(boundary.start.len + crlf.len, req.body.high)
+
+          if filename != "" and metaName != "":
+            await formData.files[metaName][^1].file.write("\n")
+            formData.files[metaName][^1].close()
+            formData.files[metaName][^1].isAccessible = formData.files[metaName][^1].path.fileExists
+
+          filename = ""
+          metaName = ""
+          contentType = ""
+          parseStep = ParseHeader
+
+        elif parseStep == ParseHeader:
+          if crlfIndex() == 0:
+            req.body = req.body.substr(crlf.len, req.body.high)
+            parseStep = ParseContent
+            continue
+
+          let data = req.body.substr(0, crlfIndex())
+
+          if data.toLower.startsWith("content-disposition"):
+            for metaList in data.split(";"):
+              let meta = metaList.split("=")
+              if meta.len == 2:
+                let metaKey = meta[0].strip
+                let metaValue = meta[1].strip
+                if metaKey == "name":
+                  metaName = metaValue.replace("\"", "").replace("[]", "")
+                if metaKey == "filename":
+                  filename = metaValue.replace("\"", "")
+
+            if filename != "":
+              formData.addFile(
+                metaName,
+                newStaticFile(
+                  settings.storagesUploadDir/filename.Path
+                )
+              )
+
+              formData.files[metaName][^1].mimeType = contentType
+              formData.files[metaName][^1].open(fmWrite)
+              formData.files[metaName][^1].name = filename
+
+            else:
+              formData.data[metaName] = ""
+
+          elif data.toLower.startsWith("content-type"):
+            for metaList in data.split(";"):
+              let meta = metaList.split(":")
+              if meta.len == 2:
+                let metaKey = meta[0].strip
+                let metaValue = meta[1].strip
+                if metaKey.toLower == "content-type":
+                  contentType = metaValue
+
+            if filename != "":
+              formData.files[metaName][^1].mimeType = contentType
+              formData.files[metaName][^1].extension = filename.Path.splitFile.ext
+
+          req.body = req.body.substr(crlfIndex() + crlf.len, req.body.high)
+
+        elif parseStep == ParseContent:
+          if crlfIndex() == 0:
+            req.body = req.body.substr(crlf.len, req.body.high)
+            continue
+
+          var data = req.body
+          if boundaryStartIndex() != -1:
+            data = req.body.substr(0, boundaryStartIndex() - crlf.len)
+            req.body = req.body.substr(boundaryStartIndex(), req.body.high)
+
+          if filename != "" and contentType != "":
+            await formData.files[metaName][^1].file.write(data)
+
+          else:
+            formData.data[metaName] &= data
+
+    # set context request paramter
+    req.param.form = formData
 
 
 proc parseJson*(
@@ -490,37 +642,80 @@ proc parseFormUrlencoded*(
       req.param.form = formData
 
 
-proc parseNonFormMultipart*(
-    self: HttpContext,
-    env: Environment = environment.instance()
-  ) {.gcsafe async.} = ## \
-  ## parse request parameter content to json
+when not CgiApp:
+  proc parseNonFormMultipart*(
+      self: HttpContext,
+      env: Environment = environment.instance()
+    ) {.gcsafe async.} = ## \
+    ## parse request parameter content to json
 
-  let settings = env.settings
-  let client = self.client
-  let req = self.request
-  let bodyLen = req.headers.contentLength
+    let settings = env.settings
+    let client = self.client
+    let req = self.request
+    let bodyLen = req.headers.contentLength
 
-  if bodyLen <= settings.readRecvBuffer:
-    req.body = await client.recv(bodyLen)
-  else:
-    let remainBodyLen = bodyLen mod settings.readRecvBuffer
-    let toBuff = floor(bodyLen / settings.readRecvBuffer).int
+    if bodyLen <= settings.readRecvBuffer:
+      req.body = await client.recv(bodyLen)
+    else:
+      let remainBodyLen = bodyLen mod settings.readRecvBuffer
+      let toBuff = floor(bodyLen / settings.readRecvBuffer).int
 
-    for i in 0..toBuff:
-      if i < toBuff - 1:
-        req.body = await client.recv(settings.readRecvBuffer)
-      elif remainBodyLen != 0:
-        req.body = await client.recv(remainBodyLen)
+      for i in 0..toBuff:
+        if i < toBuff - 1:
+          req.body &= await client.recv(settings.readRecvBuffer)
+        elif remainBodyLen != 0:
+          req.body &= await client.recv(remainBodyLen)
 
-  if req.headers.isJson:
-    await self.parseJson
+    if req.headers.isJson:
+      await self.parseJson
 
-  elif req.headers.isXml:
-    await self.parseXml
+    elif req.headers.isXml:
+      await self.parseXml
 
-  elif req.headers.isFormUrlEncoded:
-    await self.parseFormUrlencoded
+    elif req.headers.isFormUrlEncoded:
+      await self.parseFormUrlencoded
+
+else:
+  ## build for CgiApp
+  proc parseNonFormMultipart*(
+      self: HttpContext,
+      env: Environment = environment.instance()
+    ) {.gcsafe async.} = ## \
+    ## parse request parameter content to json
+
+    let settings = env.settings
+    let client = self.client
+    let req = self.request
+    let bodyLen = req.headers.contentLength
+
+    if bodyLen <= settings.readRecvBuffer:
+      var bodyBuffer: seq[char] = newSeq[char](bodyLen)
+      discard stdin.readBuffer(bodyBuffer[0].addr, bodyLen)
+      req.body = bodyBuffer.join("")
+
+    else:
+      let remainBodyLen = bodyLen mod settings.readRecvBuffer
+      let toBuff = floor(bodyLen / settings.readRecvBuffer).int
+
+      for i in 0..toBuff:
+        var bufferSize = 0
+        if i < toBuff - 1:
+          bufferSize = settings.readRecvBuffer
+        elif remainBodyLen != 0:
+          bufferSize = remainBodyLen
+
+        var bodyBuffer: seq[char] = newSeq[char](bufferSize)
+        discard stdin.readBuffer(bodyBuffer[0].addr, bufferSize)
+        req.body &= bodyBuffer.join("")
+
+    if req.headers.isJson:
+      await self.parseJson
+
+    elif req.headers.isXml:
+      await self.parseXml
+
+    elif req.headers.isFormUrlEncoded:
+      await self.parseFormUrlencoded
 
 
 proc toCookieDateFormat*(dt: DateTime): string = ## \

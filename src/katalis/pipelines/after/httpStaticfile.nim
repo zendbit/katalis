@@ -44,9 +44,14 @@ export
     if not @!Req.isStaticfile: return false
 
     # static path request location
-    let requestStaticPath = @!Settings.staticDir/
-      @!Req.uri.getPathSegments().
-      join($DirSep).decodeUri().Path
+    when not CgiApp:
+      let requestStaticPath = @!Settings.staticDir/
+        @!Req.uri.getPathSegments().
+        join($DirSep).decodeUri().Path
+    else:
+      let requestStaticPath = @!Settings.staticDir/
+        (@!Req.uri.getQuery("uri").
+          replace("/", $DirSep).decodeUri()).Path
 
     # return with reply sendFile with specific path
     await @!Context.replySendFile(requestStaticPath)

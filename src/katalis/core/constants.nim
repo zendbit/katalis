@@ -16,6 +16,21 @@ import std/tables
 from std/httpcore import HttpMethod
 
 
+# flag
+const
+  WithSsl* = defined(ssl) or defined(nimdoc) ## \
+  ## SSL checking enable or not
+  IsReleaseMode* = defined(release) or defined(nimdoc) ## \
+  ## check production mode
+  CgiApp* = defined(cgiapp) or defined(nimdoc) ## \
+  ## check if build for cgi app
+
+when defined(release) or defined(nimdoc):
+  const BuildMode* = "release"
+
+else:
+  const BuildMode* = "debug"
+
 # server constants
 const
   HttpVersion* = "HTTP/1.1" ## \
@@ -26,10 +41,15 @@ const
   ## server build version
 
 # utility
-const
-  CrLf* = "\c\L" ## \
-  ## CrLf header token
+when not CgiApp:
+  const
+    CrLf* = "\c\L" ## \
+    ## CrLf header token
+else:
+  const
+    CrLf* = "\n"
 
+const
   HttpMethodTable* = {
       "POST": (code: HttpPost, codeStr: "HttpPost"),
       "GET": (code: HttpGet, codeStr: "HttpGet"),
@@ -42,15 +62,3 @@ const
       "TRACE": (code: HttpTrace, codeStr: "HttpTrace")
     }.toTable
 
-# flag
-const
-  WithSsl* = defined(ssl) or defined(nimdoc) ## \
-  ## SSL checking enable or not
-  IsReleaseMode* = defined(release) or defined(nimdoc) ## \
-  ## check production mode
-
-when defined(release) or defined(nimdoc):
-  const BuildMode* = "release"
-
-else:
-  const BuildMode* = "debug"

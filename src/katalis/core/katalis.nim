@@ -40,8 +40,8 @@ export
   paths
 
 
-import routes
-
+import
+  routes
 
 type
   # Katalis type

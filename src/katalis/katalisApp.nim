@@ -61,6 +61,10 @@ proc initialize() {.gcsafe.} = ## \
     # check storage for cache dir
     settings.storagesCacheDir.createDir
 
+  if not settings.staticDir.dirExists:
+    # check storage for static dir
+    settings.staticDir.createDir
+
   # show traceging output
   @!Trace:
     echo ""
@@ -257,4 +261,8 @@ proc serve*() {.gcsafe.} = ## \
 
 proc emit*() {.gcsafe.} =
   ## run katalis
-  serve()
+
+  when not CgiApp:
+    serve()
+  else:
+    waitFor katalisInstance.r.doRoute(newHttpContext(client = nil))

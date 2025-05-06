@@ -434,9 +434,15 @@ proc matchRoute(
   let settings = env.settings
   #let routes = self.routeTable
   #let routes = self.routeList
-  var requestStaticPath = request.uri.getPathSegments().
-    join($DirSep).decodeUri()
-  var requestPath = request.uri.getPath().decodeUri()
+  when not CgiApp:
+    var requestStaticPath = request.uri.getPathSegments().
+      join($DirSep).decodeUri()
+    var requestPath = request.uri.getPath().decodeUri()
+  else:
+    var requestStaticPath = request.uri.getQuery("uri").
+      replace("/", $DirSep).
+      decodeUri()
+    var requestPath = request.uri.getQuery("uri").decodeUri()
 
   # static route found
   # if found then set reqest isStatic to true
