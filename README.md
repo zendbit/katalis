@@ -94,7 +94,7 @@ nim c -r --threads:on app.nim
 
 Katalis also support for chronos async/await framework [https://github.com/status-im/nim-chronos](https://github.com/status-im/nim-chronos) as asyncdispatch backend
 ```bash
-nim c -r --thread:on -d:asyncBackend=chronos
+nim c -r --thread:on -d:asyncBackend=chronos app.nim
 ```
 
 Katalis will run on port 8000 as default port
@@ -1055,7 +1055,6 @@ Using server sent event from katalis just do like this
     ##
     ## await @!Context.replyEventStream(Http200, "message from server..", event: "data")
     ##
-
 ```
 
 ## 14. Serve SSL
@@ -1075,7 +1074,56 @@ Then you can pass the certificate to the katalis settings
 
 it will server on [https://localhost:8443](https://localhost:8443)
 
-## 15. Fullstack
+## 15. Deploy to shared hosting that support Common Gateway Interface (CGI)
+Katalis support to shared hosting using The Common Gateway Interface (CGI) is a standard protocol that defines how web servers can interact with external programs to process user requests and generate dynamic content.
+
+***---Note---***
+
+Deploy to shared hosting, mean we use web hosting service, and we cannot run katalis like running on real hardware, vm or docker.
+Because of the limitation, we cannot use WEBSOCKET, TASKMONITOR. but all others feature is running well. Tested on Litespeed, Apache and Lighttpd
+
+***---Note---***
+
+To compile for shared hosting with CGI support just pass the **-d:cgiapp**
+```bash
+nnim c app.nim
+```
+
+after compile the app, you can just upload the executable app with others folder like templates, static in the cgi or cgi-bin folder on then shared hosting
+
+***---Note---***
+
+Before further using CGI app, you need to know that earch time request we must add query string to the url for routing purpose
+
+for example the app location is in ***https://mydomain/cgi/app***, we need to pass ***?uri=/<target_routing>***
+
+See this example and this is just straight forward
+```nim
+@!App:
+  ## this mean we need to call using ?uri=/admin
+  ## for full url example https://mydomain/cgi/app?uri=/admin
+  @!Get "/admin":
+    CODE_GOES_HERE
+
+  ## this mean we need to call using ?uri=/user
+  ## for full url example https://mydomain/cgi/app?uri=/user
+  @!Get "/user":
+    CODE_GOES_HERE
+
+  ## this mean we need to call using ?uri=/user/add
+  ## for full url example https://mydomain/cgi/app?uri=/user/add
+  @!Get "/user/add":
+    CODE_GOES_HERE
+@Emit
+```
+
+***---Note---***
+
+Access static file is also same, for example we put css file in **static/css/style.css**, we can access it by using [https://mydomain/cgi/app?uri=/css/style.css](https://mydomain/cgi/app?uri=/css/style.css)
+
+Just remember, using ***?uri=/<target_routing>*** to mapping with routing. ***?uri=/*** mean routing to / and will uri not specify then will automatic the app will redirect to ***?=uri/***
+
+## 16. Fullstack
 Katalis is not fullstack framework, but if you want to use katalis as part of your stack you can use with others framework.
 
 Frontend:
@@ -1088,14 +1136,14 @@ Databse (ORM):
 - [norman](https://norman.nim.town/)
 - [katabase](https://github.com/zendbit/katabase)
 
-## 16. Katalis Coding Style Guideline
+## 17. Katalis Coding Style Guideline
 Katalis coding style guideline is simple
 - Follow nim lang Coding Style
 - Only use Katalis DSL on the App and Pipeline don't use it on the *core, utils* to make katalis easy for debugging
 
-## 17. Katalis structure
+## 18. Katalis structure
 Internal katalis structure is devided into some folders structure
-### 17.1 core (folder)
+### 18.1 core (folder)
 Core folder contains base katalis framework it's focused on http protocol implementataion and some protocols enhancements
 |Filename|Description|
 |--------|-----------|
@@ -1112,7 +1160,7 @@ Core folder contains base katalis framework it's focused on http protocol implem
 |session.nim|contains funtionalities for handling cookies|
 |staticFile.nim|contains funtionalities for handling static file|
 |webSocket.nim|websocket object type for handling websocket request|
-### 17.2 Pipelines (folder)
+### 18.2 Pipelines (folder)
 Pipelines in katalis is like middleware, it will process request from client and response with appropriate response. Katalis has some pipelines
 |Pipelines|Descriptions|
 |---------|------------|
@@ -1121,7 +1169,7 @@ Pipelines in katalis is like middleware, it will process request from client and
 |initialize|will be eveluate on katalis initialization when katalis start|
 |onReply|will be evaluate before response message to client, this usually used for modified response message|
 
-#### 17.2.1 Initialize pipelines
+#### 18.2.1 Initialize pipelines
 Initialize pipeline will be eveluate on katalis initialization when katalis start.
 |Filename|Description|
 |--------|-----------|
@@ -1129,7 +1177,7 @@ Initialize pipeline will be eveluate on katalis initialization when katalis star
 
 We can also add custom task with schedules like cron job
 
-#### 17.2.2 Before pipelines
+#### 18.2.2 Before pipelines
 Before pipeline will be evaluate before route processing, this pipeline has advantages like early checking like authentication. Katalis has some predefines before pipelines
 |Filename|Description|
 |--------|-----------|
@@ -1138,7 +1186,7 @@ Before pipeline will be evaluate before route processing, this pipeline has adva
 |session.nim|session initialization|
 |webSocket.nim|handle web socket request from client, if http protocol upgrade request present|
 
-#### 17.2.3 After pipelines
+#### 18.2.3 After pipelines
 After pipeline will be evaluate after route processing, this pipelines has advantages like early checking if request has access to route resource or not
 |Filename|Description|
 |--------|-----------|
@@ -1146,20 +1194,20 @@ After pipeline will be evaluate after route processing, this pipelines has advan
 
 Static file must be placed is in *static* folder, but we can also changes default static folder from configuration (For more information about configuration see configuration section).
 
-#### 17.2.4 OnReply pipelines
+#### 18.2.4 OnReply pipelines
 OnReply pipeline will be evaluate before sending response to client, this pipeline used for modifying payload.
 |Filename|Description|
 |--------|-----------|
 |httpComposePayload.nim|handle composing payload header + body for response|
 |httpCompress.nim|handle compression support (gzip) if client support zip compression|
 
-#### 17.2.5 Cleanup pipelines
+#### 18.2.5 Cleanup pipelines
 Clenup pipeline will evaluate after sending response to client, this pipeline will evaluate after all process response to client finished.
 |Filename|Description|
 |--------|-----------|
 |httpContext.nim|will cleanup unused cache data related with http context|
 
-### 17.3 Macros (folder)
+### 18.3 Macros (folder)
 Macros folder contains macros definition for katalis framework
 |Filename|Description|
 |--------|-----------|
@@ -1167,7 +1215,7 @@ Macros folder contains macros definition for katalis framework
 
 More information about DSL, see DSL (Domain Specific Languate) section
 
-### 17.4 Utils (folder)
+### 18.4 Utils (folder)
 Utilities and helper for katalis framework
 |Filename|Description|
 |--------|-----------|
@@ -1176,7 +1224,7 @@ Utilities and helper for katalis framework
 |httpcore.nim|http core stdlib [plugins|](plugins|)
 |json.nim|some json stdlib plugins|
 
-### 17.5 Plugins (folder)
+### 18.5 Plugins (folder)
 Internal plugins for katalis framework
 |Filename|Description|
 |--------|-----------|
@@ -1184,13 +1232,13 @@ Internal plugins for katalis framework
 |taskMonitor.nim|simple cron job for katalis|
 |validation.nim|simplify validation for form, json, and Table[string, string]|
 
-### 17.6 KatalisApp (file)
+### 18.6 KatalisApp (file)
 Katalis application, this is starting poin of katalis framework. Includes all file needed for developing katalis application.
 |Filename|Description|
 |--------|-----------|
 |katalisApp.nim|include this file for starting the app server|
 
-### 17.7 Pipelines (file)
+### 18.7 Pipelines (file)
 Katalis pipeline contains include declaration for katalis pipelines order, include declaration is important depend on this order:
 - initialize
 - before
