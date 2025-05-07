@@ -702,7 +702,7 @@ This is handy hack, for example if we want to validate if user already login or 
 
    ## for example we want to check if user already login or not
    ## if not login then just skip all process with return true
-   if @!Req.uri.getPath.startsWith("/admin") and not checkIfUserIsLoginAndIsAdmin:
+   if ($ @!Req.uri).contains("/admin") and not checkIfUserIsLoginAndIsAdmin:
      ## if request path start with /admin , and user is not admin we need to denied the access
      ## then redirect to login page
      await @!Context.replyRedirect("/login")
