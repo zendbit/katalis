@@ -904,7 +904,7 @@ Nim come with *Mustache* template engine. see katalis/plugins/nimMustache.nim, t
 
 For using mustache, we need to import mustache from the plugins
 ```nim
-import katalis/plugins/nimMustache.nim
+import katalis/plugins/nimMustache
 ```
 
 For mustache specs, you can refer to [https://mustache.github.io/](https://mustache.github.io/)
