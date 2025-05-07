@@ -282,6 +282,7 @@ proc replyEventStream*(
 
 proc replyRedirect*(
     self: HttpContext,
+    httpCode: HttpCode,
     target: string
   ) {.gcsafe async.} = ## \
   ## reply with temporary redirect http 307
@@ -291,9 +292,20 @@ proc replyRedirect*(
 
   when CgiApp:
     ## if CgiApp redirect to ?uri=<target>
-    headers["Location"] = &"?uri={target}"
+    headers["Location"] =
+      if not target.contains("://"): &"?uri={target}"
+      else: target
 
-  await self.reply(Http307, "", headers)
+  await self.reply(httpCode, "", headers)
+
+
+proc replyRedirect*(
+    self: HttpContext,
+    target: string
+  ) {.gcsafe async.} = ## \
+  ## reply with temporary redirect http 307
+
+  await self.replyRedirect(Http307, target)
 
 
 proc replyPermanentRedirect*(
@@ -302,14 +314,7 @@ proc replyPermanentRedirect*(
   ) {.gcsafe async.} = ## \
   ## reply with permanent redirect http 308
 
-  let headers = newHttpHeaders()
-  headers["Location"] = target
-
-  when CgiApp:
-    ## if CgiApp redirect to ?uri=<target>
-    headers["Location"] = &"?uri={target}"
-
-  await self.reply(Http308, "", headers)
+  await self.replyRedirect(Http308, target)
 
 
 when not CgiApp:
