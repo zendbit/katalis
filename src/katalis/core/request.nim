@@ -62,6 +62,8 @@ type
     isStaticfile*: bool ## \
     ## hold if request is static file or not
     ## this will set on route process
+    path*: string ## \
+    ## path request
 
 
   RequestParam* = ref object of RootObj ## \

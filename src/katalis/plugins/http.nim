@@ -60,6 +60,7 @@ when not CgiApp:
           self.request.uri.setDomain(address)
           self.request.uri.setPort($port)
           self.request.httpVersion = reqParts[2]
+          self.request.path = self.request.uri.getPath
 
       else:
         isRequestHeaderValid = false
@@ -161,7 +162,6 @@ when not CgiApp:
 
     else:
       self.response.headers["connection"] = "close"
-
     if "chunked" in self.response.headers.getValues("transfer-encoding"):
       self.response.headers.del("content-length")
     else:
@@ -208,6 +208,7 @@ else:
     self.request.headers["Content-Length"] = $self.cgi.contentLength
     self.request.headers["Authorization"] = self.cgi.authType
     self.request.headers["Content-Type"] = self.cgi.contentType.raw
+    self.request.path = self.request.uri.getQuery("uri")
 
     var isErrorBodyContent = false
     # parse body
