@@ -91,16 +91,27 @@ proc getValue(self: Validation): string {.gcsafe.} = ## \
 
   when self.toCheck is Form:
     result =
-      if self.toCheck.data.hasKey(self.field.name): self.field.name
-      elif self.toCheck.files.hasKey(self.field.name): self.field.name
+      if self.toCheck.data.hasKey(self.field.name):
+        self.toCheck.data.getOrDefault(self.field.name).strip
+      elif self.toCheck.files.hasKey(self.field.name):
+        self.field.name
       else: ""
 
   when self.toCheck is JsonNode:
     if not self.toCheck{self.field.name}.isNil:
-      result = $self.toCheck{self.field.name}
+      let val = self.toCheck{self.field.name}
+      case val.kind
+      of JInt:
+        result = $val.getBiggestInt
+      of JFloat:
+        result = $val.getBiggestFloat
+      of JBool:
+        result = $val.getBiggestFloat
+      else:
+        result = $val
 
   when self.toCheck is TableRef[string, string]:
-    result = self.toCheck.getOrDefault(self.field.name)
+    result = self.toCheck.getOrDefault(self.field.name).strip
 
 
 proc isRequired*(
