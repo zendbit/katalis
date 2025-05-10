@@ -589,10 +589,10 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
         for name, files in @!Form.files:
           echo name
           for file in files:
-            echo file.plugins
             echo file.path
             echo file.mimetype
             echo file.isAccessible
+            echo file.name
 
       ## create directory uploaded if not exist
       if not "uploaded".dirExists:
