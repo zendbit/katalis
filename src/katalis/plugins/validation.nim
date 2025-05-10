@@ -90,7 +90,10 @@ proc getValue(self: Validation): string {.gcsafe.} = ## \
   ## get value from field
 
   when self.toCheck is Form:
-    result = self.toCheck.data.getOrDefault(self.field.name)
+    result =
+      if self.toCheck.data.hasKey(self.field.name): self.field.name
+      elif self.toCheck.files.hasKey(self.field.name): self.field.name
+      else: ""
 
   when self.toCheck is JsonNode:
     if not self.toCheck{self.field.name}.isNil:

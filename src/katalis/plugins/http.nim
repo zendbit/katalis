@@ -208,7 +208,7 @@ else:
     self.request.headers["Content-Length"] = $self.cgi.contentLength
     self.request.headers["Authorization"] = self.cgi.authType
     self.request.headers["Content-Type"] = self.cgi.contentType.raw
-    self.request.path = self.request.uri.getQuery("uri")
+    self.request.path = "?uri=" & self.request.uri.getQuery("uri")
 
     var isErrorBodyContent = false
     # parse body
