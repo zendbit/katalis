@@ -1259,3 +1259,22 @@ Katalis pipeline contains include declaration for katalis pipelines order, inclu
 |Filename|Description|
 |--------|-----------|
 |pipelines.nim|pipeline order includes declaration|
+
+### 19. Enable trace for debugging and Logging
+Trace debug for non web in console default off, we can enabled by call setting
+```nim
+@!Settings.enableTrace = true
+```
+
+for logging and system exception will saved to storages/log/ folder, and file will saved as "dd-MMMM-yyyy" format
+
+if want to add to log file, follow step bellow
+```nim
+import katalis/utils/debug
+
+## add to debug log file
+await putLog("your message log")
+
+## or for non async use waitFor
+waitFor putLog("your message log")
+```
