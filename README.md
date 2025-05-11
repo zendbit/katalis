@@ -1282,7 +1282,9 @@ waitFor putLog("your message log")
 ## also you can use switcher for debugging and production level
 ## by passing -d:release on compile time
 ## and we can use IsReleaseMode for selector
-when IsReleaseMod:
+import katalis/core/constants
+
+when IsReleaseMode:
   AVAILABLE_ON_RELEASE_MODE
 else:
   AVAILABLE_ON_DEBUG_MODE
