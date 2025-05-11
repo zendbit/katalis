@@ -3,7 +3,8 @@ import
     httpContext,
     environment,
     routes
-  ]
+  ],
+  ../utils/debug
 export
   httpContext,
   environment,
@@ -176,11 +177,12 @@ proc parseWebSocketRequest*(
       await self.webSocket.handShake(handshakeKey)
       self.webSocket.statusCode = WsStatusCode.Ok
 
-    except CatchableError:
+    except Exception as ex:
       self.webSocket.state = WsState.Close
       self.webSocket.statusCode = WsStatusCode.HandShakeFailed
       self.webSocket.errMsg = "Handshake failed."
       self.webSocket.client.close
+      await putLog "Websocket handshake failed " & ex.msg
 
   of WsState.Close:
     @!Trace:

@@ -26,7 +26,6 @@ import
     sequtils
   ]
 ## stdlib
-
 export
   tables,
   strutils,
@@ -37,24 +36,21 @@ export
   files,
   sequtils
 
-
 import
   uri3,
   regex
 ## nimble
-
 export
   uri3,
   regex
-
 
 import
   httpContext,
   environment,
   staticFile,
   replyMsg,
-  ../utils/json as utilsJson
-
+  ../utils/json as utilsJson,
+  ../utils/debug
 export
   httpContext,
   staticFile,
@@ -515,7 +511,7 @@ proc doRoute*(
             )
           )
 
-  except CatchableError as ex:
+  except Exception as ex:
     await ctx.replyJson(
         Http500,
         %newReplyMsg(
@@ -524,6 +520,8 @@ proc doRoute*(
           error = %*{"msg": &"{ex.msg}"}
         )
       )
+
+    await ex.msg.putLog
 
   await ctx.reply(env)
 

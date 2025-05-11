@@ -22,6 +22,7 @@ import
     strformat,
     files
   ]
+
 from os import FileInfo, getFileInfo
 export
   mimetypes,
@@ -33,10 +34,10 @@ export
   FileInfo,
   files
 
-
 import
   environment,
-  multipart
+  multipart,
+  ../utils/debug
 export
   multipart
 
@@ -84,10 +85,12 @@ proc newStaticFile*(
       staticFile.extension = fileParts.ext
       staticFile.mimeType = mimetype.
         getMimetype(fileParts.ext, default = "application/octet-stream")
-    except CatchableError as e:
+    except Exception as e:
       staticFile.msg = e.msg
+      waitFor e.msg.putLog
   else:
     staticFile.msg = &"{staticFile.path} doesn't exist."
+    waitFor staticFile.msg.putLog
 
   staticFile
 

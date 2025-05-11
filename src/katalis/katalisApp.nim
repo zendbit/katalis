@@ -18,7 +18,8 @@ import
   core/environment,
   core/routes,
   core/session,
-  pipelines
+  pipelines,
+  utils/debug
 export
   katalis,
   sugar,
@@ -137,7 +138,7 @@ proc clientListener(
       # callback(httpContext)
       await httpContext.callback
 
-  except CatchableError as ex:
+  except Exception as ex:
     @!Trace:
       echo ""
       echo "#== start"
@@ -145,6 +146,8 @@ proc clientListener(
       echo ex.msg
       echo "#== end"
       echo ""
+
+    await ex.msg.putLog
 
 
 proc doServe(callback: proc (ctx: HttpContext) {.gcsafe async.}) {.async gcsafe.} = ## \
@@ -168,7 +171,7 @@ proc doServe(callback: proc (ctx: HttpContext) {.gcsafe async.}) {.async gcsafe.
         var client = await katalisInstance.socketServer.accept()
         asyncCheck clientListener(client, callback)
 
-      except CatchableError as ex:
+      except Exception as ex:
         # show trace
         @!Trace:
           echo ""
@@ -177,6 +180,7 @@ proc doServe(callback: proc (ctx: HttpContext) {.gcsafe async.}) {.async gcsafe.
           echo ex.msg
           echo "#== end"
           echo ""
+        await ex.msg.putLog
 
 
 when WithSsl:
@@ -227,7 +231,7 @@ when WithSsl:
             SslHandshakeType.handshakeAsServer, &"{host}:{port}")
 
           asyncCheck clientListener(client, callback)
-        except CatchableError as ex:
+        except Exception as ex:
           @!Trace:
             echo ""
             echo "#== start"
@@ -235,6 +239,8 @@ when WithSsl:
             echo ex.msg
             echo "#== end"
             echo ""
+          await ex.msg.putLog
+
 
 when not CgiApp:
   proc serve*() {.gcsafe.} = ## \
@@ -248,8 +254,16 @@ when not CgiApp:
       try:
         await katalisInstance.r.doRoute(ctx, envInstance)
 
-      except CatchableError as e:
-        echo e.msg
+      except Exception as e:
+        @!Trace:
+          echo ""
+          echo "#== start"
+          echo "Failed to serve."
+          echo ex.msg
+          echo "#== end"
+          echo ""
+
+        await e.msg.putLog
 
     asyncCheck doServe(callback)
 

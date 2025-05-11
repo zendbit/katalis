@@ -86,6 +86,8 @@ type
     ## storage session for request/response process
     storagesCacheDir*: Path ## \
     ## storage for cache file
+    storagesLogDir*: Path ## \
+    ## log directory
     staticDir*: Path ##\
     ## static directory to serve
     enableServeStatic*: bool ##\
@@ -132,6 +134,7 @@ proc newSettings*(
     storagesBodyDir: Path = getCurrentDir()/"storages".Path/"body".Path,
     storagesSessionDir: Path = getCurrentDir()/"storages".Path/"session".Path,
     storagesCacheDir: Path = getCurrentDir()/"storages".Path/"cache".Path,
+    storagesLogDir: Path = getCurrentDir()/"storages".Path/"log".Path,
     staticDir: Path = getCurrentDir()/"static".Path,
     enableServeStatic: bool = true,
     chunkSize: int = 8129,
@@ -158,6 +161,7 @@ proc newSettings*(
       storagesBodyDir: storagesBodyDir,
       storagesSessionDir: storagesSessionDir,
       storagesCacheDir: storagesCacheDir,
+      storagesLogDir: storagesLogDir,
       staticDir: staticDir,
       enableServeStatic: enableServeStatic,
       chunkSize: chunkSize,

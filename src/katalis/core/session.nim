@@ -29,7 +29,8 @@ import checksums/sha1
 import
   httpContext,
   environment,
-  ../utils/crypt
+  ../utils/crypt,
+  ../utils/debug
 
 
 const SessionId = "_SessId"
@@ -73,7 +74,8 @@ proc writeSession*(
     await f.write(xorEncodeDecode($data, sessionToken))
     f.close
 
-  except CatchableError: discard
+  except Exception as e:
+    await e.msg.putLog
 
   sessionToken.isSessionExists
 

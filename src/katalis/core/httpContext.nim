@@ -27,7 +27,6 @@ import
     strtabs
   ]
 ## std import
-
 export
   asyncnet,
   httpcore,
@@ -35,18 +34,16 @@ export
   options
 ## std export
 
-
 import uri3
 ## nimble
-
 export uri3
 ## nimble
-
 
 import
   constants,
   webSocket,
   ../utils/httpcore as utilsHttpCore,
+  ../utils/debug,
   replyMsg,
   environment,
   staticFile,
@@ -54,7 +51,6 @@ import
   response,
   json,
   cgi
-
 export
   constants,
   webSocket,
@@ -605,7 +601,7 @@ proc parseJson*(
 
   try:
     req.param.json = req.body.parseJson
-  except CatchableError as ex:
+  except Exception as ex:
     await self.replyJson(
         Http400,
         %newReplyMsg(
@@ -614,6 +610,8 @@ proc parseJson*(
           error = %*{"msg": ex.msg}
         )
       )
+
+    await ex.msg.putLog
 
 
 proc parseXml*(
@@ -626,7 +624,7 @@ proc parseXml*(
 
   try:
     req.param.xml = req.body.parseXml
-  except CatchableError as ex:
+  except Exception as ex:
     await self.replyJson(
         Http400,
         %newReplyMsg(
@@ -635,6 +633,8 @@ proc parseXml*(
           error = %*{"msg": ex.msg}
         )
       )
+
+    await ex.msg.putLog
 
 
 proc parseFormUrlencoded*(

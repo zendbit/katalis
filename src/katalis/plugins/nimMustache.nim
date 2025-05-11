@@ -23,7 +23,9 @@ import
   strutils
 
 import
-  ../core/environment
+  ../core/environment,
+  ../macros/sugar,
+  ../utils/debug
 
 import mustache
 export mustache, tables
@@ -63,7 +65,23 @@ proc render*(
 
   templatesPath = ($templatesPath & ".mustache").Path
 
-  if fileExists(templatesPath):
-    readFile($templatesPath).render(self.data)
-  else:
-    templates.render(self.data)
+  try:
+    if fileExists(templatesPath):
+      result = readFile($templatesPath).render(self.data)
+    else:
+      result = templates.render(self.data)
+  except Exception as e:
+    result = "Failed to render!:\n\n" &
+      templates & "\n\n" & e.msg
+
+    @!Trace:
+      echo ""
+      echo "#=== start"
+      echo "failed to render"
+      echo templates
+      echo e.msg
+      echo "#=== end"
+      echo ""
+
+    waitFor result.putLog
+

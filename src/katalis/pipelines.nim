@@ -50,3 +50,4 @@ include pipelines/onReply/httpComposePayload
 # include cleanup pipeline
 # as chain sequence
 include pipelines/cleanup/httpContext
+include pipelines/cleanup/log
