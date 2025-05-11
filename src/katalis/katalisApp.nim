@@ -259,7 +259,7 @@ when not CgiApp:
           echo ""
           echo "#== start"
           echo "Failed to serve."
-          echo ex.msg
+          echo e.msg
           echo "#== end"
           echo ""
 
