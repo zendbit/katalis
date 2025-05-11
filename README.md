@@ -44,7 +44,8 @@ If you want to use katalis as fullstack nim, you can read on [fullstack](https:/
 16. [Katalis as fullstack](https://github.com/zendbit/katalis/tree/main#15-fullstack)
 17. [Katalis coding style guideline](https://github.com/zendbit/katalis/tree/main#16-katalis-coding-style-guideline)
 18. [Katalis structure](https://github.com/zendbit/katalis/tree/main#17-katalis-structure)
-19. [AI generated Docs](https://deepwiki.com/zendbit/katalis)
+19. [Enable trace for debugging and logging](https://github.com/zendbit/katalis/edit/main/README.md#19-enable-trace-for-debugging-and-logging)
+20. [AI generated Docs](https://deepwiki.com/zendbit/katalis)
 
 ## 1. Install
 ```bash
@@ -1259,3 +1260,32 @@ Katalis pipeline contains include declaration for katalis pipelines order, inclu
 |Filename|Description|
 |--------|-----------|
 |pipelines.nim|pipeline order includes declaration|
+
+### 19. Enable trace for debugging and Logging
+Trace debug for non web in console default off, we can enabled by call setting
+```nim
+@!Settings.enableTrace = true
+```
+
+for logging and system exception will saved to storages/log/ folder, and file will saved as "dd-MMMM-yyyy" format
+
+if want to add to log file, follow step bellow
+```nim
+import katalis/utils/debug
+
+## add to debug log file
+await putLog("your message log")
+
+## or for non async use waitFor
+waitFor putLog("your message log")
+
+## also you can use switcher for debugging and production level
+## by passing -d:release on compile time
+## and we can use IsReleaseMode for selector
+import katalis/core/constants
+
+when IsReleaseMode:
+  AVAILABLE_ON_RELEASE_MODE
+else:
+  AVAILABLE_ON_DEBUG_MODE
+```
