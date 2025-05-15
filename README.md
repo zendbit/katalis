@@ -41,9 +41,9 @@ If you want to use katalis as fullstack nim, you can read on [fullstack](https:/
 13. [SSE (Server Sent Event)](https://github.com/zendbit/katalis/tree/main#13-sse-server-sent-event)
 14. [Serve SSL](https://github.com/zendbit/katalis/tree/main#14-serve-ssl)
 15. [Deploy to shared hosting that support Common Gateway Interface CGI](https://github.com/zendbit/katalis/edit/main/README.md#15-deploy-to-shared-hosting-that-support-common-gateway-interface-cgi)
-16. [Katalis as fullstack](https://github.com/zendbit/katalis/tree/main#15-fullstack)
-17. [Katalis coding style guideline](https://github.com/zendbit/katalis/tree/main#16-katalis-coding-style-guideline)
-18. [Katalis structure](https://github.com/zendbit/katalis/tree/main#17-katalis-structure)
+16. [Katalis as fullstack](https://github.com/zendbit/katalis/tree/main#16-fullstack)
+17. [Katalis coding style guideline](https://github.com/zendbit/katalis/tree/main#17-katalis-coding-style-guideline)
+18. [Katalis structure](https://github.com/zendbit/katalis/tree/main#18-katalis-structure)
 19. [Enable trace for debugging and logging](https://github.com/zendbit/katalis/edit/main/README.md#19-enable-trace-for-debugging-and-logging)
 20. [AI generated Docs](https://deepwiki.com/zendbit/katalis)
 
