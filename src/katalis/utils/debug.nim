@@ -61,8 +61,8 @@ proc writeLog*(logDir: Path) {.async.} =
           $(logDir/(now().utc.format("dd-MMMM-yyyy") & ".log").Path),
           fmAppend
         )
-      logs.insert(&"""=== {now().utc.format("dd-MMM-yyyy HH:mm:ss")} ===""", 0)
-      await logFile.write(logs.join("\n") & "\n\n")
+      logs.insert(&"""[{now().utc.format("dd-MMM-yyyy HH:mm:ss")}]""", 0)
+      await logFile.write(logs.join("\n") & "\n")
       logFile.close
     except CatchableError as err:
       echo err.msg

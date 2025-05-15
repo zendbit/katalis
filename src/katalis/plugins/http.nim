@@ -2,7 +2,8 @@ import
   ../core/[
     httpContext,
     environment
-  ]
+  ],
+  ../utils/debug
 export
   httpContext,
   environment
@@ -61,6 +62,9 @@ when not CgiApp:
           self.request.uri.setPort($port)
           self.request.httpVersion = reqParts[2]
           self.request.path = self.request.uri.getPath
+
+          # put request to log
+          await putLog(&"Request {self.request.httpMethod} to {self.request.uri} from {address} on port {port}")
 
       else:
         isRequestHeaderValid = false
@@ -209,6 +213,9 @@ else:
     self.request.headers["Authorization"] = self.cgi.authType
     self.request.headers["Content-Type"] = self.cgi.contentType.raw
     self.request.path = "?uri=" & self.request.uri.getQuery("uri")
+
+    # put request to log
+    await putLog(&"Request {self.request.httpMethod} to {self.request.uri} from {self.cgi.remoteAddr} on port {self.cgi.remotePort}")
 
     var isErrorBodyContent = false
     # parse body

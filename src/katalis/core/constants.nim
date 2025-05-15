@@ -35,9 +35,9 @@ else:
 const
   HttpVersion* = "HTTP/1.1" ## \
   ## http version header
-  ServerId* = "katalis (Nim)" ## \
+  ServerId* = "Katalis (Nim)" ## \
   ## server header identifier
-  ServerVersion* = "0.6.5" ## \
+  ServerVersion* = "0.6.15" ## \
   ## server build version
 
 # utility
