@@ -427,7 +427,7 @@ proc inList*[T: seq[string] | seq[float] | seq[int]](
 
 proc check*(
     self: Validation,
-    cb: proc (v: string): bool,
+    cb: proc (v: string): bool {.gcsafe.},
     failedMsg: string = "Failed",
     okMsg: string = ""
   ): Validation {.gcsafe discardable.} = ## \\
