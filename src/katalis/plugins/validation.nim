@@ -461,6 +461,13 @@ proc matchWith*(
   self
 
 
+proc accept*(self: Validation): Validation {.gcsafe discardable.} = ## \
+  ## check field value is in list of values
+
+  self.field.value = self.getValue
+  self
+
+
 proc withField*(
     self: Validation,
     name: string
