@@ -447,6 +447,9 @@ when not CgiApp:
             formData.data[metaName] &= data
 
     # set context request paramter
+    for k, v in formData.data:
+      formData.data[k] = v.strip
+
     req.param.form = formData
 
 else:
@@ -586,6 +589,9 @@ else:
 
           else:
             formData.data[metaName] &= data
+
+    for k, v in formData.data:
+      formData.data[k] = v.strip
 
     # set context request paramter
     req.param.form = formData

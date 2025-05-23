@@ -464,7 +464,7 @@ proc matchWith*(
 proc withField*(
     self: Validation,
     name: string
-  ): Validation {.gcsafe.} = ## \
+  ): Validation {.gcsafe discardable.} = ## \
   ## add field to validate
 
   self.fields[name] = Field(name: name, isValid: true) ## \
