@@ -607,17 +607,17 @@ proc parseJson*(
 
   try:
     req.param.json = req.body.parseJson
-  except Exception as ex:
+  except CatchableError, Defect:
     await self.replyJson(
         Http400,
         %newReplyMsg(
           Http400,
           success = false,
-          error = %*{"msg": ex.msg}
+          error = %*{"msg": getCurrentExceptionMsg()}
         )
       )
 
-    await ex.msg.putLog
+    await getCurrentExceptionMsg().putLog
 
 
 proc parseXml*(
@@ -630,17 +630,17 @@ proc parseXml*(
 
   try:
     req.param.xml = req.body.parseXml
-  except Exception as ex:
+  except CatchableError, Defect:
     await self.replyJson(
         Http400,
         %newReplyMsg(
           Http400,
           success = false,
-          error = %*{"msg": ex.msg}
+          error = %*{"msg": getCurrentExceptionMsg()}
         )
       )
 
-    await ex.msg.putLog
+    await getCurrentExceptionMsg().putLog
 
 
 proc parseFormUrlencoded*(

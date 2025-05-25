@@ -511,17 +511,17 @@ proc doRoute*(
             )
           )
 
-  except Exception as ex:
+  except CatchableError, Defect:
     await ctx.replyJson(
         Http500,
         %newReplyMsg(
           httpCode = Http500,
           success = false,
-          error = %*{"msg": &"{ex.msg}"}
+          error = %*{"msg": &"{getCurrentExceptionMsg()}"}
         )
       )
 
-    await ex.msg.putLog
+    await getCurrentExceptionMsg().putLog
 
   await ctx.reply(env)
 

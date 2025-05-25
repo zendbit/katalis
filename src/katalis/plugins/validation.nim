@@ -214,7 +214,7 @@ proc isNumber*(
   try:
     discard self.field.value.parseFloat
 
-  except CatchableError:
+  except CatchableError, Defect:
     self.field.isValid = false
 
   self.setMsg(failedMsg, okMsg)
@@ -250,7 +250,7 @@ proc minValue*[T: int | float](
     if parsedValue < value:
       self.field.isValid = false
 
-  except CatchableError:
+  except CatchableError, Defect:
     self.field.isValid = false
 
   self.setMsg(failedMsg.replace("{value}", $value), okMsg)
@@ -286,7 +286,7 @@ proc maxValue*[T: int | float](
     if parsedValue > value:
       self.field.isValid = false
 
-  except CatchableError:
+  except CatchableError, Defect:
     self.field.isValid = false
 
   self.setMsg(failedMsg.replace("{value}", $value), okMsg)
@@ -310,7 +310,7 @@ proc isDateTime*(
   try:
     discard times.parse(self.field.value, dateTimeFormat, tz)
 
-  except CatchableError:
+  except CatchableError, Defect:
     self.field.isValid = false
 
   self.setMsg(failedMsg, okMsg)
@@ -338,7 +338,7 @@ proc minDateTime*(
     if parsedValue < dateTime:
       self.field.isValid = false
 
-  except CatchableError:
+  except CatchableError, Defect:
     self.field.isValid = false
 
   self.setMsg(
@@ -371,7 +371,7 @@ proc maxDateTime*(
     if parsedValue > dateTime:
       self.field.isValid = false
 
-  except CatchableError:
+  except CatchableError, Defect:
     self.field.isValid = false
 
   self.setMsg(
@@ -416,7 +416,7 @@ proc inList*[T: seq[string] | seq[float] | seq[int]](
       var parsedValue: int = 0
       parsedValue = self.field.value.parseInt
 
-  except CatchableError:
+  except CatchableError, Defect:
     self.field.isValid = false
 
   self.field.isValid = parsedValue in values

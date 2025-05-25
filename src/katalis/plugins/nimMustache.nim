@@ -70,16 +70,16 @@ proc render*(
       result = readFile($templatesPath).render(self.data)
     else:
       result = templates.render(self.data)
-  except Exception as e:
+  except CatchableError, Defect:
     result = "Failed to render!:\n\n" &
-      templates & "\n\n" & e.msg
+      templates & "\n\n" & getCurrentExceptionMsg()
 
     @!Trace:
       echo ""
       echo "#=== start"
       echo "failed to render"
       echo templates
-      echo e.msg
+      echo getCurrentExceptionMsg()
       echo "#=== end"
       echo ""
 

@@ -74,8 +74,8 @@ proc writeSession*(
     await f.write(xorEncodeDecode($data, sessionToken))
     f.close
 
-  except Exception as e:
-    await e.msg.putLog
+  except CatchableError, Defect:
+    await getCurrentExceptionMsg().putLog
 
   sessionToken.isSessionExists
 

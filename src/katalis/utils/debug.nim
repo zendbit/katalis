@@ -64,5 +64,5 @@ proc writeLog*(logDir: Path) {.async.} =
       logs.insert(&"""[{now().utc.format("dd-MMM-yyyy HH:mm:ss")}]""", 0)
       await logFile.write(logs.join("\n") & "\n")
       logFile.close
-    except CatchableError as err:
-      echo err.msg
+    except CatchableError, Defect:
+      echo getCurrentExceptionMsg()

@@ -74,8 +74,8 @@ proc contentLength*(headers: HttpHeaders): BiggestInt {.gcsafe.} =
     let length = headers.getValues("content-length")
     if length.len != 0: result = length[0].parseBiggestInt
 
-  except Exception as ex:
-    waitFor ex.msg.putLog
+  except CatchableError, Defect:
+    waitFor getCurrentExceptionMsg().putLog
 
 
 proc contentType*(headers: HttpHeaders): string {.gcsafe.} =
