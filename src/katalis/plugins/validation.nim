@@ -104,9 +104,11 @@ proc getValue(self: Validation): string {.gcsafe.} = ## \
       of JInt:
         result = $val.getBiggestInt
       of JFloat:
-        result = $val.getBiggestFloat
+        result = $val.getFloat
       of JBool:
         result = $val.getBool
+      of JString:
+        result = val.getStr
       else:
         result = $val
 
