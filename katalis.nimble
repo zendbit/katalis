@@ -1,5 +1,5 @@
 # Package
-version     = "0.6.21"
+version     = "0.6.22"
 author      = "Amru Rosyada"
 description = "Katalis is micro web framework for nim programming language."
 license     = "MIT"
