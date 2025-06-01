@@ -334,10 +334,10 @@ proc matchRoute(
   # fo non regex segment /:id/helo/:year/...
   var captureSegmentIds, captureSegmentValues: seq[string]
   # for segment param using :context
-  let segmentMatchPatternIds = "/:([0-9A-Za-z\\-_]+)"
+  let segmentMatchPatternIds = "/:([^\\/]+)"
   # for regex matching :re<id:([0-9]+)_[a-zA-Z0-9]+$>
   let segmentRegexMatchPattern = "/re<([^\\/]+)>"
-  let segmentRegexMatchPatternIds = ":([0-9a-zA-Z]+)\\("
+  let segmentRegexMatchPatternIds = ":([^\\/]+)("
   # get params segments name
   # ex extract from /profile/:id/details/:address
   for r in routes.routeList:
