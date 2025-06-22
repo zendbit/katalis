@@ -64,6 +64,8 @@ type
     ## this will set on route process
     path*: string ## \
     ## path request
+    routePath*: string ## \
+    ## match route path for request path
 
 
   RequestParam* = ref object of RootObj ## \

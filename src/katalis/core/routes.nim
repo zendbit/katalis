@@ -499,6 +499,9 @@ proc doRoute*(
       if not route.isNil or ctx.request.isStaticfile:
         if not await self.doAfterRoute(ctx, env):
           if not route.isNil:
+            # add route path information to request
+            ctx.request.routePath = route.path
+            # call route callback
             await route.thenDo(ctx, env)
 
       else:
