@@ -116,3 +116,14 @@ proc newRequest*(
         form: newForm()
       )
   )
+
+
+proc isHttpPost*(self: Request): bool = self.httpMethod == HttpPost
+proc isHttpGet*(self: Request): bool = self.httpMethod == HttpGet
+proc isHttpPatch*(self: Request): bool = self.httpMethod == HttpPatch
+proc isHttpHead*(self: Request): bool = self.httpMethod == HttpHead
+proc isHttpPut*(self: Request): bool = self.httpMethod == HttpPut
+proc isHttpDelete*(self: Request): bool = self.httpMethod == HttpDelete
+proc isHttpTrace*(self: Request): bool = self.httpMethod == HttpTrace
+proc isHttpOptions*(self: Request): bool = self.httpMethod == HttpOptions
+proc isHttpConnect*(self: Request): bool = self.httpMethod == HttpConnect
