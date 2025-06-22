@@ -1,5 +1,5 @@
-import std/[strutils, unicode]
-export strutils, unicode
+import std/[strutils, unicode, strformat]
+export strformat
 
 
 proc localizedCurrency*(
