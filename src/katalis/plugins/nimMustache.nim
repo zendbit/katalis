@@ -18,9 +18,10 @@ import
   std/[
     paths,
     files,
-    tables
-  ],
-  strutils
+    tables,
+    macros,
+    strutils
+  ]
 
 import
   ../core/environment,
@@ -85,3 +86,24 @@ proc render*(
 
     waitFor result.putLog
 
+
+macro mustacheView*(procDef: untyped): untyped = ## \
+  ## auto add
+  ## let check = newValidation(newJObject())
+  expectKind(procDef, nnkProcDef)
+  result = procDef
+  if procDef[^1].kind == nnkStmtList:
+    procDef[^1].insert(
+      0,
+      nnkStmtList.newTree(
+        nnkLetSection.newTree(
+          nnkIdentDefs.newTree(
+            newIdentNode("view"),
+            newEmptyNode(),
+            nnkCall.newTree(
+              newIdentNode("newMustache")
+            )
+          )
+        )
+      )
+    )

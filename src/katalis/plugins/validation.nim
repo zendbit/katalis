@@ -13,12 +13,13 @@
 ##
 
 
-import
+import std/[
   options,
   tables,
   json,
-  times
-
+  times,
+  macros
+]
 export
   options,
   tables,
@@ -516,3 +517,28 @@ proc notValidFields*(self: Validation): OrderedTable[string, Field] {.gcsafe.} =
   for k, v in self.fields:
     if v.isValid: continue
     result[k] = v
+
+
+macro validation*(procDef: untyped): untyped = ## \
+  ## auto add
+  ## let check = newValidation(newJObject())
+  expectKind(procDef, nnkProcDef)
+  result = procDef
+  if procDef[^1].kind == nnkStmtList:
+    procDef[^1].insert(
+      0,
+      nnkStmtList.newTree(
+        nnkLetSection.newTree(
+          nnkIdentDefs.newTree(
+            newIdentNode("check"),
+            newEmptyNode(),
+            nnkCall.newTree(
+              newIdentNode("newValidation"),
+              nnkCall.newTree(
+                newIdentNode("newJObject")
+              )
+            )
+          )
+        )
+      )
+    )
