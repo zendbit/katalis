@@ -386,7 +386,7 @@ import katalis/plugins/nimMustache
     let username = @!Form.data.getOrDefault("username")
     let password = @!Form.data.getOrDefault("password")
     var errorMsg = ""
-    if @!Req.httpMethod == HttpPost:
+    if @!Req.isHttpPost:
       if username == "" or password == "":
         errorMsg = "username or password is required!"
 
@@ -584,7 +584,7 @@ All xml request data will convert to nim stdlib xmltree see [https://nim-lang.or
         </html>
       """
 
-    if @!Req.httpMethod == HttpPost:
+    if @!Req.isHttpPost:
       ## test show uploaded file info to console
       if @!Form.files.len != 0:
         for name, files in @!Form.files:
@@ -873,7 +873,7 @@ Available validations are:
     ## mustache template
     let m = newMustache()
 
-    if @!Req.httpMethod == HttpPost:
+    if @!Req.isHttpPost:
       ## parameter can be Form, JsonNode or Table[string, string] type
       let v = newValidation(@!Form)
       v.withField("username").
