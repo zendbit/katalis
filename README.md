@@ -843,9 +843,10 @@ Available validations are:
 - maxDateTime
 - inList
 - matchWith -> regex validation
+- accept(value: string = "") -> accept value and set value, if you want just skip the validation
+- check(proc (v: string): bool) -> check value using procedure, must return true if value valid on checking
 ```nim
-@!App:
-  @![Get, Post] "/test-validation":
+proc testValidation(ctx: HttpContext) {.gcsafe async.} =
     ## validation is plugins on katalis
     ## see katalis/plugins/validation.nim
     let tpl =
@@ -898,6 +899,9 @@ Available validations are:
 
     @!Context.reply(Http200, m.render(tpl))
 
+@!App:
+  @![Get, Post] "/test-validation":
+    await @!Context.testValidation
 ```
 
 ## 11. Template engine (Mustache)
