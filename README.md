@@ -843,9 +843,10 @@ Available validations are:
 - maxDateTime
 - inList
 - matchWith -> regex validation
+- accept(value: string = "") -> accept value and set value, if you want just skip the validation
+- check(proc (v: string): bool) -> check value using procedure, must return true if value valid on checking
 ```nim
-@!App:
-  @![Get, Post] "/test-validation":
+proc testValidation(ctx: HttpContext) {.gcsafe async.} =
     ## validation is plugins on katalis
     ## see katalis/plugins/validation.nim
     let tpl =
@@ -854,14 +855,14 @@ Available validations are:
           <head><title>validation test</title></head>
           <body>
             <form method="POST">
-              <label>Username<label> <span>{{username.msg}}</span>
+              <label>Username<label> <span>{{fields.username.msg}}</span>
               <br>
-              <input type="text" name="username" value="{{username.value}}">
+              <input type="text" name="username" value="{{fields.username.value}}">
               <br>
               <br>
-              <label>Password</label> <span>{{password.msg}}</span>
+              <label>Password</label> <span>{{fields.password.msg}}</span>
               <br>
-              <input type="password" name="password" value="{{password.value}}">
+              <input type="password" name="password" value="{{fields.password.value}}">
               <br>
               <br>
               <input type="submit" value="Register">
@@ -893,11 +894,74 @@ Available validations are:
       echo "password " & v.fields["password"].msg & " -> " & $v.fields["password"].isValid
 
       ## set mustache context send data to template
-      for fieldName, fieldData in v.fields:
-        m.data[fieldName] = %fieldData
+      m.data["fields"] = %v.fields
 
     @!Context.reply(Http200, m.render(tpl))
 
+@!App:
+  @![Get, Post] "/test-validation":
+    await @!Context.testValidation
+```
+
+Automatic validation initialization using validation pragma
+```nim
+proc testValidation(ctx: HttpContext) {.gcsafe async validation mustacheView.} =
+    ## validation is plugins on katalis
+    ## see katalis/plugins/validation.nim
+    let tpl =
+      """
+        <html>
+          <head><title>validation test</title></head>
+          <body>
+            <form method="POST">
+              <label>Username<label> <span>{{fields.username.msg}}</span>
+              <br>
+              <input type="text" name="username" value="{{fields.username.value}}">
+              <br>
+              <br>
+              <label>Password</label> <span>{{fields.password.msg}}</span>
+              <br>
+              <input type="password" name="password" value="{{fields.password.value}}">
+              <br>
+              <br>
+              <input type="submit" value="Register">
+            </form>
+          </body>
+        </html>
+      """
+    
+    ## mustache template using mustacheView pragma
+    ## just call view for mustache instance
+
+    if @!Req.isHttpPost:
+      ## parameter can be Form, JsonNode or Table[string, string] type
+      ## with pragma validation automatically append
+      ## let check = newValidation(newJObject())
+      ## so we can just use check for validation instance
+      check.withField("username").
+        isRequired(failedMsg = "Username is empty."). ## we can add custom failedMsg
+        minLength(8). ## minimum length of field value is 8 char length
+        maxLength(50). ## maximum length of field value is 50 char length
+        matchWith("([a-zA-Z0-9_]+)$", failedMsg = "Only a-z A-Z 0-9 _ are allowed") ## check with regex, only allow a-z A-Z 0-9 _
+
+      check.withField("password").
+        isRequired(failedMsg = "Password is empty."). ## we can add custom failedMsg
+        minLength(8). ## minimum length 8 char length
+        maxLength(254) ## maximum length 254 char length
+
+      ## we can check validation result for each field
+      ## lets print to console
+      echo "username " & v.fields["username"].msg & " -> " & $v.fields["username"].isValid
+      echo "password " & v.fields["password"].msg & " -> " & $v.fields["password"].isValid
+
+      ## set mustache context send data to template
+      view.data["fields"] = %check.fields
+
+    @!Context.reply(Http200, view.render(tpl))
+
+@!App:
+  @![Get, Post] "/test-validation":
+    await @!Context.testValidation
 ```
 
 ## 11. Template engine (Mustache)
@@ -963,6 +1027,22 @@ Let do with the code
     m.data["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
     ## call the index.mustache in the templates folder
     await @!Context.reply(Http200, m.render("index"))
+```
+
+Automatic initialize mustache using mustacheView pragma
+```nim
+proc testMustache(ctx: HttpContext) {.gcsafe async mustacheView.} =
+  ## with mustacheView pragma on the top of proc will auto append
+  ## let view = newMustache()
+  ## so we can just call view for the mustache instance
+  view.data["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
+  ## call the index.mustache in the templates folder
+  await @!Context.reply(Http200, view.render("index"))
+
+
+@!App:
+  @!Get "/test-mustache":
+    @!Context.testMustache
 ```
 
 ## 12. Web Socket
