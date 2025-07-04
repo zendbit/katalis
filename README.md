@@ -936,15 +936,14 @@ proc testValidation(ctx: HttpContext) {.gcsafe async validation mustacheView.} =
     if @!Req.isHttpPost:
       ## parameter can be Form, JsonNode or Table[string, string] type
       ## with pragma validation automatically append
-      ## let check = newValidation(newJObject())
-      ## so we can just use check for validation instance
-      check.withField("username").
+      ## so we can just use @!Check for validation instance
+      @!Check.withField("username").
         isRequired(failedMsg = "Username is empty."). ## we can add custom failedMsg
         minLength(8). ## minimum length of field value is 8 char length
         maxLength(50). ## maximum length of field value is 50 char length
         matchWith("([a-zA-Z0-9_]+)$", failedMsg = "Only a-z A-Z 0-9 _ are allowed") ## check with regex, only allow a-z A-Z 0-9 _
 
-      check.withField("password").
+      @!Check.withField("password").
         isRequired(failedMsg = "Password is empty."). ## we can add custom failedMsg
         minLength(8). ## minimum length 8 char length
         maxLength(254) ## maximum length 254 char length
@@ -955,9 +954,9 @@ proc testValidation(ctx: HttpContext) {.gcsafe async validation mustacheView.} =
       echo "password " & v.fields["password"].msg & " -> " & $v.fields["password"].isValid
 
       ## set mustache context send data to template
-      view.data["fields"] = %check.fields
+      @!View.data["fields"] = % @!Check.fields
 
-    @!Context.reply(Http200, view.render(tpl))
+    @!Context.reply(Http200, @!View.render(tpl))
 
 @!App:
   @![Get, Post] "/test-validation":
@@ -1033,11 +1032,10 @@ Automatic initialize mustache using mustacheView pragma
 ```nim
 proc testMustache(ctx: HttpContext) {.gcsafe async mustacheView.} =
   ## with mustacheView pragma on the top of proc will auto append
-  ## let view = newMustache()
-  ## so we can just call view for the mustache instance
-  view.data["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
+  ## so we can just call @!View for the mustache instance
+  @!View.data["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
   ## call the index.mustache in the templates folder
-  await @!Context.reply(Http200, view.render("index"))
+  await @!Context.reply(Http200, @!View.render("index"))
 
 
 @!App:
