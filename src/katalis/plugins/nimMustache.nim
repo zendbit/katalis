@@ -90,6 +90,9 @@ proc render*(
 macro mustacheView*(procDef: untyped): untyped = ## \
   ## auto add
   ## let check = newValidation(newJObject())
+  ## pass mustacheView as procedure pragma
+  ## {.mustacheView.}
+  ## registered using @!Check on macros/sugar
   expectKind(procDef, nnkProcDef)
   result = procDef
   if procDef[^1].kind == nnkStmtList:
@@ -98,7 +101,7 @@ macro mustacheView*(procDef: untyped): untyped = ## \
       nnkStmtList.newTree(
         nnkLetSection.newTree(
           nnkIdentDefs.newTree(
-            newIdentNode("view"),
+            newIdentNode("mustacheView"),
             newEmptyNode(),
             nnkCall.newTree(
               newIdentNode("newMustache")
@@ -107,3 +110,4 @@ macro mustacheView*(procDef: untyped): untyped = ## \
         )
       )
     )
+

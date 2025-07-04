@@ -370,7 +370,7 @@ proc app(body: NimNode): NimNode =
                   childNode[2] # StmtList of action code,
                 )
               )
-            
+
             elif $prefixNodeName == $EndPoint:
               # set base endpoint for the route
               # @!EndPoint "/home"
@@ -705,6 +705,26 @@ macro `@!`*(name: untyped): untyped =
           ),
           ident("shared")
         )
+      )
+
+    ##
+    ## for plugins
+    ## start register here
+    ##
+  of "View":
+    ## only available if procedure
+    ## contains mustacheView pragma
+
+    result = nnkStmtList.newTree(
+        ident("mustacheView")
+      )
+
+  of "Check":
+    ## only available if procedure
+    ## contains validation pragma
+
+    result = nnkStmtList.newTree(
+        ident("checkValidation")
       )
 
 

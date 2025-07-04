@@ -522,6 +522,9 @@ proc notValidFields*(self: Validation): OrderedTable[string, Field] {.gcsafe.} =
 macro validation*(procDef: untyped): untyped = ## \
   ## auto add
   ## let check = newValidation(newJObject())
+  ## pass validation as procedure pragma
+  ## {.validation.}
+  ## registered using @!View on macros/sugar
   expectKind(procDef, nnkProcDef)
   result = procDef
   if procDef[^1].kind == nnkStmtList:
@@ -530,7 +533,7 @@ macro validation*(procDef: untyped): untyped = ## \
       nnkStmtList.newTree(
         nnkLetSection.newTree(
           nnkIdentDefs.newTree(
-            newIdentNode("check"),
+            newIdentNode("checkValidation"),
             newEmptyNode(),
             nnkCall.newTree(
               newIdentNode("newValidation"),
@@ -542,3 +545,4 @@ macro validation*(procDef: untyped): untyped = ## \
         )
       )
     )
+
