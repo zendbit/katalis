@@ -937,6 +937,7 @@ proc testValidation(ctx: HttpContext) {.gcsafe async validation mustacheView.} =
       ## parameter can be Form, JsonNode or Table[string, string] type
       ## with pragma validation automatically append
       ## so we can just use @!Check for validation instance
+      @!Check.toCheck = % @!Form.data
       @!Check.withField("username").
         isRequired(failedMsg = "Username is empty."). ## we can add custom failedMsg
         minLength(8). ## minimum length of field value is 8 char length
@@ -1033,6 +1034,10 @@ Automatic initialize mustache using mustacheView pragma
 proc testMustache(ctx: HttpContext) {.gcsafe async mustacheView.} =
   ## with mustacheView pragma on the top of proc will auto append
   ## so we can just call @!View for the mustache instance
+  ## want to validate http post form data
+  @!Req.isHttpPost:
+    @!View.toCheck = % @!Form.data
+  ## pass data to view
   @!View.data["post"] = %*{"title": "This is katalis", "article": "This is just simple micro framework but powerfull!"}
   ## call the index.mustache in the templates folder
   await @!Context.reply(Http200, @!View.render("index"))
