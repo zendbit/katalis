@@ -125,9 +125,12 @@ proc readSession*(sessionToken: string): Future[JsonNode] {.gcsafe async.} = ## 
   ##  read session data with given token.
   ##
   if sessionToken.isSessionExists:
-    let f = ($(sessionDir/sessionToken.Path)).openAsync
-    result = (await f.readAll()).xorEncodeDecode(sessionToken).parseJson
-    f.close
+    try:
+      let f = ($(sessionDir/sessionToken.Path)).openAsync
+      result = (await f.readAll()).xorEncodeDecode(sessionToken).parseJson
+      f.close
+    except CatchableError, Defect:
+      await getCurrentExceptionMsg().putLog
 
 
 proc destroySession*(sessionToken: string) {.gcsafe.} = ## \
@@ -172,7 +175,6 @@ proc initCookieSession*(
   var sessionData: JsonNode
   let cookie = ctx.getCookie
   var token = cookie.getOrDefault(SessionId)
-
   if token.isSessionExists:
     sessionData = await token.readSession
 
